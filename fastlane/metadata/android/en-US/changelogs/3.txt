@@ -1,0 +1,1 @@
+Initial F-Droid release. Fully offline period tracker with cycle predictions, daily logging, and PIN lock.

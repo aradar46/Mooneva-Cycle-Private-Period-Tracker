@@ -1,0 +1,22 @@
+Mooneva is a private, fully offline period and cycle tracker. All data stays on your device — no account, no cloud sync, no ads.
+
+<b>Features</b>
+<ul>
+<li>Period and cycle tracking with predictions</li>
+<li>Fertile window and ovulation estimates</li>
+<li>Daily log: mood, symptoms, flow intensity, discharge</li>
+<li>PMS window warnings</li>
+<li>Trends and cycle history</li>
+<li>Clinical report export</li>
+<li>Discrete mode (disguises app icon)</li>
+<li>PIN lock with configurable timeout</li>
+<li>Reminder notifications</li>
+<li>Birth control mode (hides fertile window)</li>
+<li>Fully offline — no internet permission required</li>
+</ul>
+
+<b>Privacy</b>
+No data ever leaves your device. No analytics, no tracking, no third-party services.
+
+<b>Open Source</b>
+Licensed under GPL-3.0. Source code available on GitHub.
