@@ -1,0 +1,374 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Local Font Definitions --- */
+
+/* Poppins (Latin) */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/poppins-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/poppins-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+
+
+/* Vazirmatn (Persian) */
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Vazirmatn-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Vazirmatn-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/Vazirmatn-Light.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/Vazirmatn-Medium.woff2') format('woff2');
+}
+
+/* Sahel (Persian) */
+@font-face {
+  font-family: 'Sahel';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/Sahel-Light-FD-WOL.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Sahel';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Sahel-FD-WOL.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Sahel';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/Sahel-SemiBold-FD-WOL.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Sahel';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Sahel-Bold-FD-WOL.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Sahel';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/fonts/Sahel-Black-FD-WOL.woff2') format('woff2');
+}
+
+/* Persian font weight cap - heavy fonts don't render well with Persian script */
+html[lang="fa"] * {
+  font-weight: clamp(100, var(--tw-font-weight, 400), 600) !important;
+}
+
+html[lang="fa"] .font-bold,
+html[lang="fa"] .font-semibold {
+  font-weight: 600 !important;
+}
+
+html[lang="fa"] .font-extrabold,
+html[lang="fa"] .font-black {
+  font-weight: 600 !important;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Smooth scrolling for the whole app */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* Prevent horizontal scroll on all screens — iOS WebView can shift sideways on input focus */
+body,
+#root {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Hide scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom selection colors */
+::selection {
+  background-color: rgba(117, 152, 160, 0.3);
+  /* accent/30 */
+  color: #1E293B;
+  /* text-primary */
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid #7598a0;
+  /* accent */
+  outline-offset: 2px;
+}
+
+/* Disable tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Global Typography & Background */
+html,
+body,
+#root {
+  font-family: 'Poppins', sans-serif;
+  background-color: #fcfaf6;
+  /* surface-body */
+  color: #1E293B;
+  /* text-primary */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* Premium Typography for RTL (Arabic/Persian) */
+[dir="rtl"],
+[dir="rtl"] * {
+  font-family: 'Sahel', sans-serif !important;
+}
+
+/* Chinese (System Fonts) */
+[lang="zh"],
+[lang="zh"] * {
+  font-family: 'PingFang SC', 'Noto Sans CJK', 'Droid Sans Fallback', sans-serif !important;
+}
+
+/* Redesigned DayModal Styles */
+@keyframes blob-bounce {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-blob-slow {
+  animation: blob-bounce 6s infinite ease-in-out;
+}
+
+.watercolor-wash-red {
+  background: radial-gradient(circle at 30% 30%, #fee2e2, #fecaca);
+}
+
+.watercolor-wash-orange {
+  background: radial-gradient(circle at 30% 30%, #ffedd5, #fed7aa);
+}
+
+.watercolor-wash-yellow {
+  background: radial-gradient(circle at 30% 30%, #fef3c7, #fde68a);
+}
+
+.watercolor-wash-mint {
+  background: radial-gradient(circle at 30% 30%, #dcfce7, #bbf7d0);
+}
+
+.watercolor-wash-green {
+  background: radial-gradient(circle at 30% 30%, #ccfbf1, #99f6e4);
+}
+
+.watercolor-wash-blue {
+  background: radial-gradient(circle at 30% 30%, #dbeafe, #bfdbfe);
+}
+
+.watercolor-wash-indigo {
+  background: radial-gradient(circle at 30% 30%, #e0e7ff, #c7d2fe);
+}
+
+.blob-1 {
+  border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+}
+
+.blob-2 {
+  border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%;
+}
+
+.blob-3 {
+  border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%;
+}
+
+.blob-4 {
+  border-radius: 58% 42% 33% 67% / 37% 55% 45% 63%;
+}
+
+.blob-5 {
+  border-radius: 45% 55% 30% 70% / 60% 40% 60% 40%;
+}
+
+/* Droplet-like blobs for Flow */
+.blob-droplet-1 {
+  border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+}
+
+/* Light */
+.blob-droplet-2 {
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+/* Medium */
+.blob-droplet-3 {
+  border-radius: 40% 60% 50% 50% / 50% 50% 50% 50%;
+}
+
+/* Heavy */
+.blob-droplet-4 {
+  border-radius: 60% 40% 50% 50% / 40% 40% 60% 60%;
+}
+
+/* Spotting */
+
+.watercolor-wash-rose-light {
+  background: radial-gradient(circle at 30% 30%, #ffe4e6, #fecdd3);
+}
+
+.watercolor-wash-rose-medium {
+  background: radial-gradient(circle at 30% 30%, #fecdd3, #fda4af);
+}
+
+.watercolor-wash-rose-heavy {
+  background: radial-gradient(circle at 30% 30%, #fda4af, #fb7185);
+}
+
+.watercolor-wash-rose-spotting {
+  background: radial-gradient(circle at 30% 30%, #fff1f2, #fecdd3);
+}
+
+/* Phase-specific Watercolor Accents */
+.phase-accent-period {
+  background: radial-gradient(circle at center, rgba(251, 113, 133, 0.08) 0%, transparent 70%);
+}
+
+.phase-accent-follicular {
+  background: radial-gradient(circle at center, rgba(125, 211, 252, 0.08) 0%, transparent 70%);
+}
+
+.phase-accent-ovulation {
+  background: radial-gradient(circle at center, rgba(45, 212, 191, 0.08) 0%, transparent 70%);
+}
+
+.phase-accent-luteal {
+  background: radial-gradient(circle at center, rgba(251, 191, 36, 0.08) 0%, transparent 70%);
+}
+
+@keyframes blob-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+}
+
+.animate-blob-pulse {
+  animation: blob-pulse 8s infinite ease-in-out;
+}
+
+@keyframes slide-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-bottom {
+  animation: slide-in-bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes period-button-pulse {
+  0%   { transform: scale(1);    color: #f472b6; }
+  16%  { transform: scale(1.06); color: #fb923c; }
+  33%  { transform: scale(1);    color: #facc15; }
+  50%  { transform: scale(1.06); color: #4ade80; }
+  66%  { transform: scale(1);    color: #60a5fa; }
+  83%  { transform: scale(1.06); color: #c084fc; }
+  100% { transform: scale(1);    color: #f472b6; }
+}
+
+.animate-period-button {
+  animation: period-button-pulse 7.5s ease-in-out infinite;
+  will-change: transform, color;
+}
