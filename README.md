@@ -11,9 +11,7 @@
     <img src="https://img.shields.io/badge/App_Store-Download-0D96F6?style=for-the-badge&logo=app-store&logoColor=white" alt="Download on the App Store" />
   </a>
   &nbsp;
-  <a href="https://f-droid.org/packages/com.mooneva.app">
-    <img src="https://img.shields.io/badge/F--Droid-Download-1976D2?style=for-the-badge&logo=f-droid&logoColor=white" alt="Get it on F-Droid" />
-  </a>
+ 
 
   <br /><br />
 
@@ -41,10 +39,10 @@
 
 ## About
 
-Mooneva Cycle is developed by **[Mooneva](https://mooneva.se/)**, a Swedish company dedicated to building private, thoughtful tools for women's health. Learn more at [mooneva.se/pages/mooneva_cycle](https://mooneva.se/pages/mooneva_cycle).
+Mooneva Cycle is developed by **[Mooneva](https://mooneva.se/)**, a Swedish femtech company dedicated to building thoughtful tools for women's health. Learn more at [mooneva.se/pages/mooneva_cycle](https://mooneva.se/pages/mooneva_cycle).
 
 All your cycle data stays on your device. No server ever sees it.
-
+ 
 ---
 
 ## Features
