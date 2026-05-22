@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="12dp"
+    android:background="@drawable/widget_background">
+
+    <!-- Cycle Day (Left) -->
+    <TextView
+        android:id="@+id/cycle_day_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="60dp"
+        android:text="Day 14"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#334155"
+        android:gravity="center"
+        android:paddingEnd="12dp" />
+
+    <!-- Progress Bar (Middle) -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:layout_weight="1"
+        android:max="100"
+        android:progress="50"
+        android:progressDrawable="@drawable/progress_bar_drawable"
+        android:layout_marginEnd="12dp" />
+
+    <!-- Split Status (Right) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:minWidth="70dp">
+
+        <!-- P: Period -->
+        <TextView
+            android:id="@+id/status_text_p"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="P: 5 days"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#64748b"
+            android:gravity="end"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- O: Ovulation -->
+        <TextView
+            android:id="@+id/status_text_o"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="O: 12 days"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#94a3b8"
+            android:gravity="end"
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+</LinearLayout>

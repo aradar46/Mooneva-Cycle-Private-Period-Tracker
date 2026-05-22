@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mooneva Cycle</string>
+    <string name="title_activity_main">Mooneva Cycle</string>
+    <string name="package_name">com.mooneva.app</string>
+    <string name="custom_url_scheme">com.mooneva.app</string>
+    <string name="widget_name">Cycle Tracker</string>
+    <string name="widget_ring_name">Cycle Ring</string>
+    <string name="widget_ring_desc">Circular arc showing your cycle progress</string>
+</resources>
