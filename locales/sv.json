@@ -63,7 +63,7 @@
         "ovulation_reminder_desc": "Specifik varning för högsta fertilitetsdagen.",
         "ovulation_reminder_desc_discrete": "Viktigt datum imorgon.",
         "daily_log": "Daglig logg",
-        "daily_log_desc": "Påminnelse att logga humör och symtom.",
+        "daily_log_desc": "En påminnelse att logga ditt humör och symtom för dagen.",
         "daily_log_discrete": "Check-in",
         "daily_log_desc_discrete": "Check-in: Nya uppgifter att logga?",
         "pms_reminder": "Mjuk påminnelse",
@@ -179,7 +179,7 @@
         },
         "period_question": "Mens?",
         "edit_period": "Redigera mens",
-        "edit_mode_hint": "Tryck på dagar för att markera eller avmarkera mensdagar",
+        "edit_mode_hint": "Tryck på dagar för att lägga till, ta bort eller justera dina mensdagar",
         "period_saved": "Mens sparad",
         "empty_state_hint": "Tryck på 'Mens?' nedan för att markera din senaste mens",
         "legend": {

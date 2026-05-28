@@ -156,48 +156,50 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     ];
 
     return (
-      <div className="flex flex-col h-full justify-center items-center py-8 px-6">
-        <div className="w-24 mb-6">
-          <img
-            src="/bitmap.png"
-            alt="Mooneva"
-            className="w-full h-auto object-contain drop-shadow-lg"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        </div>
-        <h1 className="text-2xl font-bold text-slate-800 mb-1">Mooneva</h1>
-        <p className="text-xs text-slate-400 font-medium mb-8 tracking-wide">Choose your language</p>
-        <div
-          className="w-full max-w-sm bg-[#F0F2F5] rounded-2xl p-4"
-          style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)' }}
-        >
-          <div className="grid grid-cols-3 gap-2">
-            {languages.map((lang) => {
-              const isSelected = i18n.language === lang.code;
-              return (
-                <button
-                  key={lang.code}
-                  onClick={() => i18n.changeLanguage(lang.code)}
-                  className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all ${isSelected
-                    ? 'bg-[#7598a0] text-white scale-[0.98]'
-                    : 'bg-white text-slate-600 hover:bg-slate-50'
-                    }`}
-                  style={isSelected ? {
-                    boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.1)'
-                  } : {
-                    boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.9)'
-                  }}
-                >
-                  <span className="text-xl mb-1">{lang.flag}</span>
-                  <span className={`text-[10px] font-bold ${isSelected ? 'text-white' : 'text-slate-600'}`}>{lang.native}</span>
-                </button>
-              );
-            })}
+      <div className="flex flex-col h-full min-h-0">
+        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col justify-center items-center py-4 px-2">
+          <div className="w-16 mb-4">
+            <img
+              src="/bitmap.png"
+              alt="Mooneva"
+              className="w-full h-auto object-contain drop-shadow-lg"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-800 mb-1">Mooneva</h1>
+          <p className="text-xs text-slate-400 font-medium mb-6 tracking-wide">Choose your language</p>
+          <div
+            className="w-full max-w-sm bg-[#F0F2F5] rounded-2xl p-4"
+            style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)' }}
+          >
+            <div className="grid grid-cols-3 gap-2">
+              {languages.map((lang) => {
+                const isSelected = i18n.language === lang.code;
+                return (
+                  <button
+                    key={lang.code}
+                    onClick={() => i18n.changeLanguage(lang.code)}
+                    className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all ${isSelected
+                      ? 'bg-[#7598a0] text-white scale-[0.98]'
+                      : 'bg-white text-slate-600 hover:bg-slate-50'
+                      }`}
+                    style={isSelected ? {
+                      boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.1)'
+                    } : {
+                      boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.9)'
+                    }}
+                  >
+                    <span className="text-xl mb-1">{lang.flag}</span>
+                    <span className={`text-[10px] font-bold ${isSelected ? 'text-white' : 'text-slate-600'}`}>{lang.native}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
-        <div className="w-full max-w-sm mt-8">
+        <div className="flex-shrink-0 w-full max-w-sm mx-auto pt-4 pb-2">
           <button
             onClick={nextStep}
             className="w-full py-4 rounded-2xl font-bold text-sm text-white bg-[#7598a0] transition-all active:scale-[0.98]"
@@ -211,9 +213,9 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   };
 
   const renderTrust = () => (
-    <div className="flex flex-col h-full justify-between py-8">
-      <div className="flex-1 flex flex-col items-center justify-start pt-8 text-center space-y-10 px-4">
-        <div className="w-64 relative">
+    <div className="flex flex-col h-full min-h-0">
+      <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col items-center justify-center text-center gap-6 px-4 py-4">
+        <div className="w-40 max-w-[40vw] relative">
           <img
             src="/bitmap.png"
             alt="Mooneva"
@@ -234,7 +236,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
           </p>
         </div>
       </div>
-      <div className="space-y-6 px-4 w-full max-w-sm mx-auto">
+      <div className="flex-shrink-0 space-y-3 w-full max-w-sm mx-auto pt-4 pb-2">
         <button
           onClick={nextStep}
           className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs text-white bg-[#7598a0] transition-all active:scale-[0.98]"
@@ -262,9 +264,9 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     }
 
     return (
-      <div className="flex flex-col h-full py-2 px-2">
-        <h2 className="text-2xl font-black text-slate-800 tracking-tight text-center mb-6">{t('onboarding.calibration.title')}</h2>
-        <div className="flex-1 space-y-8 overflow-y-auto no-scrollbar pb-8">
+      <div className="flex flex-col h-full min-h-0 py-2 px-2">
+        <h2 className="flex-shrink-0 text-2xl font-black text-slate-800 tracking-tight text-center mb-4">{t('onboarding.calibration.title')}</h2>
+        <div className="flex-1 min-h-0 space-y-6 overflow-y-auto no-scrollbar pb-2">
           <div className="space-y-4">
             <label className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-2">{t('onboarding.calibration.last_period_label')}</label>
             {!dontRemember ? (
@@ -345,7 +347,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             </div>
           </div>
         </div>
-        <div className="pt-4 space-y-3">
+        <div className="flex-shrink-0 pt-3 space-y-3">
           <button
             onClick={() => {
               if (!lastPeriodDate && !dontRemember) {
@@ -359,8 +361,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             {t('common.next')}
           </button>
           <button onClick={prevStep} className="w-full text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('common.back')}</button>
+          <p className="text-[9px] text-center text-slate-400">{t('onboarding.calibration.settings_hint')}</p>
         </div>
-        <p className="text-[9px] text-center text-slate-400 mt-2">{t('onboarding.calibration.settings_hint')}</p>
       </div>
     );
   };
@@ -374,9 +376,9 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     ] as const;
 
     return (
-      <div className="flex flex-col h-full py-6 px-2">
-        <h2 className="text-2xl font-black text-slate-800 tracking-tight text-center mb-8">{t('onboarding.goal.title')}</h2>
-        <div className="flex-1 space-y-4">
+      <div className="flex flex-col h-full min-h-0 py-2 px-2">
+        <h2 className="flex-shrink-0 text-2xl font-black text-slate-800 tracking-tight text-center mb-4">{t('onboarding.goal.title')}</h2>
+        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar space-y-3 pb-2">
           {goals.map((g) => {
             const active = goal === g.id;
             return (
@@ -399,7 +401,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             );
           })}
         </div>
-        <div className="mt-8 space-y-3">
+        <div className="flex-shrink-0 pt-3 space-y-3">
           <button
             onClick={nextStep}
             className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs text-white bg-[#7598a0] transition-all active:scale-[0.98]"
@@ -408,18 +410,18 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             {t('common.continue')}
           </button>
           <button onClick={prevStep} className="w-full text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('common.back')}</button>
+          <p className="text-[9px] text-center text-slate-400">{t('onboarding.calibration.settings_hint')}</p>
         </div>
-        <p className="text-[9px] text-center text-slate-400 mt-2">{t('onboarding.calibration.settings_hint')}</p>
       </div>
     );
   };
 
   const renderAdaptivePrediction = () => {
     return (
-      <div className="flex flex-col h-full py-6 px-2">
-        <h2 className="text-2xl font-black text-slate-800 tracking-tight text-center mb-4">{t('onboarding.adaptive.title')}</h2>
-        <div className="flex-1 space-y-6 overflow-y-auto no-scrollbar pb-8">
-          <div className="bg-[#F0F2F5] p-6 rounded-3xl space-y-4" style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.7)' }}>
+      <div className="flex flex-col h-full min-h-0 py-2 px-2">
+        <h2 className="flex-shrink-0 text-2xl font-black text-slate-800 tracking-tight text-center mb-3">{t('onboarding.adaptive.title')}</h2>
+        <div className="flex-1 min-h-0 space-y-4 overflow-y-auto no-scrollbar pb-2">
+          <div className="bg-[#F0F2F5] p-5 rounded-3xl space-y-3" style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.7)' }}>
             <p className="text-sm text-slate-600 leading-relaxed font-medium">{t('onboarding.adaptive.desc')}</p>
             <p className="text-xs text-slate-400 leading-relaxed">{t('onboarding.adaptive.hint')}</p>
             <p className="text-xs text-[#7598a0] font-semibold leading-relaxed border-t border-slate-200/60 pt-3">{t('onboarding.adaptive.activation_note')}</p>
@@ -449,7 +451,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             </div>
           </button>
         </div>
-        <div className="mt-8 space-y-3">
+        <div className="flex-shrink-0 pt-3 space-y-3">
           <button
             onClick={nextStep}
             className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs text-white bg-[#7598a0] transition-all active:scale-[0.98]"
@@ -465,10 +467,10 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
 
   const renderSpycraft = () => {
     return (
-      <div className="flex flex-col h-full py-4 px-2">
-        <h2 className="text-2xl font-black text-slate-800 tracking-tight text-center mb-1">{t('onboarding.discrete.title')}</h2>
-        <p className="text-xs text-slate-400 text-center mb-6 font-medium max-w-xs mx-auto leading-relaxed">{t('onboarding.discrete.desc')}</p>
-        <div className="flex-1 relative mb-6">
+      <div className="flex flex-col h-full min-h-0 py-2 px-2">
+        <h2 className="flex-shrink-0 text-2xl font-black text-slate-800 tracking-tight text-center mb-1">{t('onboarding.discrete.title')}</h2>
+        <p className="flex-shrink-0 text-xs text-slate-400 text-center mb-3 font-medium max-w-xs mx-auto leading-relaxed">{t('onboarding.discrete.desc')}</p>
+        <div className="flex-1 min-h-0 relative mb-3">
           <div className="absolute inset-0 bg-slate-900 rounded-[2rem] border-4 border-slate-800 shadow-2xl overflow-hidden flex flex-col">
             <div className="bg-slate-50 flex-1 p-4 flex flex-col relative overflow-hidden">
               <div className="flex justify-between items-center mb-6">
@@ -540,7 +542,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             </div>
           </div>
         </div>
-        <div className="space-y-3">
+        <div className="flex-shrink-0 space-y-3">
           <button
             onClick={nextStep}
             disabled={!discreteUnlocked}
@@ -561,11 +563,11 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   };
 
   const renderGetStarted = () => (
-    <div className="flex flex-col h-full py-6 px-2">
-      <h2 className="text-2xl font-black text-slate-800 tracking-tight text-center mb-6">
+    <div className="flex flex-col h-full min-h-0 py-2 px-2">
+      <h2 className="flex-shrink-0 text-2xl font-black text-slate-800 tracking-tight text-center mb-4">
         {t('onboarding.get_started.title')}
       </h2>
-      <div className="flex-1 space-y-4 overflow-y-auto no-scrollbar pb-8">
+      <div className="flex-1 min-h-0 space-y-4 overflow-y-auto no-scrollbar pb-2">
 
         {/* Card 1: Log your period */}
         <div
@@ -628,7 +630,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="flex-shrink-0 pt-3">
         <button
           onClick={handleFinish}
           className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-xs text-white bg-[#7598a0] transition-all active:scale-[0.98]"
@@ -643,17 +645,21 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   return (
     <div className="fixed inset-0 bg-[#F0F2F5] z-[100] flex items-center justify-center p-4 selection:bg-[#7598a0]/20">
       <div
-        className="w-full max-w-md h-full max-h-[800px] bg-[#F0F2F5] rounded-[32px] overflow-hidden flex flex-col relative"
-        style={{ boxShadow: '12px 12px 24px rgba(163, 177, 198, 0.4), -12px -12px 24px rgba(255, 255, 255, 0.8)' }}
+        className="w-full max-w-md bg-[#F0F2F5] rounded-[32px] overflow-hidden flex flex-col relative"
+        style={{
+          boxShadow: '12px 12px 24px rgba(163, 177, 198, 0.4), -12px -12px 24px rgba(255, 255, 255, 0.8)',
+          height: 'min(800px, 100%)',
+          maxHeight: '100%',
+        }}
       >
         {step > 0 && (
-          <div className="absolute top-6 left-0 right-0 flex justify-center gap-2 z-20">
+          <div className="absolute top-4 left-0 right-0 flex justify-center gap-2 z-20">
             {[1, 2, 3, 4, 5, 6, 7].map(i => (
               <div key={i} className={`w-2 h-2 rounded-full transition-all duration-500 ${step + 1 >= i ? 'bg-[#7598a0]' : 'bg-slate-300'}`} />
             ))}
           </div>
         )}
-        <div className="flex-1 p-6 pt-10 relative">
+        <div className="flex-1 min-h-0 p-4 pt-10 relative flex flex-col">
           {step === 0 && renderLanguage()}
           {step === 1 && renderTrust()}
           {step === 2 && renderCalibration()}

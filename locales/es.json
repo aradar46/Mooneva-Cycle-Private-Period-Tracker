@@ -63,7 +63,7 @@
         "ovulation_reminder_desc": "Alerta específica para el día de máxima fertilidad.",
         "ovulation_reminder_desc_discrete": "Fecha importante mañana.",
         "daily_log": "Registro diario",
-        "daily_log_desc": "Recordatorio para registrar humor y síntomas.",
+        "daily_log_desc": "Un recordatorio para registrar tu estado de ánimo y síntomas del día.",
         "daily_log_discrete": "Check-in",
         "daily_log_desc_discrete": "¿Alguna nueva tarea para registrar?",
         "pms_reminder": "Recordatorio suave",
@@ -179,7 +179,7 @@
         },
         "period_question": "¿Periodo?",
         "edit_period": "Editar Periodo",
-        "edit_mode_hint": "Toca los días para marcar o desmarcar días de periodo",
+        "edit_mode_hint": "Toca los días para añadir, quitar o ajustar tus días de periodo",
         "period_saved": "Periodo guardado",
         "empty_state_hint": "Toca '¿Periodo?' abajo para marcar tu último periodo",
         "legend": {

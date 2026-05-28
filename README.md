@@ -22,6 +22,14 @@
 
 ---
 
+## Why offline-first?
+
+Most period trackers upload your data to corporate servers — data that has been sold to advertisers, exposed in breaches, and in some jurisdictions legally demanded by law enforcement. Mooneva is built on a different premise: **data that never leaves your device cannot be leaked or subpoenaed.**
+
+There are no Mooneva servers. Your cycle data is encrypted on your device using PBKDF2/AES-GCM and never leaves it. The app declares internet permission only to open external links in your system browser (the about page, a WHO reference) — no health data is ever transmitted anywhere. If someone filed a legal request for user data, there would be nothing to hand over — not because we deleted it, but because we never had it.
+
+---
+
 <img src="fastlane/metadata/android/en-US/images/featureGraphic.png" alt="Mooneva Cycle Banner" width="100%" />
 
 ---
@@ -57,13 +65,21 @@ All your cycle data stays on your device. No server ever sees it.
 - **PIN lock** with configurable timeout
 - **Reminder notifications** (period, ovulation, daily log, PMS)
 - **Birth control mode** — hides fertile window, tags bleeds as withdrawal
-- **Fully offline** — no internet permission required at runtime
+- **No data transmission** — internet permission exists only to open external links in the system browser, no health data ever leaves the device
 
 ---
 
 ## Privacy
 
 Mooneva Cycle collects no data. There are no analytics, no crash reporters, no third-party SDKs that phone home. Everything you log stays on your device, encrypted in local storage.
+
+| Cloud-based trackers | Mooneva |
+|---|---|
+| Data stored on company servers | Data stored only on your device |
+| Vulnerable to breaches | No server exists to breach |
+| Subject to legal subpoenas | No centralised data to subpoena |
+| Requires account with personal info | No account, no registration |
+| Company can analyse your data | We cannot see your data — ever |
 
 ---
 

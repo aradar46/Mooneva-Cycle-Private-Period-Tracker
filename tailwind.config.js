@@ -55,12 +55,17 @@ export default {
                 scalePulse: {
                     '0%, 100%': { transform: 'scale(1)' },
                     '50%': { transform: 'scale(1.05)' },
-                }
+                },
+                pulseSlow: {
+                    '0%, 100%': { opacity: '1' },
+                    '50%': { opacity: '0.1' },
+                },
             },
             animation: {
                 'fade-in': 'fadeIn 0.5s ease-out',
                 'slide-up': 'slideUp 0.5s ease-out',
                 'pulse-scale': 'scalePulse 2s infinite ease-in-out',
+                'pulse-slow': 'pulseSlow 2s ease-in-out infinite',
             }
         }
     },

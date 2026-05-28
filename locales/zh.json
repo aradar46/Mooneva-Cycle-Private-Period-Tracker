@@ -179,7 +179,7 @@
         },
         "period_question": "经期？",
         "edit_period": "编辑经期",
-        "edit_mode_hint": "点击日期以标记或取消标记经期天数",
+        "edit_mode_hint": "点击日期以添加、删除或调整经期天数",
         "period_saved": "经期已保存",
         "empty_state_hint": "点击下方「经期？」来标记您的上次月经",
         "legend": {

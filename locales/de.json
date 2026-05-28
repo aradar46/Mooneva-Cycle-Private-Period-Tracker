@@ -63,7 +63,7 @@
         "ovulation_reminder_desc": "Spezieller Alarm am Tag der höchsten Fruchtbarkeit.",
         "ovulation_reminder_desc_discrete": "Wichtiger Termin morgen.",
         "daily_log": "Tägliches Protokoll",
-        "daily_log_desc": "Erinnerung, Stimmung und Symptome zu protokollieren.",
+        "daily_log_desc": "Eine Erinnerung, Stimmung und Symptome für den Tag zu protokollieren.",
         "daily_log_discrete": "Check-In",
         "daily_log_desc_discrete": "Check-in: Neue Aufgaben zum Protokollieren?",
         "pms_reminder": "Sanfte Erinnerung",
@@ -179,7 +179,7 @@
         },
         "period_question": "Periode?",
         "edit_period": "Periode bearbeiten",
-        "edit_mode_hint": "Tippe auf Tage, um sie als Periodetage zu markieren oder zu entmarkieren",
+        "edit_mode_hint": "Tippe auf Tage, um Periodentage hinzuzufügen, zu entfernen oder anzupassen",
         "period_saved": "Periode gespeichert",
         "empty_state_hint": "Tippe unten auf 'Periode?', um deine letzte Periode einzutragen",
         "legend": {
