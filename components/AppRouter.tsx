@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useMooneva } from '../contexts/MoonevaContext';
 import { useAppNavigation } from '../hooks/useAppNavigation';
 import { useAppTheme } from '../hooks/useAppTheme';
+import { useAppReview } from '../hooks/useAppReview';
 
 import OnboardingWizard from './OnboardingWizard';
 import PinLock from './PinLock';
@@ -27,6 +28,7 @@ export const AppRouter = () => {
     // --- Navigation & Theme Hooks ---
     const { view, setView, subView, setSubView, previousView } = useAppNavigation();
     useAppTheme({ view, discreteMode: !!settings.discreteMode, darkNeumorphism: !!settings.darkNeumorphism });
+    useAppReview();
 
     // --- Security & Onboarding State ---
     const [isLocked, setIsLocked] = useState(true);

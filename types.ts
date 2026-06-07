@@ -65,6 +65,7 @@ export interface PeriodRecord {
   cycleLength?: number; // Stored cycle length (optional for migration)
   activeDays?: number[]; // indices relative to startDate that actually have bleeding
   isWithdrawalBleed?: boolean; // Tagged if created while on birth control
+  ignoreForAverages?: boolean; // Manual override for outlier cycles (miscarriage, stress, etc)
 }
 
 export interface Cycle {
@@ -79,6 +80,8 @@ export interface Cycle {
   isOutlier?: boolean;
   /** True if period was logged while on birth control (exclude from natural cycle stats) */
   isWithdrawalBleed?: boolean;
+  /** Manual override to exclude this cycle from adaptive predictions */
+  ignoreForAverages?: boolean;
   // Computed Fertile Window (for historical display)
   ovulationDate?: string;
   fertileStart?: string;
@@ -138,6 +141,12 @@ export interface AppSettings {
   reminderPMSTime?: string;
   reminderPeriodLate?: boolean; // Late period prompt
   reminderPeriodLateTime?: string;
+
+  showPMS?: boolean; // Show PMS warning zone on calendar
+
+  // Pill / Birth Control Reminders
+  reminderPillDaily?: boolean;
+  reminderPillDailyTime?: string;
 
   // Global Behaviour
   reminderGentleMode?: boolean; // If true, suppress notifications if app used recently, etc.
@@ -206,6 +215,7 @@ export interface BackupData {
   data: Record<string, DailyLog>;
   settings: AppSettings;
   timestamp: string;
+  periods?: PeriodRecord[];
 }
 
 export interface DayMeta {
@@ -222,6 +232,7 @@ export interface DayMeta {
   isFertile: boolean;
   isOvulation: boolean;
   isPMS: boolean;
+  isWithdrawalBleed?: boolean;
   isUnavailableFuture?: boolean;
   // Visuals
   intensity?: FlowIntensity;
