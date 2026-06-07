@@ -326,6 +326,8 @@
         "pms_alerts_desc": "Varna 3 dagar innan mens",
         "security": "Säkerhet",
         "security_desc_long": "Detta lösenord krypterar din data och gör den oåtkomlig utan koden.",
+        "dark_neumorphism": "Mörk neumorfism",
+        "dark_neumorphism_desc": "Använd nattläget Balanced Moonstone (experimentellt)",
         "discrete_mode": "Diskret läge",
         "discrete_mode_desc": "Dölj appen som en 'Uppgifter'-hanterare",
         "discrete_mode_full_desc": "Ändrar appen till en enkel uppgiftslista, byter ikon och startar om appen. För att återgå, håll (+) knappen nere till höger intryckt i 2 sekunder.",

@@ -316,6 +316,8 @@
         "pms_alerts_desc": "Alarm 3 Tage vor der Periode",
         "security": "Sicherheit",
         "security_desc_long": "Dieses Passwort verschlüsselt deine persönlichen Daten und macht sie ohne Code unzugänglich.",
+        "dark_neumorphism": "Dunkle Neumorphie",
+        "dark_neumorphism_desc": "Balanced-Moonstone-Nachtdesign verwenden (experimentell)",
         "discrete_mode": "Diskret-Modus",
         "discrete_mode_desc": "Tarnung der App als Aufgabenplaner",
         "discrete_mode_full_desc": "Ändert die App-Oberfläche zu einem einfachen Aufgabenmanager, wechselt das App-Symbol und startet die App neu. Um zurückzukehren, halte die + Taste (unten rechts) 2 Sekunden lang gedrückt.",

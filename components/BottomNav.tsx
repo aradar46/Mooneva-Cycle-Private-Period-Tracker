@@ -11,12 +11,12 @@ interface BottomNavProps {
 const BottomNav: React.FC<BottomNavProps> = ({ currentView, onViewChange, onSettingsClick, isCloaked }) => {
     const { t } = useTranslation();
 
-    const navWrapperClass = 'fixed bottom-0 left-1/2 -translate-x-1/2 w-[85%] max-w-xs z-50 pointer-events-auto';
+    const navWrapperClass = 'mooneva-bottom-nav-wrap fixed bottom-0 left-1/2 -translate-x-1/2 w-[85%] max-w-xs z-50 pointer-events-auto';
 
     return (
         <div className={navWrapperClass} style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
             <nav
-                className={`flex justify-around items-center h-14 px-4 rounded-[28px] transition-colors ${isCloaked ? 'bg-slate-900 border border-white/10' : 'bg-[#F0F2F5]'
+                className={`mooneva-bottom-nav flex justify-around items-center h-14 px-4 rounded-[28px] transition-colors ${isCloaked ? 'bg-slate-900 border border-white/10' : 'bg-[#F0F2F5]'
                     }`}
                 style={!isCloaked ? {
                     boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)'

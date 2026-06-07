@@ -34,6 +34,7 @@ export const usePersistence = (): UsePersistenceResult => {
     const [periods, setPeriods] = useState<PeriodRecord[]>([]);
     const [settings, setSettings] = useState<AppSettings>({
         discreteMode: false,
+        darkNeumorphism: false,
         userName: 'User',
         onboardingCompleted: false,
         symptoms: INITIAL_SYMPTOMS,

@@ -11,6 +11,10 @@
     <img src="https://img.shields.io/badge/App_Store-Download-0D96F6?style=for-the-badge&logo=app-store&logoColor=white" alt="Download on the App Store" />
   </a>
   &nbsp;
+  <a href="https://f-droid.org/en/packages/com.mooneva.app/">
+    <img src="https://img.shields.io/badge/F--Droid-Download-1976D2?style=for-the-badge&logo=f-droid&logoColor=white" alt="Get it on F-Droid" />
+  </a>
+  &nbsp;
  
 
   <br /><br />
@@ -26,7 +30,7 @@
 
 Most period trackers upload your data to corporate servers — data that has been sold to advertisers, exposed in breaches, and in some jurisdictions legally demanded by law enforcement. Mooneva is built on a different premise: **data that never leaves your device cannot be leaked or subpoenaed.**
 
-There are no Mooneva servers. Your cycle data is encrypted on your device using PBKDF2/AES-GCM and never leaves it. The app declares internet permission only to open external links in your system browser (the about page, a WHO reference) — no health data is ever transmitted anywhere. If someone filed a legal request for user data, there would be nothing to hand over — not because we deleted it, but because we never had it.
+There are no Mooneva servers. Your cycle data is encrypted on your device using PBKDF2/AES-GCM and never leaves it. The app requires no internet permission whatsoever — no health data is ever transmitted anywhere. If someone filed a legal request for user data, there would be nothing to hand over — not because we deleted it, but because we never had it.
 
 ---
 
@@ -65,7 +69,7 @@ All your cycle data stays on your device. No server ever sees it.
 - **PIN lock** with configurable timeout
 - **Reminder notifications** (period, ovulation, daily log, PMS)
 - **Birth control mode** — hides fertile window, tags bleeds as withdrawal
-- **No data transmission** — internet permission exists only to open external links in the system browser, no health data ever leaves the device
+- **No data transmission** — no internet permission declared, no health data ever leaves the device
 
 ---
 

@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 interface UseAppThemeOptions {
     view: string;
     discreteMode: boolean;
+    darkNeumorphism?: boolean;
 }
 
-export const useAppTheme = ({ view, discreteMode }: UseAppThemeOptions) => {
+export const useAppTheme = ({ view, discreteMode, darkNeumorphism = false }: UseAppThemeOptions) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -16,6 +17,7 @@ export const useAppTheme = ({ view, discreteMode }: UseAppThemeOptions) => {
 
         // Reset all classes first
         body.className = 'transition-colors duration-500 ease-in-out';
+        body.removeAttribute('data-theme');
 
         if (discreteMode) {
             body.classList.add('bg-gray-100', 'text-gray-900', 'antialiased');
@@ -24,12 +26,21 @@ export const useAppTheme = ({ view, discreteMode }: UseAppThemeOptions) => {
             if (favicon) favicon.href = iconUrl;
             if (appleIcon) appleIcon.href = iconUrl;
         } else {
-            // View-based backgrounds
-            if (view === 'calendar') body.classList.add('bg-[#f5f4f2]');
-            else if (view === 'trends') body.classList.add('bg-[#fffaf5]');
-            else body.classList.add('bg-white');
+            if (darkNeumorphism) {
+                body.dataset.theme = 'dark-neumorphism';
+                body.classList.add('bg-[var(--app-bg)]', 'text-[var(--text-primary)]');
+            } else if (view === 'calendar') {
+                body.classList.add('bg-[#f5f4f2]');
+            } else if (view === 'trends') {
+                body.classList.add('bg-[#fffaf5]');
+            } else {
+                body.classList.add('bg-white');
+            }
 
-            body.classList.add('text-gray-900', 'antialiased');
+            if (!darkNeumorphism) {
+                body.classList.add('text-gray-900');
+            }
+            body.classList.add('antialiased');
 
             // Title switching
             const titles: Record<string, string> = {
@@ -44,5 +55,5 @@ export const useAppTheme = ({ view, discreteMode }: UseAppThemeOptions) => {
             if (favicon) favicon.href = iconUrl;
             if (appleIcon) appleIcon.href = iconUrl;
         }
-    }, [view, discreteMode, t]);
+    }, [view, discreteMode, darkNeumorphism, t]);
 };

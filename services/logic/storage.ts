@@ -101,6 +101,7 @@ export const loadSettings = (): AppSettings => {
     const settings = localStorage.getItem(SETTINGS_KEY);
     const defaults: AppSettings = {
         discreteMode: false,
+        darkNeumorphism: false,
         userName: 'User',
         onboardingCompleted: false,
         symptoms: INITIAL_SYMPTOMS,

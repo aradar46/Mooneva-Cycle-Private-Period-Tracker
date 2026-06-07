@@ -316,6 +316,8 @@
         "pms_alerts_desc": "经期开始前 3 天提醒",
         "security": "安全",
         "security_desc_long": "此密码将加密您的个人数据，无密码将无法访问内容。",
+        "dark_neumorphism": "深色新拟态",
+        "dark_neumorphism_desc": "使用 Balanced Moonstone 夜间主题（实验性）",
         "discrete_mode": "伪装模式",
         "discrete_mode_desc": "将应用伪装成“任务”管理器",
         "discrete_mode_full_desc": "将应用界面更改为简单的任务管理器，更换应用图标并重启应用。要返回，请长按右下角的 (+) 按钮 2 秒。",

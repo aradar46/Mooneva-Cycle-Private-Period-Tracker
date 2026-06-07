@@ -94,6 +94,7 @@ export interface SymptomConfig {
 export interface AppSettings {
   // Security Feature: Disguises app as Task Manager
   discreteMode: boolean;
+  darkNeumorphism?: boolean;
 
   userName: string;
   pin?: string;

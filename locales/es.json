@@ -316,6 +316,8 @@
         "pms_alerts_desc": "Aviso 3 días antes de la regla",
         "security": "Seguridad",
         "security_desc_long": "Esta contraseña cifra tus datos personales, haciéndolos inaccesibles sin el código.",
+        "dark_neumorphism": "Neumorfismo oscuro",
+        "dark_neumorphism_desc": "Usar el tema nocturno Balanced Moonstone (experimental)",
         "discrete_mode": "Modo discreto",
         "discrete_mode_desc": "Disfrazar la app como gestor de tareas",
         "discrete_mode_full_desc": "Cambia la interfaz a un gestor de tareas simple, cambia el icono y reinicia la app. Para volver, mantén presionado el botón + (abajo derecha) durante 2 segundos.",

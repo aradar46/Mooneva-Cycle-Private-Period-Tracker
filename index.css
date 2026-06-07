@@ -175,6 +175,272 @@ body,
   min-height: 100vh;
 }
 
+:root {
+  --app-bg: #f0f2f5;
+  --surface: #f0f2f5;
+  --surface-alt: #ffffff;
+  --surface-raised: #f0f2f5;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-soft: rgba(148, 163, 184, 0.28);
+  --accent-soft: #7598a0;
+  --shadow-raised: 8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
+  --shadow-raised-sm: 4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8);
+  --shadow-inset: inset 3px 3px 6px rgba(163, 177, 198, 0.4), inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+}
+
+body[data-theme="dark-neumorphism"] {
+  --app-bg: #20262c;
+  --surface: #20262c;
+  --surface-alt: #252c33;
+  --surface-raised: #20262c;
+  --text-primary: #edf5f3;
+  --text-secondary: #b8c6c9;
+  --text-muted: #829197;
+  --border-soft: rgba(184, 198, 201, 0.14);
+  --accent-soft: #8fb8b4;
+  --cycle-period: #ff8aa0;
+  --cycle-ovulation: #5eead4;
+  --cycle-follicular: #7dd3fc;
+  --cycle-luteal: #facc6b;
+  --cycle-spotting: #ff6b6b;
+  --shadow-raised: 8px 8px 16px rgba(6, 9, 12, 0.7), -8px -8px 16px rgba(61, 71, 80, 0.5);
+  --shadow-raised-sm: 4px 4px 8px rgba(6, 9, 12, 0.68), -4px -4px 8px rgba(61, 71, 80, 0.46);
+  --shadow-inset: inset 4px 4px 8px rgba(6, 9, 12, 0.72), inset -4px -4px 8px rgba(61, 71, 80, 0.42);
+  background-color: var(--app-bg);
+  color: var(--text-primary);
+}
+
+body[data-theme="dark-neumorphism"],
+body[data-theme="dark-neumorphism"] #root {
+  background-color: var(--app-bg) !important;
+  color: var(--text-primary);
+}
+
+body[data-theme="dark-neumorphism"] [class*="bg-[#F0F2F5]"],
+body[data-theme="dark-neumorphism"] [class*="bg-[#f0f2f5]"],
+body[data-theme="dark-neumorphism"] [class*="bg-[#fcfaf6]"],
+body[data-theme="dark-neumorphism"] [class*="bg-[#f5f4f2]"],
+body[data-theme="dark-neumorphism"] [class*="bg-[#fffaf5]"],
+body[data-theme="dark-neumorphism"] [class~="bg-white"],
+body[data-theme="dark-neumorphism"] [class~="bg-slate-100"],
+body[data-theme="dark-neumorphism"] [class~="bg-slate-50"],
+body[data-theme="dark-neumorphism"] [class~="bg-gray-50"] {
+  background-color: var(--surface) !important;
+}
+
+body[data-theme="dark-neumorphism"] [class~="bg-slate-200/50"],
+body[data-theme="dark-neumorphism"] [class~="bg-slate-50/80"],
+body[data-theme="dark-neumorphism"] [class~="bg-slate-50/50"],
+body[data-theme="dark-neumorphism"] [class~="bg-white/50"],
+body[data-theme="dark-neumorphism"] [class~="bg-gray-100"],
+body[data-theme="dark-neumorphism"] [class~="bg-gray-50/50"] {
+  background-color: var(--surface-alt) !important;
+}
+
+body[data-theme="dark-neumorphism"] [class*="bg-rose-50"],
+body[data-theme="dark-neumorphism"] [class*="bg-emerald-100"],
+body[data-theme="dark-neumorphism"] [class*="bg-[#e8f4f8]"],
+body[data-theme="dark-neumorphism"] [class*="bg-[#e0f2fe]"] {
+  background-color: rgba(143, 184, 180, 0.14) !important;
+}
+
+body[data-theme="dark-neumorphism"] [class*="bg-[#E8EAED]"] {
+  background-color: #171c21 !important;
+}
+
+body[data-theme="dark-neumorphism"] [style*="box-shadow"] {
+  box-shadow: var(--shadow-raised) !important;
+}
+
+body[data-theme="dark-neumorphism"] [style*="background-color"][style*="box-shadow"] {
+  background-color: var(--surface) !important;
+}
+
+body[data-theme="dark-neumorphism"] [style*="inset"] {
+  box-shadow: var(--shadow-inset) !important;
+}
+
+body[data-theme="dark-neumorphism"] .shadow-sm,
+body[data-theme="dark-neumorphism"] .shadow-md,
+body[data-theme="dark-neumorphism"] .shadow-lg,
+body[data-theme="dark-neumorphism"] .shadow-xl,
+body[data-theme="dark-neumorphism"] .shadow-2xl {
+  box-shadow: var(--shadow-raised-sm) !important;
+}
+
+body[data-theme="dark-neumorphism"] .mooneva-bottom-nav-wrap {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body[data-theme="dark-neumorphism"] .mooneva-bottom-nav {
+  isolation: isolate;
+  overflow: hidden;
+  background-color: #20262c !important;
+  border: 1px solid rgba(184, 198, 201, 0.08);
+  box-shadow:
+    8px 10px 18px rgba(6, 9, 12, 0.62),
+    -6px -6px 14px rgba(61, 71, 80, 0.34) !important;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-backdrop {
+  background-color: rgba(9, 13, 17, 0.5) !important;
+  backdrop-filter: blur(10px);
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-modal {
+  background: #20262c !important;
+  border-color: rgba(184, 198, 201, 0.14) !important;
+  box-shadow:
+    14px 18px 34px rgba(5, 8, 11, 0.68),
+    -8px -8px 18px rgba(61, 71, 80, 0.28) !important;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-glow {
+  background: linear-gradient(to bottom, rgba(143, 184, 180, 0.1), transparent) !important;
+  opacity: 1 !important;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-close {
+  background-color: #252c33 !important;
+  color: #b8c6c9 !important;
+  box-shadow: var(--shadow-raised-sm) !important;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-close:hover {
+  color: #edf5f3 !important;
+  background-color: #2a323a !important;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-scroll {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  scrollbar-color: rgba(184, 198, 201, 0.34) transparent;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(184, 198, 201, 0.34);
+  border-radius: 999px;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-list>div:not([class*="text-[9px]"]) {
+  min-height: 2.5rem;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-list [class*="bg-white"],
+body[data-theme="dark-neumorphism"] .calendar-guide-list [class*="bg-rose-50"] {
+  background-color: #252c33 !important;
+}
+
+body[data-theme="dark-neumorphism"] .calendar-guide-list [class*="ring-offset"] {
+  --tw-ring-offset-color: #20262c !important;
+}
+
+body[data-theme="dark-neumorphism"] [class*="text-slate-800"],
+body[data-theme="dark-neumorphism"] [class*="text-slate-900"],
+body[data-theme="dark-neumorphism"] [class*="text-slate-700"],
+body[data-theme="dark-neumorphism"] [class*="text-gray-900"],
+body[data-theme="dark-neumorphism"] [class*="text-gray-800"],
+body[data-theme="dark-neumorphism"] [class*="text-gray-700"],
+body[data-theme="dark-neumorphism"] [class*="text-text-primary"] {
+  color: var(--text-primary) !important;
+}
+
+body[data-theme="dark-neumorphism"] [class*="text-slate-600"],
+body[data-theme="dark-neumorphism"] [class*="text-slate-500"],
+body[data-theme="dark-neumorphism"] [class*="text-gray-600"],
+body[data-theme="dark-neumorphism"] [class*="text-gray-500"],
+body[data-theme="dark-neumorphism"] [class*="text-text-secondary"] {
+  color: var(--text-secondary) !important;
+}
+
+body[data-theme="dark-neumorphism"] [class*="text-slate-400"],
+body[data-theme="dark-neumorphism"] [class*="text-gray-400"] {
+  color: var(--text-muted) !important;
+}
+
+body[data-theme="dark-neumorphism"] [class*="border-slate-"],
+body[data-theme="dark-neumorphism"] [class*="border-gray-"],
+body[data-theme="dark-neumorphism"] [class*="border-white"] {
+  border-color: var(--border-soft) !important;
+}
+
+body[data-theme="dark-neumorphism"] input,
+body[data-theme="dark-neumorphism"] select,
+body[data-theme="dark-neumorphism"] textarea {
+  background-color: #171c21 !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-soft) !important;
+}
+
+body[data-theme="dark-neumorphism"] input::placeholder,
+body[data-theme="dark-neumorphism"] textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+body[data-theme="dark-neumorphism"] a,
+body[data-theme="dark-neumorphism"] [class*="text-[#7598a0]"] {
+  color: var(--accent-soft);
+}
+
+body[data-theme="dark-neumorphism"] .text-blue-600 {
+  color: #7fb6ff !important;
+}
+
+body[data-theme="dark-neumorphism"] .text-amber-600,
+body[data-theme="dark-neumorphism"] .text-amber-500 {
+  color: #facc6b !important;
+}
+
+body[data-theme="dark-neumorphism"] .text-rose-600,
+body[data-theme="dark-neumorphism"] .text-rose-500 {
+  color: #ff8aa0 !important;
+}
+
+body[data-theme="dark-neumorphism"] .text-emerald-600 {
+  color: #5eead4 !important;
+}
+
+body[data-theme="dark-neumorphism"] #report-content {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
+}
+
+body[data-theme="dark-neumorphism"] #report-content [class*="bg-white"],
+body[data-theme="dark-neumorphism"] #report-content [class*="bg-slate-50"] {
+  background-color: #f8fafc !important;
+}
+
+body[data-theme="dark-neumorphism"] #report-content [class*="text-slate-900"],
+body[data-theme="dark-neumorphism"] #report-content [class*="text-slate-800"],
+body[data-theme="dark-neumorphism"] #report-content [class*="text-slate-700"] {
+  color: #0f172a !important;
+}
+
+body[data-theme="dark-neumorphism"] #report-content [class*="text-slate-600"],
+body[data-theme="dark-neumorphism"] #report-content [class*="text-slate-500"] {
+  color: #475569 !important;
+}
+
+body[data-theme="dark-neumorphism"] #report-content [class*="text-slate-400"] {
+  color: #94a3b8 !important;
+}
+
+body[data-theme="dark-neumorphism"] #report-content [class*="border-slate-"] {
+  border-color: #cbd5e1 !important;
+}
+
 /* Premium Typography for RTL (Arabic/Persian) */
 [dir="rtl"],
 [dir="rtl"] * {

@@ -323,6 +323,8 @@
         "pms_alerts_desc": "Alert 3 days before period",
         "security": "Security",
         "security_desc_long": "This password will encrypt your personal data, making it inaccessible without the code.",
+        "dark_neumorphism": "Dark Neumorphism",
+        "dark_neumorphism_desc": "Use the Balanced Moonstone night theme (experimental)",
         "discrete_mode": "Discrete App Mode",
         "discrete_mode_desc": "Disguise app as 'Tasks' manager",
         "discrete_mode_full_desc": "Changes the app UI to a simple task manager, switches the app icon, and restarts the app. To toggle remember, hold the + button (bottom right) for 2 seconds.",

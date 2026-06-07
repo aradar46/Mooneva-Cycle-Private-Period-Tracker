@@ -26,7 +26,7 @@ export const AppRouter = () => {
 
     // --- Navigation & Theme Hooks ---
     const { view, setView, subView, setSubView, previousView } = useAppNavigation();
-    useAppTheme({ view, discreteMode: !!settings.discreteMode });
+    useAppTheme({ view, discreteMode: !!settings.discreteMode, darkNeumorphism: !!settings.darkNeumorphism });
 
     // --- Security & Onboarding State ---
     const [isLocked, setIsLocked] = useState(true);

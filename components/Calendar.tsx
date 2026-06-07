@@ -276,7 +276,7 @@ const Calendar: React.FC<CalendarProps> = ({
         </div>
 
         {isEditMode && (
-          <p className="text-center text-[11px] text-blue-800 font-semibold tracking-wide mt-1 mb-0.5 animate-pulse-slow whitespace-normal px-4 leading-snug">
+          <p className="text-center text-[13px] text-blue-800 font-semibold tracking-wide mt-1 mb-0.5 animate-pulse-slow whitespace-normal px-4 leading-snug">
             {t('calendar.edit_mode_hint', 'Tap days to add, remove or adjust your period days')}
           </p>
         )}
@@ -373,31 +373,31 @@ const Calendar: React.FC<CalendarProps> = ({
       {showLegend && (
         <>
           <div
-            className="fixed inset-0 z-[60] bg-slate-200/20 backdrop-blur-sm transition-all duration-300"
+            className="calendar-guide-backdrop fixed inset-0 z-[60] bg-slate-200/20 backdrop-blur-sm transition-all duration-300"
             onClick={() => setShowLegend(false)}
             aria-hidden="true"
           />
           <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 pointer-events-none">
             <div
-              className="bg-white rounded-[32px] p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden w-full max-w-[300px] max-h-[60vh] flex flex-col pointer-events-auto animate-scale-in"
+              className="calendar-guide-modal bg-white rounded-[32px] p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 relative overflow-hidden w-full max-w-[320px] max-h-[68vh] flex flex-col pointer-events-auto animate-scale-in"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setShowLegend(false)}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors z-20"
+                className="calendar-guide-close absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors z-20"
                 aria-label={t('calendar.guide.hide')}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
               </button>
 
-              <div className="absolute top-0 left-0 w-full h-16 bg-gradient-to-b from-[#FFF0F3] to-transparent opacity-40 z-0 pointer-events-none" />
+              <div className="calendar-guide-glow absolute top-0 left-0 w-full h-16 bg-gradient-to-b from-[#FFF0F3] to-transparent opacity-40 z-0 pointer-events-none" />
 
               <div className="relative z-10 mb-4 pr-10">
                 <h3 className="text-lg font-black text-slate-800 tracking-tight">{t('calendar.legend_title')}</h3>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t('calendar.guide_subtitle')}</p>
               </div>
 
-              <div className="relative z-10 flex-1 overflow-y-auto px-6 custom-scrollbar space-y-4 pb-2">
+              <div className="calendar-guide-scroll relative z-10 flex-1 overflow-y-auto px-5 custom-scrollbar space-y-4 pb-2">
 
                 {/* HOW TO USE */}
                 <div className="space-y-3 pb-3 border-b border-slate-100">
@@ -422,7 +422,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-y-3">
+                <div className="calendar-guide-list grid grid-cols-1 gap-y-3">
                   {/* CATEGORY 1: FLOW */}
                   <div className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-400/90 border-b border-rose-100 pb-1.5 mb-1">{t('calendar.category_flow')}</div>
 
