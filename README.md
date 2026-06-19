@@ -67,7 +67,7 @@ All your cycle data stays on your device. No server ever sees it.
 - **Clinical report** export (PDF)
 - **Discrete mode** — disguises the app icon and name
 - **PIN lock** with configurable timeout
-- **Reminder notifications** (period, ovulation, daily log, PMS)
+- **Reminder notifications** (period, ovulation, daily log, PMS, Pill)
 - **Birth control mode** — hides fertile window, tags bleeds as withdrawal
 - **No data transmission** — no internet permission declared, no health data ever leaves the device
 
@@ -133,3 +133,43 @@ Any modified version you distribute must also be open-sourced under GPL-3.0.
 - Google Play: [com.mooneva.app](https://play.google.com/store/apps/details?id=com.mooneva.app&pcampaignid=web_share)
 - App Store: [Mooneva Cycle](https://apps.apple.com/us/app/mooneva-cycle/id6761208425)
 - Issue tracker: [GitHub Issues](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues)
+
+---
+
+## Release Log
+
+### 2.0.2
+- Added a first-day-of-week setting so calendars can start on Monday, Sunday, or Saturday independent of app language.
+- Added pill time logging with editable 24-hour times, calendar/preview badges, backup support, and clinical report output.
+- Added the pill logged marker to the calendar guide.
+- Moved advanced period options under the Flow tab and kept them visible but disabled until a period day is selected.
+- Fixed trend heatmaps so mood and symptom row headers stay visible while scrolling across cycle days, including RTL layouts.
+
+---
+
+## Roadmap
+
+### In progress
+- fixing bugs and tweak user friendliness
+- dark theme
+
+### Planned
+- Zero-knowledge cross-device sync — encrypted client-side,
+  server sees only opaque blobs. Device pairing via QR code
+  and ECDH key exchange. Opt-in and sandboxed so the
+  zero-internet-permission guarantee holds for users who
+  skip it.
+- Import and migrate data from other period and cycle tracking apps
+
+Have a feature request? Open an [issue](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues) and let us know.
+
+---
+
+## Support the project
+
+Mooneva Cycle is free, open source, and built without any VC funding or commercial data model. If it is useful to you, the best things you can do are:
+
+- Leave a review on [Google Play](https://play.google.com/store/apps/details?id=com.mooneva.app) or the [App Store](https://apps.apple.com/us/app/mooneva-cycle/id6761208425)
+- Star the repo
+- Report bugs or suggest features via [GitHub Issues](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues)
+- Share it with anyone who cares about health data privacy

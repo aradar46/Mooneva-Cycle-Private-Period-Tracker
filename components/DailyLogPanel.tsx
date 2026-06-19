@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { DailyLog, FlowIntensity, MoodOptionConfig, MOOD_OPTIONS, PeriodRecord, SYMPTOM_GROUPS, DischargeType, SexDriveType, SexType } from '../types';
 import { findNearbyPeriod } from '../services/logic';
 import { toLocalISOString, addDays, diffInDays } from '../utils/dateUtils';
+import { formatLocalTimeHHmm } from '../utils/timeFormat';
 import { useAutoSave } from '../hooks/useAutoSave';
 import { useMooneva } from '../contexts/MoonevaContext';
 import { createPortal } from 'react-dom';
@@ -55,6 +56,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
     const [discharge, setDischarge] = useState<DischargeType>(log?.discharge || null);
     const [sexDrive, setSexDrive] = useState<SexDriveType>(log?.sexDrive || null);
     const [sexType, setSexType] = useState<SexType>(log?.sexType || null);
+    const [pillTakenAt, setPillTakenAt] = useState<string | undefined>(log?.pillTakenAt);
 
     // Sync state when date/logs change
     useEffect(() => {
@@ -66,6 +68,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
         setDischarge(activeLog?.discharge || null);
         setSexDrive(activeLog?.sexDrive || null);
         setSexType(activeLog?.sexType || null);
+        setPillTakenAt(activeLog?.pillTakenAt);
     }, [date, logs]);
 
     // Check if there is an existing period overlapping this date
@@ -88,12 +91,13 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
             mood,
             discharge,
             sexDrive,
-            sexType
+            sexType,
+            pillTakenAt
         });
         // Note: Auto-period creation removed. Periods are managed via calendar toggle only.
-    }, [date, flow, symptoms, notes, mood, discharge, sexDrive, sexType, updateLog]);
+    }, [date, flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, updateLog]);
 
-    useAutoSave(saveToLog, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, saveToLog]);
+    useAutoSave(saveToLog, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, saveToLog]);
 
     const handleMerge = () => {
         if (!mergePrompt?.nearbyPeriod) return;
@@ -128,15 +132,20 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
     const isFuture = !!meta.isUnavailableFuture;
     const visibleSymptoms = settings.symptoms.filter(s => !s.isHidden);
 
-    type TabId = 'flow' | 'mood' | 'symptoms' | 'notes' | 'advanced';
+    type TabId = 'flow' | 'mood' | 'symptoms' | 'notes' | 'pill';
     const [activeTab, setActiveTab] = useState<TabId>('flow');
+    const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
     const tabItems = [
         { id: 'flow' as const, labelKey: 'log.flow_tab' },
         { id: 'mood' as const, labelKey: 'log.mood' },
         { id: 'symptoms' as const, labelKey: 'log.vitals_tab' },
         { id: 'notes' as const, labelKey: 'log.notes' },
-        { id: 'advanced' as const, labelKey: 'log.advanced' }
+        { id: 'pill' as const, labelKey: 'log.pill_tab' }
     ];
+
+    useEffect(() => {
+        setIsAdvancedOpen(false);
+    }, [date]);
 
     const toggleMood = (m: string) => {
         if (mood.includes(m)) {
@@ -146,6 +155,138 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                 setMood([...mood, m]);
             }
         }
+    };
+
+    const renderAdvancedContent = () => {
+        if (!activePeriod) {
+            return (
+                <section className="flex flex-col gap-4 py-2">
+                    <p className="text-xs text-slate-400 text-center px-3">
+                        {t('log.no_period_advanced', 'This date is not part of a period. Start or select a period day to access advanced options.')}
+                    </p>
+
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 pl-1">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-300">{t('log.period_type', 'Period Type')}</span>
+                            <div className="h-[1.5px] w-6 bg-indigo-100 rounded-full" />
+                        </div>
+                        <div
+                            aria-disabled="true"
+                            className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-not-allowed opacity-50"
+                            style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.25)' }}
+                        >
+                            <div className="flex-1">
+                                <label className="text-[11px] font-bold text-slate-600 select-none block">
+                                    {t('log.withdrawal_bleed_question', 'Was this a withdrawal bleed?')}
+                                </label>
+                                <p className="text-[9px] text-slate-400 mt-0.5">
+                                    {t('log.withdrawal_bleed_desc', 'Tag if on hormonal birth control (pill, ring, patch)')}
+                                </p>
+                            </div>
+                            <div className="w-6 h-6 rounded-lg bg-white border-2 border-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.3)]" />
+                        </div>
+                    </div>
+
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 pl-1">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-300">{t('log.stats')}</span>
+                            <div className="h-[1.5px] w-6 bg-amber-100 rounded-full" />
+                        </div>
+                        <div
+                            aria-disabled="true"
+                            className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-not-allowed opacity-50"
+                            style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.25)' }}
+                        >
+                            <div className="flex-1">
+                                <label className="text-[11px] font-bold text-slate-600 select-none block">
+                                    {t('log.ignore_averages_question', 'Exclude from cycle averages?')}
+                                </label>
+                                <p className="text-[9px] text-slate-400 mt-0.5">
+                                    {t('log.ignore_averages_desc', 'For irregular cycles (stress, illness, etc.)')}
+                                </p>
+                            </div>
+                            <div className="w-6 h-6 rounded-lg bg-white border-2 border-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.3)]" />
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        return (
+            <section className="flex flex-col gap-4 py-2">
+                <div className="space-y-3">
+                    <div className="flex items-center gap-2 pl-1">
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400">{t('log.period_type', 'Period Type')}</span>
+                        <div className="h-[1.5px] w-6 bg-indigo-200 rounded-full" />
+                    </div>
+                    <div
+                        className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-pointer transition-all active:scale-[0.99]"
+                        style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
+                        onClick={() => updatePeriodWithdrawalBleed(activePeriod.id, !activePeriod.isWithdrawalBleed)}
+                    >
+                        <div className="flex-1">
+                            <label className="text-[11px] font-bold text-slate-700 cursor-pointer select-none block">
+                                {t('log.withdrawal_bleed_question', 'Was this a withdrawal bleed?')}
+                            </label>
+                            <p className="text-[9px] text-slate-400 mt-0.5">
+                                {t('log.withdrawal_bleed_desc', 'Tag if on hormonal birth control (pill, ring, patch)')}
+                            </p>
+                        </div>
+                        <div
+                            className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 border-2
+                            ${activePeriod.isWithdrawalBleed
+                                    ? 'bg-indigo-50 border-indigo-400 text-indigo-600'
+                                    : 'bg-white border-transparent text-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.4)]'}`}
+                        >
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </div>
+                    </div>
+                    {activePeriod.isWithdrawalBleed && (
+                        <p className="text-[10px] text-indigo-500 px-1 font-medium">
+                            💊 {t('log.withdrawal_tagged', 'This period is tagged as a withdrawal bleed and will be excluded from natural cycle statistics.')}
+                        </p>
+                    )}
+                </div>
+
+                <div className="space-y-3">
+                    <div className="flex items-center gap-2 pl-1">
+                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-400">{t('log.stats')}</span>
+                        <div className="h-[1.5px] w-6 bg-amber-200 rounded-full" />
+                    </div>
+                    <div
+                        className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-pointer transition-all active:scale-[0.99]"
+                        style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
+                        onClick={() => updatePeriodIgnoreForAverages(activePeriod.id, !activePeriod.ignoreForAverages)}
+                    >
+                        <div className="flex-1">
+                            <label className="text-[11px] font-bold text-slate-700 cursor-pointer select-none block">
+                                {t('log.ignore_averages_question', 'Exclude from cycle averages?')}
+                            </label>
+                            <p className="text-[9px] text-slate-400 mt-0.5">
+                                {t('log.ignore_averages_desc', 'For irregular cycles (stress, illness, etc.)')}
+                            </p>
+                        </div>
+                        <div
+                            className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 border-2
+                            ${activePeriod.ignoreForAverages
+                                    ? 'bg-amber-50 border-amber-400 text-amber-600'
+                                    : 'bg-white border-transparent text-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.4)]'}`}
+                        >
+                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                        </div>
+                    </div>
+                    {activePeriod.ignoreForAverages && (
+                        <p className="text-[10px] text-amber-500 px-1 font-medium">
+                            ⚠️ {t('log.ignore_tagged', 'This period will be excluded from cycle length calculations and averages.')}
+                        </p>
+                    )}
+                </div>
+            </section>
+        );
     };
 
     return (
@@ -167,6 +308,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                     {!meta.isUnavailableFuture && (
                         <div
                             className="flex-1 min-w-0 flex flex-nowrap gap-0 p-1.5 bg-[#F0F2F5] rounded-2xl overflow-x-auto no-scrollbar mt-[5px]"
+                            aria-label={t('log.daily_log_tabs', 'Daily log tabs')}
                             style={{ boxShadow: 'inset 3px 3px 6px rgba(163, 177, 198, 0.4), inset -3px -3px 6px rgba(255, 255, 255, 0.8)' }}
                         >
                             {tabItems.map((tab) => (
@@ -256,6 +398,30 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                             ))
                                         )}
                                     </div>
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsAdvancedOpen(open => !open)}
+                                        aria-expanded={isAdvancedOpen}
+                                        className="mx-auto flex items-center gap-1 px-3 py-1 text-[11px] font-semibold text-slate-500 hover:text-slate-700 transition-colors"
+                                    >
+                                        <span>{t('log.advanced', 'Advanced')}</span>
+                                        <svg
+                                            className={`w-3.5 h-3.5 transition-transform ${isAdvancedOpen ? 'rotate-180' : ''}`}
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                            aria-hidden="true"
+                                        >
+                                            <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                                        </svg>
+                                    </button>
+
+                                    {isAdvancedOpen && (
+                                        <div className="animate-fade-in">
+                                            {renderAdvancedContent()}
+                                        </div>
+                                    )}
                                 </div>
                             </section>
                         )}
@@ -396,88 +562,52 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                             </section>
                         )}
 
-                        {activeTab === 'advanced' && activePeriod && (
+                        {activeTab === 'pill' && (
                             <section className="flex flex-col gap-4 py-2">
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 pl-1">
-                                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400">{t('log.period_type', 'Period Type')}</span>
-                                        <div className="h-[1.5px] w-6 bg-indigo-200 rounded-full" />
+                                <label
+                                    className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-cyan-100/60 cursor-pointer transition-all active:scale-[0.99]"
+                                    style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
+                                >
+                                    <div className="flex-1">
+                                        <span className="text-[11px] font-bold text-slate-700 select-none block">
+                                            {t('log.pill_taken', 'Took pill')}
+                                        </span>
                                     </div>
+                                    <input
+                                        type="checkbox"
+                                        aria-label={t('log.pill_taken', 'Took pill')}
+                                        checked={!!pillTakenAt}
+                                        onChange={(event) => {
+                                            setPillTakenAt(event.target.checked ? formatLocalTimeHHmm() : undefined);
+                                        }}
+                                        className="sr-only"
+                                    />
                                     <div
-                                        className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-pointer transition-all active:scale-[0.99]"
-                                        style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
-                                        onClick={() => updatePeriodWithdrawalBleed(activePeriod.id, !activePeriod.isWithdrawalBleed)}
+                                        className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 border-2
+                                        ${pillTakenAt
+                                                ? 'bg-cyan-50 border-cyan-400 text-cyan-600'
+                                                : 'bg-white border-transparent text-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.4)]'}`}
                                     >
-                                        <div className="flex-1">
-                                            <label className="text-[11px] font-bold text-slate-700 cursor-pointer select-none block">
-                                                {t('log.withdrawal_bleed_question', 'Was this a withdrawal bleed?')}
-                                            </label>
-                                            <p className="text-[9px] text-slate-400 mt-0.5">
-                                                {t('log.withdrawal_bleed_desc', 'Tag if on hormonal birth control (pill, ring, patch)')}
-                                            </p>
-                                        </div>
-                                        <div
-                                            className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 border-2
-                                            ${activePeriod.isWithdrawalBleed
-                                                    ? 'bg-indigo-50 border-indigo-400 text-indigo-600'
-                                                    : 'bg-white border-transparent text-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.4)]'}`}
-                                        >
-                                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                                <polyline points="20 6 9 17 4 12" />
-                                            </svg>
-                                        </div>
+                                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
                                     </div>
-                                    {activePeriod.isWithdrawalBleed && (
-                                        <p className="text-[10px] text-indigo-500 px-1 font-medium">
-                                            💊 {t('log.withdrawal_tagged', 'This period is tagged as a withdrawal bleed and will be excluded from natural cycle statistics.')}
-                                        </p>
-                                    )}
-                                </div>
+                                </label>
 
-                                {/* Ignore for Averages Toggle */}
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 pl-1">
-                                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-400">{t('log.stats')}</span>
-                                        <div className="h-[1.5px] w-6 bg-amber-200 rounded-full" />
-                                    </div>
-                                    <div
-                                        className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-pointer transition-all active:scale-[0.99]"
-                                        style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
-                                        onClick={() => updatePeriodIgnoreForAverages(activePeriod.id, !activePeriod.ignoreForAverages)}
-                                    >
-                                        <div className="flex-1">
-                                            <label className="text-[11px] font-bold text-slate-700 cursor-pointer select-none block">
-                                                {t('log.ignore_averages_question', 'Exclude from cycle averages?')}
-                                            </label>
-                                            <p className="text-[9px] text-slate-400 mt-0.5">
-                                                {t('log.ignore_averages_desc', 'For irregular cycles (stress, illness, etc.)')}
-                                            </p>
-                                        </div>
-                                        <div
-                                            className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 border-2
-                                            ${activePeriod.ignoreForAverages
-                                                    ? 'bg-amber-50 border-amber-400 text-amber-600'
-                                                    : 'bg-white border-transparent text-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.4)]'}`}
-                                        >
-                                            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
-                                                <polyline points="20 6 9 17 4 12" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    {activePeriod.ignoreForAverages && (
-                                        <p className="text-[10px] text-amber-500 px-1 font-medium">
-                                            ⚠️ {t('log.ignore_tagged', 'This period will be excluded from cycle length calculations and averages.')}
-                                        </p>
-                                    )}
-                                </div>
-                            </section>
-                        )}
-
-                        {activeTab === 'advanced' && !activePeriod && (
-                            <section className="flex flex-col items-center justify-center py-8">
-                                <p className="text-xs text-slate-400 text-center">
-                                    {t('log.no_period_advanced', 'This date is not part of a period. Start or select a period day to access advanced options.')}
-                                </p>
+                                {pillTakenAt && (
+                                    <label className="flex items-center justify-between gap-3 p-4 bg-white/50 rounded-xl border border-cyan-100/70">
+                                        <span className="text-[11px] font-bold text-slate-600">
+                                            {t('log.pill_time', 'Pill time')}
+                                        </span>
+                                        <input
+                                            type="time"
+                                            aria-label={t('log.pill_time', 'Pill time')}
+                                            value={pillTakenAt}
+                                            onChange={(event) => setPillTakenAt(event.target.value || undefined)}
+                                            className="text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-cyan-300/40 outline-none"
+                                        />
+                                    </label>
+                                )}
                             </section>
                         )}
                     </>

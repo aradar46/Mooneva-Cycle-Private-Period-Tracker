@@ -1,0 +1,5 @@
+Added a first-day-of-week setting, pill time logging, and clearer advanced period controls.
+
+Calendar and trend views now better explain and preserve context: pill logs appear in the calendar guide, and mood/symptom timeline row headers stay visible while scrolling.
+
+Includes bug fixes and usability improvements across calendar logging, previews, reports, backups, and RTL layouts.

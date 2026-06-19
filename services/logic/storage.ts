@@ -15,6 +15,7 @@ import {
     isFullFlowDay,
     CYCLE_GAP_THRESHOLD_DAYS
 } from './cycle';
+import { normalizeFirstDayOfWeek } from '../../utils/weekStart';
 
 // --- Constants ---
 const STORAGE_KEY_ENCRYPTED = 'mooneva_data_enc';
@@ -124,6 +125,13 @@ export const loadSettings = (): AppSettings => {
             // Legacy migrations
             if (parsed.theme === 'discrete' || parsed.cloakedMode) {
                 parsed.discreteMode = true;
+            }
+
+            const normalizedFirstDayOfWeek = normalizeFirstDayOfWeek(parsed.firstDayOfWeek);
+            if (normalizedFirstDayOfWeek) {
+                parsed.firstDayOfWeek = normalizedFirstDayOfWeek;
+            } else {
+                delete parsed.firstDayOfWeek;
             }
 
             return {

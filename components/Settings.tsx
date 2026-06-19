@@ -3,13 +3,14 @@ import { version } from '../package.json';
 import Logger from '../services/logger';
 import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { AppSettings, PeriodRecord } from '../types';
+import type { AppSettings, FirstDayOfWeek, PeriodRecord } from '../types';
 import { useTranslation } from 'react-i18next';
 import { SettingCard, SettingRow, Toggle } from './settings/SettingsUI';
 import DataManagementView from './settings/DataManagementView';
 import NumberSettingRow from './settings/NumberSettingRow';
 import { ClinicalReportView } from './settings/ClinicalReportView';
 import { addDays, getTodayStr } from '../utils/dateUtils';
+import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
 
 import { SubViewType, ViewType } from '../hooks/useAppNavigation';
 
@@ -42,6 +43,7 @@ const Icons = {
   Message: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>,
   Search: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>,
   Bell: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>,
+  Calendar: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h18" /></svg>,
   Database: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /></svg>,
   Share: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" /></svg>
 };
@@ -59,6 +61,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
   const [showAdaptiveOffWarning, setShowAdaptiveOffWarning] = useState(false);
   const [pendingAction, setPendingAction] = useState<'bc' | 'pause' | null>(null);
   const [periodForDialog, setPeriodForDialog] = useState<PeriodRecord | null>(null);
+  const effectiveFirstDayOfWeek = resolveFirstDayOfWeek(i18n.language, settings.firstDayOfWeek);
 
   const activePeriod = useMemo(() => {
     const todayStr = getTodayStr();
@@ -521,7 +524,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
           {/* 2. Language */}
           <section>
             <SettingCard title={t('settings.language')}>
-              <SettingRow label={t('settings.language')} icon={<Icons.Globe />} last>
+              <SettingRow label={t('settings.language')} icon={<Icons.Globe />}>
                 <select
                   value={i18n.language}
                   onChange={(e) => {
@@ -542,6 +545,37 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                     <option key={lang.code} value={lang.code}>{lang.label}</option>
                   ))}
                 </select>
+              </SettingRow>
+              <SettingRow
+                label={t('settings.first_day_of_week')}
+                desc={t('settings.first_day_of_week_desc')}
+                icon={<Icons.Calendar />}
+                last
+              >
+                <div className="flex flex-col items-end gap-1">
+                  <select
+                    aria-label={t('settings.first_day_of_week')}
+                    value={effectiveFirstDayOfWeek}
+                    onChange={(e) => onUpdate({
+                      ...settings,
+                      firstDayOfWeek: e.target.value as FirstDayOfWeek
+                    })}
+                    className="bg-slate-100 border-none text-text-secondary text-sm font-medium rounded-lg px-3 py-2 pr-8 focus:ring-2 focus:ring-accent/20 outline-none"
+                  >
+                    {FIRST_DAY_OPTIONS.map(day => (
+                      <option key={day} value={day}>{t(`settings.week_start_${day}`)}</option>
+                    ))}
+                  </select>
+                  {settings.firstDayOfWeek && (
+                    <button
+                      type="button"
+                      onClick={() => onUpdate({ ...settings, firstDayOfWeek: undefined })}
+                      className="text-[9px] font-bold uppercase tracking-wider text-[#7598a0] hover:text-[#5d7f87] transition-colors"
+                    >
+                      {t('settings.use_language_default')}
+                    </button>
+                  )}
+                </div>
               </SettingRow>
             </SettingCard>
           </section>

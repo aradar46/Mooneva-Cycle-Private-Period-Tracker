@@ -155,6 +155,12 @@ export const DayCell: React.FC<DayCellProps> = ({
                             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                         </svg>
                     )}
+                    {/* Pill taken - cyan capsule */}
+                    {log?.pillTakenAt && (
+                        <svg aria-label="Pill taken" role="img" className="w-[10px] h-[10px] text-cyan-500" viewBox="0 0 24 24" fill="currentColor">
+                            <path fillRule="evenodd" d="M19.5 6.5a3.5 3.5 0 0 0-7 0v11a3.5 3.5 0 1 0 7 0v-11ZM16 2a5.5 5.5 0 0 0-5.5 5.5v11a5.5 5.5 0 1 0 11 0v-11A5.5 5.5 0 0 0 16 2Zm-3.5 5.5v4.25h7V7.5a3.5 3.5 0 1 0-7 0Z" clipRule="evenodd" />
+                        </svg>
+                    )}
                     {/* Notes - paperclip */}
                     {log?.notes && (
                         <svg className="w-[9px] h-[9px] text-slate-500 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

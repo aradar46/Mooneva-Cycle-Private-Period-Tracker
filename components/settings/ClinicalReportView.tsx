@@ -5,6 +5,7 @@ import { useMooneva } from '../../contexts/MoonevaContext';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { addDays } from '../../utils/dateUtils';
+import { hasDailyLogContent } from '../../utils/dailyLogContent';
 import { formatNumber } from '../../services/i18n';
 import { Cycle, DailyLog, MOOD_OPTIONS } from '../../types';
 
@@ -127,7 +128,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                 const log = logs[date];
 
                 // Only include days with data
-                if (log && (log.flow || (log.symptoms && log.symptoms.length > 0) || (log.mood && (Array.isArray(log.mood) ? log.mood.length > 0 : true)) || log.notes || log.sexDrive || log.discharge || log.sexType)) {
+                if (log && hasDailyLogContent(log)) {
                     cycleDays.push({ ...log, cycleDay: i + 1 });
                 }
             }
@@ -365,6 +366,11 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                                             {/* Flow */}
                                             <td className={`py-2 px-2 text-center font-bold text-slate-800 ${isRtl ? 'border-l' : 'border-r'} border-slate-100`}>
                                                 <span className="text-xs">{getFlowLabel(day.flow)}</span>
+                                                {day.pillTakenAt && (
+                                                    <span className="mt-1 block text-[9px] font-bold text-cyan-700">
+                                                        {t('log.pill_report_label', 'Pill')}: {day.pillTakenAt}
+                                                    </span>
+                                                )}
                                             </td>
 
                                             {/* Combined Sex / Libido / Secretion */}

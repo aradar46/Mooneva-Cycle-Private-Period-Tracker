@@ -15,6 +15,7 @@ import { useDiscreteMode } from '../../hooks/useDiscreteMode';
 import { useSwipe } from '../../hooks/useSwipe';
 import { SubViewType, ViewType } from '../../hooks/useAppNavigation';
 import { toLocalISOString } from '../../utils/dateUtils';
+import { hasDailyLogContent } from '../../utils/dailyLogContent';
 import { PeriodRecord } from '../../types';
 
 interface CalendarScreenProps {
@@ -89,15 +90,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
     // Handle date click - skip preview for empty days
     const handleDateClick = (dateStr: string) => {
         const log = logs[dateStr];
-        const hasLogData = !!(log && (
-            log.flow ||
-            log.mood ||
-            (log.symptoms && log.symptoms.length > 0) ||
-            log.notes ||
-            log.discharge ||
-            log.sexDrive ||
-            log.sexType
-        ));
+        const hasLogData = hasDailyLogContent(log);
 
         if (previewDate === dateStr) {
             // Second click on same day: always go to editor

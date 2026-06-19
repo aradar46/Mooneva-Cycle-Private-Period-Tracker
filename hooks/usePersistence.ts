@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DailyLog, AppSettings, INITIAL_SYMPTOMS, PeriodRecord } from '../types';
 import { loadData, saveData, loadSettings, saveSettings, loadPeriods, savePeriods, findNearbyPeriod, MIN_GAP_DAYS } from '../services/logic';
 import { addDays, diffInDays } from '../utils/dateUtils';
+import { hasDailyLogContent } from '../utils/dailyLogContent';
 import Logger from '../services/logger';
 import { syncReminderNotifications } from '../services/notifications';
 
@@ -117,7 +118,7 @@ export const usePersistence = (): UsePersistenceResult => {
     const updateLog = useCallback(async (date: string, data: DailyLog) => {
         setLogs(prev => {
             const newLogs = { ...prev, [date]: data };
-            if (!data.flow && data.symptoms.length === 0 && !data.notes && !data.mood) {
+            if (!hasDailyLogContent(data)) {
                 delete newLogs[date];
             }
             return newLogs;

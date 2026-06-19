@@ -47,8 +47,15 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
     rows,
     maxValue
 }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const scale = COLOR_SCALES[colorScale];
+    const isRtl = i18n.dir?.() === 'rtl';
+    const stickyHeaderClass = isRtl
+        ? 'sticky right-0 pl-2 text-left'
+        : 'sticky left-0 pr-2 text-right';
+    const stickyShadowClass = isRtl
+        ? 'shadow-[-4px_0_8px_rgba(240,242,245,0.95)]'
+        : 'shadow-[4px_0_8px_rgba(240,242,245,0.95)]';
 
     return (
         <section
@@ -79,7 +86,7 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                 <div className="min-w-[700px]">
                     {/* Day Header */}
                     <div className="flex mb-1">
-                        <div className="w-20 shrink-0" />
+                        <div className={`w-20 shrink-0 ${stickyHeaderClass} z-30 bg-[#F0F2F5]`} />
                         {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
                             <div
                                 key={day}
@@ -94,7 +101,9 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                     {/* Grid Rows - Smooth heat gradient */}
                     {rows.map((row) => (
                         <div key={row.id} className="flex items-center h-5 mb-0.5">
-                            <div className="w-20 shrink-0 text-[9px] font-semibold text-slate-500 pr-2 text-right truncate capitalize">
+                            <div
+                                className={`w-20 shrink-0 ${stickyHeaderClass} ${stickyShadowClass} z-20 bg-[#F0F2F5] text-[9px] font-semibold text-slate-500 truncate capitalize`}
+                            >
                                 {t(`symptom.${row.label.toLowerCase()}`, row.label)}
                             </div>
                             {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {

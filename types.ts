@@ -1,4 +1,5 @@
 export type FlowIntensity = 'light' | 'medium' | 'heavy' | 'spotting' | null;
+export type FirstDayOfWeek = 'monday' | 'sunday' | 'saturday';
 
 // Big 5 Menstrual Moods - covers 95% of cycle-related mood shifts
 export type MoodType = 'energetic' | 'calm' | 'sad' | 'anxious' | 'irritable' | null;
@@ -39,6 +40,7 @@ export interface DailyLog {
   discharge?: DischargeType;
   sexDrive?: SexDriveType;
   sexType?: SexType;
+  pillTakenAt?: string; // Local HH:mm time when birth control pill was taken
   // --- Medical Flags ---
   isWithdrawalBleeding?: boolean; // Tagged if on birth control during log
   ignoreForAverages?: boolean;   // Manual override for outliers (miscarriage, stress, etc)
@@ -149,6 +151,7 @@ export interface AppSettings {
   reminderPillDailyTime?: string;
 
   // Global Behaviour
+  firstDayOfWeek?: FirstDayOfWeek;
   reminderGentleMode?: boolean; // If true, suppress notifications if app used recently, etc.
 }
 

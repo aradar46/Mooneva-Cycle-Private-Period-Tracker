@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { toJalaali, toGregorian, jalaaliMonthLength, isLeapJalaaliYear, jalaaliMonths } from '../utils/jalaali';
+import type { FirstDayOfWeek } from '../types';
+import { getLeadingDayCount, getWeekDayKeys, resolveFirstDayOfWeek } from '../utils/weekStart';
 
 export interface CalendarDateParts {
     year: number;
@@ -20,14 +22,16 @@ export interface CalendarSystem {
     getMonthGrid: (year: number, month: number) => { date: Date; isCurrentMonth: boolean; label: number }[];
 }
 
-export const useCalendarSystem = (): CalendarSystem => {
-    const { i18n, t } = useTranslation();
+export const useCalendarSystem = (firstDayOfWeek?: FirstDayOfWeek): CalendarSystem => {
+    const { i18n } = useTranslation();
     const isJalaali = i18n.language === 'fa';
+    const effectiveFirstDayOfWeek = resolveFirstDayOfWeek(i18n.language, firstDayOfWeek);
+    const weekDayKeys = getWeekDayKeys(effectiveFirstDayOfWeek);
 
     if (isJalaali) {
         const jalaaliSystem: CalendarSystem = {
             name: 'jalaali',
-            weekDayKeys: ['sa', 'su', 'mo', 'tu', 'we', 'th', 'fr'], // Persian week starts Saturday
+            weekDayKeys,
 
             today: () => {
                 const now = new Date();
@@ -79,8 +83,7 @@ export const useCalendarSystem = (): CalendarSystem => {
             getFirstDayOfWeek: (year: number, month: number) => {
                 const g = toGregorian(year, month + 1, 1);
                 const gDate = new Date(g.gy, g.gm - 1, g.gd);
-                const gDay = gDate.getDay();
-                return (gDay + 1) % 7;
+                return getLeadingDayCount(gDate.getDay(), effectiveFirstDayOfWeek);
             },
 
             getMonthGrid: (year: number, month: number) => {
@@ -123,7 +126,7 @@ export const useCalendarSystem = (): CalendarSystem => {
     // Default Gregorian System
     const gregorianSystem: CalendarSystem = {
         name: 'gregorian',
-        weekDayKeys: ['su', 'mo', 'tu', 'we', 'th', 'fr', 'sa'],
+        weekDayKeys,
 
         today: () => {
             const now = new Date();
@@ -156,12 +159,12 @@ export const useCalendarSystem = (): CalendarSystem => {
         },
 
         getFirstDayOfWeek: (year: number, month: number) => {
-            return new Date(year, month, 1).getDay();
+            return getLeadingDayCount(new Date(year, month, 1).getDay(), effectiveFirstDayOfWeek);
         },
 
         getMonthGrid: (year: number, month: number) => {
             const daysInCurrentMonth = new Date(year, month + 1, 0).getDate();
-            const firstDayOfWeek = new Date(year, month, 1).getDay();
+            const firstDayOfWeek = gregorianSystem.getFirstDayOfWeek(year, month);
             const totalCellsNeeded = firstDayOfWeek + daysInCurrentMonth;
             const rowCount = Math.ceil(totalCellsNeeded / 7);
             const totalCells = rowCount * 7;

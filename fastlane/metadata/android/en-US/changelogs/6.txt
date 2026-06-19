@@ -1,0 +1,1 @@
+Removed internet permission — the app now declares zero network permissions. All data remains fully on-device. Bug fixes for cycle predictions and backup restore.

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useMooneva } from '../contexts/MoonevaContext';
 import { MOOD_OPTIONS } from '../types';
 import { toLocalISOString } from '../utils/dateUtils';
+import { hasDailyLogContent } from '../utils/dailyLogContent';
 
 interface DayPreviewProps {
     date: string;
@@ -26,7 +27,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
         return current >= start && current <= end;
     });
 
-    const hasContent = log && (log.flow || log.symptoms?.length || log.notes || log.mood || log.discharge || log.sexDrive || log.sexType);
+    const hasContent = hasDailyLogContent(log);
 
     if (!hasContent && !activePeriod) {
         return null;
@@ -106,32 +107,45 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
             {/* Content Body */}
             <div className="space-y-2 px-1">
                 {/* Symptoms & Vitals */}
-                {(log?.symptoms?.length > 0 || log?.discharge || log?.sexDrive || log?.sexType || activePeriod?.isWithdrawalBleed || activePeriod?.ignoreForAverages) && (
+                {(log?.symptoms?.length > 0 || log?.discharge || log?.sexDrive || log?.sexType || log?.pillTakenAt || activePeriod?.isWithdrawalBleed || activePeriod?.ignoreForAverages) && (
                     <div className="flex flex-wrap items-center gap-1.5">
-                        {log.symptoms?.map((s) => (
+                        {log?.symptoms?.map((s) => (
                             <span key={s} className="text-[10px] font-bold text-slate-500 bg-white/50 px-2 py-0.5 rounded-full">
                                 {t(`symptom.${s.toLowerCase()}`, s)}
                             </span>
                         ))}
-                        {log.discharge && (
+                        {log?.discharge && (
                             <span className="text-[10px] font-bold text-teal-600 bg-teal-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                                 {isRtl
                                     ? `${t('log.secretions')} ${t(`log.discharge_${log.discharge}`, log.discharge)}`
                                     : `${t(`log.discharge_${log.discharge}`, log.discharge)} ${t('log.secretions')}`}
                             </span>
                         )}
-                        {log.sexDrive && (
+                        {log?.sexDrive && (
                             <span className="text-[10px] font-bold text-amber-600 bg-amber-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                                 {isRtl
                                     ? `${t('log.libido')} ${t(`log.libido_${log.sexDrive}`, log.sexDrive)}`
                                     : `${t(`log.libido_${log.sexDrive}`, log.sexDrive)} ${t('log.libido')}`}
                             </span>
                         )}
-                        {log.sexType && (
+                        {log?.sexType && (
                             <span className="text-[10px] font-bold text-purple-600 bg-purple-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                                 {isRtl
                                     ? `${t('log.sex_activity')} ${t(`log.sex_${log.sexType}`, log.sexType)}`
                                     : `${t(`log.sex_${log.sexType}`, log.sexType)} ${t('log.sex_activity')}`}
+                            </span>
+                        )}
+                        {log?.pillTakenAt && (
+                            <span
+                                aria-label={t('log.pill_taken_at', { time: log.pillTakenAt })}
+                                className="inline-flex h-[20px] overflow-hidden rounded-full border border-cyan-100/80 shadow-[1px_1px_3px_rgba(14,116,144,0.12),-1px_-1px_3px_rgba(255,255,255,0.75)]"
+                            >
+                                <span className="flex items-center bg-cyan-500 px-2 text-[10px] font-black uppercase tracking-tighter text-white">
+                                    {t('log.pill_badge', 'Pill')}
+                                </span>
+                                <span className="flex items-center bg-cyan-50 px-2 text-[10px] font-black tabular-nums tracking-tight text-cyan-800">
+                                    {log.pillTakenAt}
+                                </span>
                             </span>
                         )}
                         {activePeriod?.isWithdrawalBleed && (
