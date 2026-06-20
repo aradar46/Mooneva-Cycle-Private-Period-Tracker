@@ -1,7 +1,7 @@
 {
   "name": "mooneva-private-period-tracker",
   "private": true,
-  "version": "2.0.2",
+  "version": "2.0.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,13 +10,12 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@capacitor-community/in-app-review": "^8.0.0",
-    "@capacitor/android": "^8.0.2",
+    "@capacitor/android": "8.4.1",
     "@capacitor/app": "^8.0.0",
-    "@capacitor/cli": "^8.0.2",
-    "@capacitor/core": "^8.0.2",
+    "@capacitor/cli": "8.4.1",
+    "@capacitor/core": "8.4.1",
     "@capacitor/filesystem": "^8.1.0",
-    "@capacitor/ios": "^8.3.0",
+    "@capacitor/ios": "8.4.1",
     "@capacitor/local-notifications": "^8.0.0",
     "@capacitor/share": "^8.0.0",
     "capacitor-native-settings": "^8.0.0",
