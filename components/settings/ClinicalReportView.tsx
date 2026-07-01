@@ -158,7 +158,8 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
     }, [model.cycles]);
 
     const formatDate = (dateStr: string) => {
-        return new Date(dateStr).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' });
+        const [y, m, d] = dateStr.split('-').map(Number);
+        return new Date(y, m - 1, d).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' });
     };
 
     const getFlowLabel = (flow: string | null) => {

@@ -138,6 +138,13 @@ Any modified version you distribute must also be open-sourced under GPL-3.0.
 
 ## Release Log
 
+### 2.0.4
+- Fixed a timezone bug where dates in the PDF clinical report (including registered sex logs) could appear one day earlier than the calendar.
+
+### 2.0.3
+- Fixed the F-Droid build by removing the proprietary in-app-review plugin from the public build (Play Store build is unaffected).
+- Pinned Capacitor core/android/ios/cli to 8.4.1 to stop version drift.
+
 ### 2.0.2
 - Added a first-day-of-week setting so calendars can start on Monday, Sunday, or Saturday independent of app language.
 - Added pill time logging with editable 24-hour times, calendar/preview badges, backup support, and clinical report output.
