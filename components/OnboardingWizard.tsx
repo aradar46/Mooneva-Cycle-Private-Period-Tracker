@@ -153,6 +153,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
       { code: 'sv', label: 'Swedish', native: 'Svenska', flag: '🇸🇪' },
       { code: 'zh', label: 'Chinese', native: '中文', flag: '🇨🇳' },
       { code: 'fa', label: 'Persian', native: 'فارسی', flag: '🇮🇷' },
+      { code: 'fr', label: 'French', native: 'Français', flag: '🇫🇷' },
     ];
 
     return (
