@@ -57,7 +57,7 @@ describe('Adaptive Prediction Logic', () => {
             expect(result).toEqual({
                 cycleLength: 30,
                 periodLength: 5,
-                source: 'adaptive_3'
+                source: 'adaptive'
             });
         });
 
@@ -69,7 +69,7 @@ describe('Adaptive Prediction Logic', () => {
             expect(result).toEqual({
                 cycleLength: 35,
                 periodLength: 5,
-                source: 'adaptive_3'
+                source: 'adaptive'
             });
         });
 
@@ -77,7 +77,7 @@ describe('Adaptive Prediction Logic', () => {
             // 9 cycles: [..., 28, 28, 28] -> Last 3 are 28
             const cycles = createCycles(Array(9).fill(28));
             const result = computeAdaptiveLengths(cycles);
-            expect(result?.source).toBe('adaptive_3');
+            expect(result?.source).toBe('adaptive');
             expect(result?.cycleLength).toBe(28);
         });
 
@@ -88,7 +88,7 @@ describe('Adaptive Prediction Logic', () => {
             const cycles = createCycles(lengths);
             const result = computeAdaptiveLengths(cycles);
             expect(result?.cycleLength).toBe(28);
-            expect(result?.source).toBe('adaptive_3');
+            expect(result?.source).toBe('adaptive');
         });
     });
 });

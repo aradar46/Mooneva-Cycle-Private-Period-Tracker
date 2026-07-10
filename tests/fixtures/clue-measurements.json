@@ -1,0 +1,538 @@
+[
+  {
+    "id": "m0",
+    "date": "2026-03-04",
+    "type": "spotting",
+    "value": null
+  },
+  {
+    "id": "m1",
+    "date": "2026-03-05",
+    "type": "period",
+    "value": {
+      "option": "medium"
+    }
+  },
+  {
+    "id": "m2",
+    "date": "2026-03-05",
+    "type": "pain",
+    "value": [
+      {
+        "option": "period_cramps"
+      },
+      {
+        "option": "lower_back"
+      }
+    ]
+  },
+  {
+    "id": "m3",
+    "date": "2026-03-05",
+    "type": "feelings",
+    "value": [
+      {
+        "option": "sad"
+      }
+    ]
+  },
+  {
+    "id": "m4",
+    "date": "2026-03-05",
+    "type": "energy",
+    "value": [
+      {
+        "option": "exhausted"
+      }
+    ]
+  },
+  {
+    "id": "m5",
+    "date": "2026-03-06",
+    "type": "period",
+    "value": {
+      "option": "very_heavy"
+    }
+  },
+  {
+    "id": "m6",
+    "date": "2026-03-06",
+    "type": "pain",
+    "value": [
+      {
+        "option": "period_cramps"
+      },
+      {
+        "option": "lower_back"
+      }
+    ]
+  },
+  {
+    "id": "m7",
+    "date": "2026-03-06",
+    "type": "feelings",
+    "value": [
+      {
+        "option": "sad"
+      }
+    ]
+  },
+  {
+    "id": "m8",
+    "date": "2026-03-06",
+    "type": "energy",
+    "value": [
+      {
+        "option": "exhausted"
+      }
+    ]
+  },
+  {
+    "id": "m9",
+    "date": "2026-03-07",
+    "type": "period",
+    "value": {
+      "option": "heavy"
+    }
+  },
+  {
+    "id": "m10",
+    "date": "2026-03-08",
+    "type": "period",
+    "value": {
+      "option": "medium"
+    }
+  },
+  {
+    "id": "m11",
+    "date": "2026-03-09",
+    "type": "period",
+    "value": {
+      "option": "light"
+    }
+  },
+  {
+    "id": "m12",
+    "date": "2026-04-02",
+    "type": "spotting",
+    "value": null
+  },
+  {
+    "id": "m13",
+    "date": "2026-04-03",
+    "type": "period",
+    "value": {
+      "option": "medium"
+    }
+  },
+  {
+    "id": "m14",
+    "date": "2026-04-03",
+    "type": "pain",
+    "value": [
+      {
+        "option": "period_cramps"
+      },
+      {
+        "option": "lower_back"
+      }
+    ]
+  },
+  {
+    "id": "m15",
+    "date": "2026-04-03",
+    "type": "feelings",
+    "value": [
+      {
+        "option": "sad"
+      }
+    ]
+  },
+  {
+    "id": "m16",
+    "date": "2026-04-03",
+    "type": "energy",
+    "value": [
+      {
+        "option": "exhausted"
+      }
+    ]
+  },
+  {
+    "id": "m17",
+    "date": "2026-04-04",
+    "type": "period",
+    "value": {
+      "option": "very_heavy"
+    }
+  },
+  {
+    "id": "m18",
+    "date": "2026-04-04",
+    "type": "pain",
+    "value": [
+      {
+        "option": "period_cramps"
+      },
+      {
+        "option": "lower_back"
+      }
+    ]
+  },
+  {
+    "id": "m19",
+    "date": "2026-04-04",
+    "type": "feelings",
+    "value": [
+      {
+        "option": "sad"
+      }
+    ]
+  },
+  {
+    "id": "m20",
+    "date": "2026-04-04",
+    "type": "energy",
+    "value": [
+      {
+        "option": "exhausted"
+      }
+    ]
+  },
+  {
+    "id": "m21",
+    "date": "2026-04-05",
+    "type": "period",
+    "value": {
+      "option": "heavy"
+    }
+  },
+  {
+    "id": "m22",
+    "date": "2026-04-06",
+    "type": "period",
+    "value": {
+      "option": "medium"
+    }
+  },
+  {
+    "id": "m23",
+    "date": "2026-04-07",
+    "type": "period",
+    "value": {
+      "option": "light"
+    }
+  },
+  {
+    "id": "m24",
+    "date": "2026-05-01",
+    "type": "spotting",
+    "value": null
+  },
+  {
+    "id": "m25",
+    "date": "2026-05-02",
+    "type": "period",
+    "value": {
+      "option": "medium"
+    }
+  },
+  {
+    "id": "m26",
+    "date": "2026-05-02",
+    "type": "pain",
+    "value": [
+      {
+        "option": "period_cramps"
+      },
+      {
+        "option": "lower_back"
+      }
+    ]
+  },
+  {
+    "id": "m27",
+    "date": "2026-05-02",
+    "type": "feelings",
+    "value": [
+      {
+        "option": "sad"
+      }
+    ]
+  },
+  {
+    "id": "m28",
+    "date": "2026-05-02",
+    "type": "energy",
+    "value": [
+      {
+        "option": "exhausted"
+      }
+    ]
+  },
+  {
+    "id": "m29",
+    "date": "2026-05-03",
+    "type": "period",
+    "value": {
+      "option": "very_heavy"
+    }
+  },
+  {
+    "id": "m30",
+    "date": "2026-05-03",
+    "type": "pain",
+    "value": [
+      {
+        "option": "period_cramps"
+      },
+      {
+        "option": "lower_back"
+      }
+    ]
+  },
+  {
+    "id": "m31",
+    "date": "2026-05-03",
+    "type": "feelings",
+    "value": [
+      {
+        "option": "sad"
+      }
+    ]
+  },
+  {
+    "id": "m32",
+    "date": "2026-05-03",
+    "type": "energy",
+    "value": [
+      {
+        "option": "exhausted"
+      }
+    ]
+  },
+  {
+    "id": "m33",
+    "date": "2026-05-04",
+    "type": "period",
+    "value": {
+      "option": "heavy"
+    }
+  },
+  {
+    "id": "m34",
+    "date": "2026-05-05",
+    "type": "period",
+    "value": {
+      "option": "medium"
+    }
+  },
+  {
+    "id": "m35",
+    "date": "2026-05-06",
+    "type": "period",
+    "value": {
+      "option": "light"
+    }
+  },
+  {
+    "id": "m36",
+    "date": "2026-05-31",
+    "type": "spotting",
+    "value": null
+  },
+  {
+    "id": "m37",
+    "date": "2026-06-01",
+    "type": "period",
+    "value": {
+      "option": "medium"
+    }
+  },
+  {
+    "id": "m38",
+    "date": "2026-06-01",
+    "type": "pain",
+    "value": [
+      {
+        "option": "period_cramps"
+      },
+      {
+        "option": "lower_back"
+      }
+    ]
+  },
+  {
+    "id": "m39",
+    "date": "2026-06-01",
+    "type": "feelings",
+    "value": [
+      {
+        "option": "sad"
+      }
+    ]
+  },
+  {
+    "id": "m40",
+    "date": "2026-06-01",
+    "type": "energy",
+    "value": [
+      {
+        "option": "exhausted"
+      }
+    ]
+  },
+  {
+    "id": "m41",
+    "date": "2026-06-02",
+    "type": "period",
+    "value": {
+      "option": "very_heavy"
+    }
+  },
+  {
+    "id": "m42",
+    "date": "2026-06-02",
+    "type": "pain",
+    "value": [
+      {
+        "option": "period_cramps"
+      },
+      {
+        "option": "lower_back"
+      }
+    ]
+  },
+  {
+    "id": "m43",
+    "date": "2026-06-02",
+    "type": "feelings",
+    "value": [
+      {
+        "option": "sad"
+      }
+    ]
+  },
+  {
+    "id": "m44",
+    "date": "2026-06-02",
+    "type": "energy",
+    "value": [
+      {
+        "option": "exhausted"
+      }
+    ]
+  },
+  {
+    "id": "m45",
+    "date": "2026-06-03",
+    "type": "period",
+    "value": {
+      "option": "heavy"
+    }
+  },
+  {
+    "id": "m46",
+    "date": "2026-06-04",
+    "type": "period",
+    "value": {
+      "option": "medium"
+    }
+  },
+  {
+    "id": "m47",
+    "date": "2026-06-05",
+    "type": "period",
+    "value": {
+      "option": "light"
+    }
+  },
+  {
+    "id": "m48",
+    "date": "2026-03-18",
+    "type": "discharge",
+    "value": {
+      "option": "egg_white"
+    }
+  },
+  {
+    "id": "m49",
+    "date": "2026-03-18",
+    "type": "sex_life",
+    "value": [
+      {
+        "option": "high_sex_drive"
+      },
+      {
+        "option": "unprotected_sex"
+      }
+    ]
+  },
+  {
+    "id": "m50",
+    "date": "2026-04-17",
+    "type": "sex_life",
+    "value": [
+      {
+        "option": "protected_sex"
+      }
+    ]
+  },
+  {
+    "id": "m51",
+    "date": "2026-04-17",
+    "type": "bbt",
+    "value": {
+      "temperature": 36.35
+    }
+  },
+  {
+    "id": "m52",
+    "date": "2026-05-16",
+    "type": "feelings",
+    "value": [
+      {
+        "option": "happy"
+      },
+      {
+        "option": "grateful"
+      }
+    ]
+  },
+  {
+    "id": "m53",
+    "date": "2026-06-20",
+    "type": "pain",
+    "value": [
+      {
+        "option": "migraine_with_aura"
+      },
+      {
+        "option": "tender_ovaries"
+      }
+    ]
+  },
+  {
+    "id": "m54",
+    "date": "2026-06-20",
+    "type": "digestion",
+    "value": [
+      {
+        "option": "nauseous"
+      },
+      {
+        "option": "bloated"
+      }
+    ]
+  },
+  {
+    "id": "m55",
+    "date": "2026-06-25",
+    "type": "cravings",
+    "value": [
+      {
+        "option": "chocolate"
+      }
+    ]
+  }
+]

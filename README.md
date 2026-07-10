@@ -14,14 +14,14 @@
   <a href="https://f-droid.org/en/packages/com.mooneva.app/">
     <img src="https://img.shields.io/badge/F--Droid-Download-1976D2?style=for-the-badge&logo=f-droid&logoColor=white" alt="Get it on F-Droid" />
   </a>
-  &nbsp;
- 
 
   <br /><br />
 
   <img src="https://img.shields.io/github/license/aradar46/Mooneva-Cycle-Private-Period-Tracker?style=flat-square" alt="License: GPL-3.0" />
   <img src="https://img.shields.io/github/v/tag/aradar46/Mooneva-Cycle-Private-Period-Tracker?label=version&style=flat-square" alt="Version" />
   <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey?style=flat-square" alt="Platform" />
+  <br /><br />
+  <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2Fkitswas%2Ffdroid-metrics-dashboard%2Fraw%2Frefs%2Fheads%2Fmain%2Fprocessed%2Ftotal%2Fcom.mooneva.app.json&query=%24.total_downloads&logo=fdroid&label=F-Droid%20Downloads" alt="F-Droid Downloads (all time)" />
 </div>
 
 ---
@@ -136,7 +136,22 @@ Any modified version you distribute must also be open-sourced under GPL-3.0.
 
 ---
 
+## Contributors
+
+- [@octantblow](https://github.com/octantblow) — French translation
+
+---
+
 ## Release Log
+
+### 2.0.6
+- Added importers for data from other period trackers (drip, Flo, Clue).
+- Added French as a new app language.
+- Added Joint Pain, Fever, and Chills symptom tags.
+- Translation fixes across all languages 
+
+### 2.0.5
+- Included the logo and fonts (public/) in the F-Droid public repo sync so the open-source build renders correctly.
 
 ### 2.0.4
 - Fixed a timezone bug where dates in the PDF clinical report (including registered sex logs) could appear one day earlier than the calendar.

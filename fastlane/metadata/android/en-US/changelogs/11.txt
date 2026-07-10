@@ -1,0 +1,5 @@
+Added importers for data from other period trackers (drip, Flo, Clue) so you can switch to Mooneva without losing your history.
+
+Added French as a new app language, and new symptom tags: Joint Pain, Fever, and Chills.
+
+Includes translation fixes across all languages, including corrected Persian wording.

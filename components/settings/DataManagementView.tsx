@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSettings } from '../../types';
-import { generateEncryptedBackup, shareOrDownloadBackup, loadData, wipeAllData, decryptBackup, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods } from '../../services/logic';
+import { generateEncryptedBackup, shareOrDownloadBackup, loadData, wipeAllData, decryptBackup, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport } from '../../services/logic';
 import Logger from '../../services/logger';
 import { toLocalISOString } from '../../utils/dateUtils';
 
@@ -28,6 +28,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
     const [archiveDate, setArchiveDate] = useState(toLocalISOString(new Date()));
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const appImportInputRef = useRef<HTMLInputElement>(null);
 
     const handleBackup = async () => {
         setIsProcessing(true);
@@ -71,6 +72,45 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
             }
         } catch (err) { alert((err as Error).message); }
         finally { setIsProcessing(false); setImportPassword(''); if (fileInputRef.current) fileInputRef.current.value = ''; }
+    };
+
+    const handleAppImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsProcessing(true);
+        try {
+            const parsed = parseExternalImport(await file.text());
+            if (!parsed) {
+                alert(t('settings.import_unrecognized'));
+                return;
+            }
+            const ok = confirm(t('settings.import_app_confirm', {
+                app: parsed.source,
+                days: Object.keys(parsed.logs).length,
+                periods: parsed.periods.length,
+            }));
+            if (!ok) return;
+
+            const existingData = await loadData();
+            const existingPeriods = await loadPeriods();
+            // Existing entries win on conflict; imported data only fills gaps
+            const mergedLogs = { ...parsed.logs, ...existingData };
+            const existingStarts = new Set(existingPeriods.map(p => p.startDate));
+            const mergedPeriods = [
+                ...existingPeriods,
+                ...parsed.periods.filter(p => !existingStarts.has(p.startDate)),
+            ];
+            await saveData(mergedLogs);
+            await savePeriods(mergedPeriods);
+            window.location.reload();
+        } catch (err) {
+            alert((err as Error).message);
+            Logger.error('App import failed:', err);
+        } finally {
+            setIsProcessing(false);
+            if (appImportInputRef.current) appImportInputRef.current.value = '';
+        }
     };
 
     return (
@@ -199,6 +239,23 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                     type="file"
                                     ref={fileInputRef}
                                     onChange={handleImport}
+                                />
+
+                                <button
+                                    onClick={() => appImportInputRef.current?.click()}
+                                    disabled={isProcessing}
+                                    className="w-full py-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-sm"
+                                >
+                                    {t('settings.import_from_app')}
+                                </button>
+                                <p className="text-[10px] text-slate-400 text-center -mt-2">{t('settings.import_app_desc')}</p>
+
+                                <input
+                                    accept=".csv,.json,text/csv,application/json"
+                                    className="hidden"
+                                    type="file"
+                                    ref={appImportInputRef}
+                                    onChange={handleAppImport}
                                 />
                             </div>
 

@@ -160,7 +160,7 @@ const BIG_6 = [
 ];
 
 const BODY_GUT = [
-  'Backache', 'Nausea', 'Digestion', 'Insomnia', 'Cravings'
+  'Backache', 'Nausea', 'Digestion', 'Insomnia', 'Cravings', 'Joint Pain', 'Fever', 'Chills'
 ];
 
 export const SYMPTOM_GROUPS = {
