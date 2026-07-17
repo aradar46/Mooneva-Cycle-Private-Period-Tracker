@@ -292,19 +292,7 @@ export const calculateCycleStatus = (
         statusVariant: finalVariant,
         dayOfCycle,
         cycleLength: predictions.cycleLengthUsed || 28,
-        dayOfPeriod: hasFertility ? undefined : baseDayOfPeriod, // Hide period dots if fertility overlay wins?
-        // Actually, if flow is active but fertility wins copy, do we still showing the red dots?
-        // The prompt says "Replace card copy". It doesn't explicitly say "hide period dots UI".
-        // However, the `CycleStatusData` structure often drives the UI rendering mode.
-        // If I pass `dayOfPeriod`, the current UI *might* force the Period View (red dots).
-        // Let's check Calendar.tsx:
-        // `{cycleStatus.dayOfPeriod != null ... ? ( <Period dots UI> ) : ( <Subtitle UI> )}`
-        // So if I pass dayOfPeriod, it SHOWS period UI and HIDES subtitle.
-        // But the prompt says: "Subtitle `Fertile Window`".
-        // Use CASE: Short cycle coverage. Flow active + Fertile.
-        // If I return `dayOfPeriod`, the UI shows "Period X / Y" and IGNORES subtitle.
-        // To strictly follow "Subtitle: Fertile Window", I MUST NOT return `dayOfPeriod` if fertility wins.
-        // So `dayOfPeriod: hasFertility ? undefined : baseDayOfPeriod` is CORRECT behavior to force subtitle view.
+        dayOfPeriod: hasFertility ? undefined : baseDayOfPeriod, // hide period dots when fertility copy wins
         periodLength: hasFertility ? undefined : basePeriodLength
     };
 };

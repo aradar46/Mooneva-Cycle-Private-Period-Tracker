@@ -22,12 +22,14 @@ interface CalendarScreenProps {
     setSubView: (view: SubViewType) => void;
     setView: (view: ViewType) => void;
     isCloaked: boolean;
+    onRequestExitDiscreteMode: () => void;
 }
 
 export const CalendarScreen: React.FC<CalendarScreenProps> = ({
     setSubView,
     setView,
-    isCloaked
+    isCloaked,
+    onRequestExitDiscreteMode
 }) => {
     const { t } = useTranslation();
     const { logs, periods, settings, model, actions } = useMooneva();
@@ -65,15 +67,14 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
 
     // --- Discrete Mode State ---
     const { dummyTasks, toggleDummyTask, updateDummyTaskText, addDummyTask } = useDiscreteMode();
-    const longPressTimer = React.useRef<NodeJS.Timeout | null>(null);
+    const longPressTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
     const isLongPress = React.useRef(false);
 
     const handleSettingsStart = () => {
         isLongPress.current = false;
         longPressTimer.current = setTimeout(() => {
             isLongPress.current = true;
-            // Directly Deactivate Discrete Mode
-            actions.updateSettings({ ...settings, discreteMode: false });
+            onRequestExitDiscreteMode();
         }, 2000);
     };
 

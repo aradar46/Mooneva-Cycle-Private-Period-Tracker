@@ -59,9 +59,6 @@ export const findNearbyPeriod = (
 const MIN_ADAPTIVE_CYCLES = 3;
 
 /**
- * Normalizes and clamps cycle length to medically typical ranges (21-45 days).
- */
-/**
  * Generic helper to clamp and round a value within a range.
  */
 const clampAndRound = (value: number, min: number, max: number): number => {

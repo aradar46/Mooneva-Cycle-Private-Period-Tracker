@@ -2,6 +2,7 @@ import React from 'react';
 import { DayMeta, AppSettings, DailyLog } from '../../types';
 import { diffInDays, getTodayStr } from '../../utils/dateUtils';
 import { formatNumber } from '../../services/i18n';
+import { SexMarkerIcon } from './SexMarkerIcon';
 
 interface DayCellProps {
     date: Date;
@@ -51,6 +52,7 @@ export const DayCell: React.FC<DayCellProps> = ({
 
     const hasSymptoms = (meta.symptoms?.length || 0) > 0;
     const isSpotting = meta.isSpotting;
+    const sexType = log?.sexType;
 
     const todayStr = getTodayStr();
     const isFutureLocked = diffInDays(dateStr, todayStr) > 7;
@@ -58,55 +60,55 @@ export const DayCell: React.FC<DayCellProps> = ({
     // Random blob shape for organic feel
     const blobShape = `blob-${(idx % 5) + 1}`;
 
-    let containerClass = "bg-transparent text-text-secondary hover:bg-slate-50 border border-transparent";
+    let containerClass = "bg-transparent text-slate-600 hover:bg-white/70 border border-transparent";
     let shapeClass = "rounded-2xl";
 
     // Priority: Period active days > Period span > Predictions
     if (hasFlow || hasFlowLog) {
         // Active bleeding day (either via activeDays or flow log)
-        containerClass = `bg-rose-100 text-cycle-period z-10`;
+        containerClass = `bg-rose-100 text-rose-700 z-10`;
         if ((isPredFertile || isOvulation) && !isSelected) {
             containerClass += ` ring-2 ring-emerald-400 ring-inset`;
         }
         shapeClass = "rounded-full";
     } else if (isInsideSpan) {
         // Gap day (inside period span but not bleeding)
-        containerClass = `bg-rose-50/50 text-cycle-period/60 border border-rose-100/30`;
+        containerClass = `bg-rose-50/70 text-rose-600 border border-rose-200/60`;
         if ((isPredFertile || isOvulation) && !isSelected) {
             containerClass += ` ring-2 ring-emerald-400/50 ring-inset`;
         }
         shapeClass = "rounded-full";
     } else if (isEditMode) {
         if (isFutureLocked) {
-            containerClass = `bg-transparent text-slate-200 border border-transparent opacity-40 grayscale pointer-events-none`;
+            containerClass = `bg-transparent text-slate-300 border border-transparent opacity-40 grayscale pointer-events-none`;
         } else {
-            containerClass = `bg-slate-50/30 text-text-dimmed border border-dashed border-slate-200 hover:border-cycle-period/50 hover:bg-rose-50/50 hover:text-cycle-period`;
+            containerClass = `bg-slate-50/40 text-slate-500 border border-dashed border-slate-300 hover:border-rose-400/60 hover:bg-rose-50/70 hover:text-rose-700`;
         }
         shapeClass = "rounded-xl";
     } else if (isPredPeriod) {
-        containerClass = `bg-transparent border-2 border-dashed border-cycle-period/40 text-cycle-period/80`;
+        containerClass = `bg-transparent border-2 border-dashed border-rose-300 text-rose-600`;
         shapeClass = "rounded-full";
     } else if (isOvulation) {
-        containerClass = `bg-transparent border-2 border-[#b0f4eb] text-success z-10`;
+        containerClass = `bg-transparent border-2 border-teal-300 text-teal-700 z-10`;
         shapeClass = "rounded-full";
     } else if (isPredFertile) {
-        containerClass = `border-2 border-[#b0f4eb] text-success`;
+        containerClass = `border-2 border-teal-300 text-teal-700`;
         shapeClass = "rounded-full";
     } else if (hasLog && (hasSymptoms || isSpotting)) {
-        containerClass = `bg-transparent ${isPMS ? 'text-blue-400' : 'text-text-secondary'} hover:bg-slate-50 border border-transparent`;
+        containerClass = `bg-transparent ${isPMS ? 'text-blue-600' : 'text-slate-700'} hover:bg-white/70 border border-transparent`;
         shapeClass = "rounded-full";
     } else if (isPMS) {
-        containerClass = `bg-transparent text-blue-400 hover:bg-blue-50/50 border border-transparent`;
+        containerClass = `bg-transparent text-blue-600 hover:bg-blue-50/70 border border-transparent`;
         shapeClass = "rounded-full";
     } else {
-        containerClass = "bg-transparent text-text-secondary hover:bg-slate-50 border border-transparent";
+        containerClass = "bg-transparent text-slate-600 hover:bg-white/70 border border-transparent";
     }
 
     return (
         <button
             key={dateStr}
             className={`
-        aspect-square relative transition-all active:scale-90 flex items-center justify-center
+        calendar-day-cell aspect-square relative transition-all active:scale-90 flex items-center justify-center
         ${containerClass}
         ${shapeClass}
         ${isSelected ? 'ring-2 ring-[#8b5cf6] ring-offset-2 ring-offset-surface-card shadow-[0_0_14px_rgba(139,92,246,0.3)] z-50' : ''}
@@ -129,12 +131,21 @@ export const DayCell: React.FC<DayCellProps> = ({
             <div className="relative w-full h-full flex items-center justify-center">
                 {/* Cycle Day Badge - top of the cell */}
                 {meta.header?.dayOfCycle && meta.header.dayOfCycle > 0 && !isEditMode && (
-                    <span className="absolute top-[3px] left-1/2 -translate-x-1/2 text-[7.5px] font-bold text-slate-400/80 tracking-tight">
+                    <span className="calendar-cycle-badge absolute top-[3px] left-1/2 -translate-x-1/2 text-[8px] font-extrabold text-slate-500/95 tracking-tight">
                         {formatNumber(meta.header.dayOfCycle)}
                     </span>
                 )}
-                <span className={`text-sm tracking-tighter ${hasFlow || isOvulation ? 'font-bold' : 'font-semibold'}`}>
-                    {formatNumber(label || date.getDate())}
+                {sexType && (
+                    <SexMarkerIcon
+                        type={sexType}
+                        label={sexType === 'protected' ? 'Protected sex' : 'Unprotected sex'}
+                        className={`calendar-sex-marker-edge calendar-sex-marker-${sexType} absolute top-1/2 -translate-y-1/2 text-purple-500 z-10 pointer-events-none`}
+                    />
+                )}
+                <span className="calendar-date-row inline-flex items-center justify-center">
+                    <span className={`calendar-day-number text-[15px] sm:text-base leading-none tracking-tight ${hasFlow || hasFlowLog || isOvulation || isPredFertile || isPredPeriod || isPMS || isSelected ? 'font-extrabold' : 'font-bold'}`}>
+                        {formatNumber(label || date.getDate())}
+                    </span>
                 </span>
 
                 {/* Indicators at bottom - micro icons - absolutely positioned to not affect number centering */}

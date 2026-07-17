@@ -20,6 +20,7 @@ const translations: Record<string, string> = {
 };
 
 vi.mock('react-i18next', () => ({
+    Trans: ({ i18nKey }: { i18nKey: string }) => i18nKey,
     useTranslation: () => ({
         i18n: {
             language: 'en',

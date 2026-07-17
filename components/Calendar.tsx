@@ -1,10 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { DailyLog, AppSettings, DayMeta } from '../types';
 import { toLocalISOString } from '../utils/dateUtils';
 import { formatNumber } from '../services/i18n';
 import { CycleStatusData } from '../services/logic/status';
 import { DayCell } from './calendar/DayCell';
+import { SexMarkerIcon } from './calendar/SexMarkerIcon';
 import { useSwipe } from '../hooks/useSwipe';
 import { useCalendarSystem } from '../hooks/useCalendarSystem';
 
@@ -71,8 +72,6 @@ const Calendar: React.FC<CalendarProps> = ({
   onBulkUpdate,
   onMonthChange,
   onToggleBleedingDay,
-  onNextMonth,
-  onPrevMonth,
   isEditMode: controlledEditMode,
   onEditModeChange,
   onEditDone,
@@ -116,24 +115,31 @@ const Calendar: React.FC<CalendarProps> = ({
   };
 
   // Convert "View Date" (Gregorian) to target system (e.g. 1403/11/01)
-  const { days, year, month, isTodayMonth } = useMemo(() => {
+  const { year, month, isTodayMonth } = useMemo(() => {
     const displayDate = calendarSystem.toCalendarDate(currentDate);
     const { year, month } = displayDate;
-    const days = calendarSystem.getMonthGrid(year, month);
 
     const todayParts = calendarSystem.today();
     const isTodayMonth = month === todayParts.month && year === todayParts.year;
 
-    return { days, year, month, isTodayMonth };
+    return { year, month, isTodayMonth };
   }, [currentDate, calendarSystem]);
 
-  const swipeOptions = useMemo(() => ({
-    onSwipeLeft: onNextMonth || (() => { }),
-    onSwipeRight: onPrevMonth || (() => { }),
-    threshold: 50
-  }), [onNextMonth, onPrevMonth]);
+  const days = useMemo(() => calendarSystem.getMonthGrid(year, month), [calendarSystem, month, year]);
 
-  const swipeHandlers = useSwipe(swipeOptions);
+  const changeMonth = useCallback((amount: number) => {
+    const newParts = calendarSystem.addMonths({ year, month, day: 1 }, amount);
+    onMonthChange(calendarSystem.fromCalendarDate(newParts.year, newParts.month, 1));
+  }, [calendarSystem, month, onMonthChange, year]);
+
+  const swipeOptions = useMemo(() => ({
+    onSwipeLeft: () => changeMonth(1),
+    onSwipeRight: () => changeMonth(-1),
+  }), [changeMonth]);
+
+  const { slideStyle, triggerSwipe, ...swipeHandlers } = useSwipe(swipeOptions);
+  const goToPrevMonth = useCallback(() => triggerSwipe('right'), [triggerSwipe]);
+  const goToNextMonth = useCallback(() => triggerSwipe('left'), [triggerSwipe]);
 
   return (
     <div className="space-y-4">
@@ -167,7 +173,7 @@ const Calendar: React.FC<CalendarProps> = ({
                       cycleStatus.statusVariant === 'success' ? 'text-success' :
                         cycleStatus.statusVariant === 'info' ? 'text-slate-600' :
                           cycleStatus.statusVariant === 'secondary' ? 'text-slate-600' :
-                            'text-slate-400'
+                            'text-slate-500'
                     }`}>
                     {cycleStatus.subtitle}
                   </p>
@@ -175,7 +181,7 @@ const Calendar: React.FC<CalendarProps> = ({
                 {cycleStatus.chance && (
                   <p className={`text-[clamp(9px,2.5vw,11px)] font-bold tracking-[0.3em] uppercase whitespace-nowrap ${cycleStatus.chanceVariant === 'peak' ? 'text-success animate-pulse' :
                     cycleStatus.chanceVariant === 'high' ? 'text-success' :
-                      'text-slate-400'
+                      'text-slate-500'
                     }`}>
                     {t('calendar.fertility_label')}: {cycleStatus.chance}
                   </p>
@@ -210,7 +216,7 @@ const Calendar: React.FC<CalendarProps> = ({
       )}
 
       <div
-        className="relative z-10 bg-[#F0F2F5] rounded-[32px] px-4 pt-4 pb-2 sm:pt-6 sm:pb-3 sm:px-4 transition-all overflow-hidden mt-3"
+        className="calendar-swipe-surface relative z-10 bg-[#F0F2F5] rounded-[32px] px-4 pt-4 pb-2 sm:pt-6 sm:pb-3 sm:px-4 transition-all overflow-hidden mt-3"
         style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
         {...swipeHandlers}
       >
@@ -220,19 +226,19 @@ const Calendar: React.FC<CalendarProps> = ({
           <div className="flex gap-4 justify-self-start items-center">
             <button
               onClick={() => setShowLegend(!showLegend)}
-              className="text-[8px] text-slate-500 font-semibold uppercase tracking-[0.15em] hover:text-slate-700 transition-colors"
+              className="text-[9px] text-slate-600 font-bold uppercase tracking-[0.15em] hover:text-slate-800 transition-colors"
             >
               {showLegend ? t('calendar.guide.hide') : t('calendar.guide.show')}
             </button>
           </div>
-          <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-800 text-center">
+          <h2 className="text-xs font-black uppercase tracking-[0.18em] text-slate-800 text-center">
             {/* Use the hook to format month/year */}
             {calendarSystem.formatMonthYear(year, month)}
           </h2>
           <button
             onClick={() => onMonthChange(new Date())}
             className={`text-[8px] uppercase tracking-[0.12em] transition-all justify-self-end font-bold mr-1 ${isTodayMonth
-              ? 'text-slate-400 hover:text-slate-600'
+              ? 'text-slate-600 hover:text-slate-800'
               : 'bg-[#fb7185] text-white px-1.5 py-[2px] rounded-[4px] shadow-sm active:scale-95'
               }`}
           >
@@ -242,37 +248,45 @@ const Calendar: React.FC<CalendarProps> = ({
 
         <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {calendarSystem.weekDayKeys.map((d) => (
-            <div key={d} className="text-center text-[10px] sm:text-xs text-slate-400 font-black uppercase tracking-[0.2em] pt-2 pb-2">
+            <div key={d} className="calendar-weekday text-center text-[10px] sm:text-xs text-slate-500 font-black uppercase tracking-[0.18em] pt-2 pb-2">
               {t(`calendar.days.${d}`)}
             </div>
           ))}
+        </div>
 
-          {days.map((cell, idx) => {
-            const dateStr = toLocalISOString(cell.date);
-            const meta = getDayMeta(dateStr);
-            const log = logs[dateStr];
-            const hasLog = !!log;
-            const isSelected = dateStr === selectedDate;
+        <div className="calendar-month-viewport">
+          <div
+            key={`${year}-${month}`}
+            className="calendar-month-grid grid grid-cols-7 gap-1 sm:gap-2"
+            style={slideStyle}
+          >
+            {days.map((cell, idx) => {
+              const dateStr = toLocalISOString(cell.date);
+              const meta = getDayMeta(dateStr);
+              const log = logs[dateStr];
+              const hasLog = !!log;
+              const isSelected = dateStr === selectedDate;
 
-            return (
-              <DayCell
-                key={`${dateStr}-${cell.isCurrentMonth}-${idx}`} // Unique key
-                date={cell.date}
-                dateStr={dateStr}
-                isCurrentMonth={cell.isCurrentMonth}
-                meta={meta}
-                log={log}
-                hasLog={hasLog}
-                isSelected={isSelected}
-                settings={settings}
-                isEditMode={isEditMode}
-                onDateClick={onDateClick}
-                onToggleBleedingDay={onToggleBleedingDay}
-                idx={idx}
-                label={cell.label} // Pass custom label (Jalali day number)
-              />
-            );
-          })}
+              return (
+                <DayCell
+                  key={`${dateStr}-${cell.isCurrentMonth}-${idx}`}
+                  date={cell.date}
+                  dateStr={dateStr}
+                  isCurrentMonth={cell.isCurrentMonth}
+                  meta={meta}
+                  log={log}
+                  hasLog={hasLog}
+                  isSelected={isSelected}
+                  settings={settings}
+                  isEditMode={isEditMode}
+                  onDateClick={onDateClick}
+                  onToggleBleedingDay={onToggleBleedingDay}
+                  idx={idx}
+                  label={cell.label}
+                />
+              );
+            })}
+          </div>
         </div>
 
         {isEditMode && (
@@ -295,12 +309,8 @@ const Calendar: React.FC<CalendarProps> = ({
         <div className="grid grid-cols-3 items-center mt-2 pb-0">
           <button
             type="button"
-            // Use hook to calculate previous month date
-            onClick={() => {
-              const newParts = calendarSystem.addMonths({ year, month, day: 1 }, -1);
-              onMonthChange(calendarSystem.fromCalendarDate(newParts.year, newParts.month, 1));
-            }}
-            className="flex items-center justify-center w-8 h-8 text-slate-400 transition-all hover:text-slate-600 active:scale-90 justify-self-start"
+            onClick={goToPrevMonth}
+            className="flex items-center justify-center w-8 h-8 text-slate-600 transition-all hover:text-slate-800 active:scale-90 justify-self-start"
             aria-label={t('calendar.prev_month', 'Previous month')}
           >
             <svg className="w-5 h-5 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -311,7 +321,7 @@ const Calendar: React.FC<CalendarProps> = ({
             <div className="flex items-center gap-2 justify-self-center">
               <button
                 onClick={onEditCancel || (() => setIsEditMode(false))}
-                className="px-4 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.15em] transition-all duration-300 active:scale-[0.98] text-slate-500"
+                className="px-4 py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.15em] transition-all duration-300 active:scale-[0.98] text-slate-600"
                 style={{
                   backgroundColor: '#F0F2F5',
                   boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8)'
@@ -329,7 +339,7 @@ const Calendar: React.FC<CalendarProps> = ({
           ) : (
             <button
               onClick={() => setIsEditMode(true)}
-              className={`min-w-[140px] px-[15px] py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.2em] active:scale-[0.98] justify-self-center flex items-center justify-center gap-2 animate-period-button`}
+              className={`period-action-button min-w-[140px] px-[15px] py-1.5 rounded-full font-extrabold text-[10px] uppercase tracking-[0.2em] active:scale-[0.98] justify-self-center flex items-center justify-center gap-2 animate-period-button text-[#5b7a82]`}
               style={{
                 backgroundColor: '#F0F2F5',
                 boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)'
@@ -342,7 +352,7 @@ const Calendar: React.FC<CalendarProps> = ({
               ) : (
                 <svg
                   viewBox="0 0 24 24"
-                  className="w-3.5 h-3.5"
+                  className="period-action-icon w-3.5 h-3.5"
                   fill="currentColor"
                   style={{ filter: 'drop-shadow(0px 1px 1px rgba(138, 172, 172, 0.3))' }}
                 >
@@ -354,12 +364,8 @@ const Calendar: React.FC<CalendarProps> = ({
           )}
           <button
             type="button"
-            // Use hook to calculate next month date
-            onClick={() => {
-              const newParts = calendarSystem.addMonths({ year, month, day: 1 }, 1);
-              onMonthChange(calendarSystem.fromCalendarDate(newParts.year, newParts.month, 1));
-            }}
-            className="flex items-center justify-center w-8 h-8 text-slate-400 transition-all hover:text-slate-600 active:scale-90 justify-self-end"
+            onClick={goToNextMonth}
+            className="flex items-center justify-center w-8 h-8 text-slate-600 transition-all hover:text-slate-800 active:scale-90 justify-self-end"
             aria-label={t('calendar.next_month', 'Next month')}
           >
             <svg className="w-5 h-5 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -409,7 +415,7 @@ const Calendar: React.FC<CalendarProps> = ({
                       {t('calendar.how_to_log_period_body')}
                     </p>
                     <p className="text-[10px] text-slate-400 italic leading-snug">
-                      {t('calendar.how_to_log_period_tip')}
+                      <Trans i18nKey="calendar.how_to_log_period_tip" />
                     </p>
                   </div>
                   <div className="space-y-1.5">
@@ -417,24 +423,24 @@ const Calendar: React.FC<CalendarProps> = ({
                       {t('calendar.how_to_log_daily_title')}
                     </p>
                     <p className="text-[11px] text-slate-500 leading-snug">
-                      {t('calendar.how_to_log_daily_body')}
+                      <Trans i18nKey="calendar.how_to_log_daily_body" />
                     </p>
                   </div>
                 </div>
 
                 <div className="calendar-guide-list grid grid-cols-1 gap-y-3">
                   {/* CATEGORY 1: FLOW */}
-                  <div className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-400/90 border-b border-rose-100 pb-1.5 mb-1">{t('calendar.category_flow')}</div>
+                  <div className="calendar-guide-section-flow text-[9px] font-black uppercase tracking-[0.2em] text-rose-400/90 border-b border-rose-100 pb-1.5 mb-1">{t('calendar.category_flow')}</div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full bg-rose-100 ring-1 ring-rose-200 shadow-sm flex items-center justify-center">
+                    <div className="calendar-guide-period-marker w-9 h-9 shrink-0 rounded-full bg-rose-100 ring-1 ring-rose-200 shadow-sm flex items-center justify-center">
                       <span className="text-xs font-bold text-rose-500">24</span>
                     </div>
                     <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.logged_period', 'Period')}</span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
                       <span className="text-[10px] font-semibold text-slate-400 leading-none mb-0">12</span>
                       <svg className="w-[8px] h-[8px] text-rose-500 translate-y-0" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C8 8 4 12 4 16a8 8 0 1016 0c0-4-4-8-8-14z" />
@@ -444,21 +450,21 @@ const Calendar: React.FC<CalendarProps> = ({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full bg-rose-50/50 border border-rose-100/30 flex items-center justify-center">
+                    <div className="calendar-guide-period-soft-marker w-9 h-9 shrink-0 rounded-full bg-rose-50/50 border border-rose-100/30 flex items-center justify-center">
                       <span className="text-[10px] font-semibold text-rose-400/80">25</span>
                     </div>
                     <span className="text-[11px] text-slate-600 font-bold leading-tight">{t('calendar.legend.mid_flow_pause')}</span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full border-2 border-dashed border-rose-300 bg-transparent flex items-center justify-center">
+                    <div className="calendar-guide-expected-marker w-9 h-9 shrink-0 rounded-full border-2 border-dashed border-rose-300 bg-transparent flex items-center justify-center">
                       <span className="text-[10px] font-semibold text-rose-400/80">28</span>
                     </div>
                     <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.predicted_period', 'Expected Period')}</span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="relative w-9 h-9 shrink-0 rounded-full bg-rose-100 flex items-center justify-center">
+                    <div className="calendar-guide-period-marker relative w-9 h-9 shrink-0 rounded-full bg-rose-100 flex items-center justify-center">
                       <span className="text-xs font-bold text-rose-500">1</span>
                       <div className="absolute top-0 right-0 translate-x-[10%] -translate-y-[10%] bg-white rounded-full p-0.5 shadow-sm border border-rose-100">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-rose-400">
@@ -470,7 +476,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="relative w-9 h-9 shrink-0 rounded-full bg-rose-100 flex items-center justify-center">
+                    <div className="calendar-guide-period-marker relative w-9 h-9 shrink-0 rounded-full bg-rose-100 flex items-center justify-center">
                       <span className="text-xs font-bold text-rose-500">1</span>
                       <div className="absolute top-0 right-0 translate-x-[10%] -translate-y-[10%] bg-white rounded-full p-0.5 shadow-sm border border-rose-100">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-indigo-400">
@@ -484,7 +490,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
                       <span className="text-[10px] font-semibold text-slate-400 leading-none mb-0">15</span>
                       <div className="w-[4px] h-[4px] rounded-full bg-rose-400 translate-y-0" />
                     </div>
@@ -494,10 +500,10 @@ const Calendar: React.FC<CalendarProps> = ({
                   {/* CATEGORY 2: FERTILITY */}
                   {settings.showFertileWindow && (
                     <>
-                      <div className="text-[9px] font-black uppercase tracking-[0.2em] text-teal-600/80 border-b border-teal-100 pb-1.5 mt-2 mb-1">{t('calendar.category_fertility')}</div>
+                      <div className="calendar-guide-section-fertility text-[9px] font-black uppercase tracking-[0.2em] text-teal-600/80 border-b border-teal-100 pb-1.5 mt-2 mb-1">{t('calendar.category_fertility')}</div>
 
                       <div className="flex items-center gap-3">
-                        <div className="relative w-9 h-9 shrink-0 rounded-full border-2 border-[#b0f4eb] bg-transparent flex items-center justify-center">
+                        <div className="calendar-guide-fertile-marker relative w-9 h-9 shrink-0 rounded-full border-2 border-[#b0f4eb] bg-transparent flex items-center justify-center">
                           <span className="text-[10px] font-semibold text-teal-500">12</span>
                           <div className="absolute top-0 right-0 translate-x-[15%] -translate-y-[15%] flex items-center justify-center">
                             <div className="w-2 h-2 bg-teal-500 rounded-full border border-white shadow-sm" />
@@ -509,17 +515,17 @@ const Calendar: React.FC<CalendarProps> = ({
                   )}
 
                   {/* CATEGORY 3: LOGS */}
-                  <div className="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400/80 border-b border-indigo-100 pb-1.5 mt-2 mb-1">{t('calendar.category_logs')}</div>
+                  <div className="calendar-guide-section-logs text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400/80 border-b border-indigo-100 pb-1.5 mt-2 mb-1">{t('calendar.category_logs')}</div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full bg-transparent border border-slate-200 shadow-sm flex items-center justify-center">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-transparent border border-slate-200 shadow-sm flex items-center justify-center">
                       <span className="text-[10px] font-bold text-blue-400">26</span>
                     </div>
                     <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.pms')}</span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
                       <span className="text-[10px] font-semibold text-slate-400 leading-none mb-0">16</span>
                       <svg className="w-[8px] h-[8px] text-amber-500 translate-y-0" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
@@ -529,7 +535,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
                       <span className="text-[10px] font-semibold text-slate-400 leading-none mb-0">18</span>
                       <svg className="w-[10px] h-[10px] text-cyan-500 translate-y-0" viewBox="0 0 24 24" fill="currentColor">
                         <path fillRule="evenodd" d="M19.5 6.5a3.5 3.5 0 0 0-7 0v11a3.5 3.5 0 1 0 7 0v-11ZM16 2a5.5 5.5 0 0 0-5.5 5.5v11a5.5 5.5 0 1 0 11 0v-11A5.5 5.5 0 0 0 16 2Zm-3.5 5.5v4.25h7V7.5a3.5 3.5 0 1 0-7 0Z" clipRule="evenodd" />
@@ -539,7 +545,23 @@ const Calendar: React.FC<CalendarProps> = ({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
+                    <div className="calendar-guide-neutral-marker calendar-guide-sex-protected-marker relative w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                      <SexMarkerIcon type="protected" className="absolute left-[4px] top-1/2 -translate-y-1/2 w-[10px] h-[10px] text-purple-500" />
+                      <span className="text-[10px] font-semibold text-slate-400 leading-none">8</span>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.protected_sex')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-neutral-marker calendar-guide-sex-unprotected-marker relative w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                      <SexMarkerIcon type="unprotected" className="absolute left-[4px] top-1/2 -translate-y-1/2 w-[10px] h-[10px] text-purple-500" />
+                      <span className="text-[10px] font-semibold text-slate-400 leading-none">8</span>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.unprotected_sex')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
                       <span className="text-[10px] font-semibold text-slate-400 leading-none mb-0">10</span>
                       <svg className="w-[9px] h-[9px] text-slate-400 translate-y-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.51a2 2 0 0 1-2.83-2.83l8.49-8.48" />
@@ -549,14 +571,14 @@ const Calendar: React.FC<CalendarProps> = ({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full bg-white ring-2 ring-accent ring-offset-2 flex items-center justify-center shadow-sm">
+                    <div className="calendar-guide-today-marker w-9 h-9 shrink-0 rounded-full bg-white ring-2 ring-accent ring-offset-2 flex items-center justify-center shadow-sm">
                       <span className="text-[10px] font-bold text-slate-400">30</span>
                     </div>
                     <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.today')}</span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 shrink-0 rounded-full bg-white ring-2 ring-[#8b5cf6] ring-offset-2 flex items-center justify-center">
+                    <div className="calendar-guide-selected-marker w-9 h-9 shrink-0 rounded-full bg-white ring-2 ring-[#8b5cf6] ring-offset-2 flex items-center justify-center">
                       <span className="text-[10px] font-bold text-slate-400">4</span>
                     </div>
                     <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.selected')}</span>

@@ -14,6 +14,13 @@ describe('hasDailyLogContent', () => {
         expect(hasDailyLogContent(emptyLog)).toBe(false);
     });
 
+    it('treats a cleared editor log with no selected moods as no content', () => {
+        expect(hasDailyLogContent({
+            ...emptyLog,
+            mood: [],
+        })).toBe(false);
+    });
+
     it('treats pill-only logs as content', () => {
         expect(hasDailyLogContent({ ...emptyLog, pillTakenAt: '11:32' })).toBe(true);
     });

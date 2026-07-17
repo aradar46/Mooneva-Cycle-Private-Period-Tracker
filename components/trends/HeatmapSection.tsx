@@ -17,6 +17,10 @@ const COLOR_SCALES = {
         gradient: ['#ffedd5', '#f97316'],
         steps: ['#f1f5f9', '#ffedd5', '#fed7aa', '#fdba74', '#fb923c', '#f97316', '#ea580c', '#c2410c', '#9a3412'],
     },
+    teal: {
+        gradient: ['#ccfbf1', '#14b8a6'],
+        steps: ['#f1f5f9', '#ccfbf1', '#99f6e4', '#5eead4', '#2dd4bf', '#14b8a6', '#0d9488', '#0f766e', '#115e59'],
+    },
 };
 
 type ColorScaleName = keyof typeof COLOR_SCALES;
@@ -67,7 +71,7 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                 <div className="flex items-center justify-between">
                     <h3 className="text-sm font-extrabold tracking-[0.15em] text-slate-800 uppercase">{title}</h3>
                     <div className="flex gap-2 items-center">
-                        <span className="text-[8px] font-bold uppercase text-slate-400 tracking-wider">{lowLabel}</span>
+                        <span className="heatmap-scale-label text-[8px] font-extrabold uppercase text-slate-500 tracking-wider">{lowLabel}</span>
                         <div
                             className="w-16 h-2 rounded-full overflow-hidden"
                             style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.7)' }}
@@ -77,7 +81,7 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                                 style={{ background: `linear-gradient(to right, ${scale.gradient[0]}, ${scale.gradient[1]})` }}
                             />
                         </div>
-                        <span className="text-[8px] font-bold uppercase text-slate-400 tracking-wider">{highLabel}</span>
+                        <span className="heatmap-scale-label text-[8px] font-extrabold uppercase text-slate-500 tracking-wider">{highLabel}</span>
                     </div>
                 </div>
             </div>
@@ -86,11 +90,11 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                 <div className="min-w-[700px]">
                     {/* Day Header */}
                     <div className="flex mb-1">
-                        <div className={`w-20 shrink-0 ${stickyHeaderClass} z-30 bg-[#F0F2F5]`} />
+                        <div className={`heatmap-sticky-spacer w-20 shrink-0 ${stickyHeaderClass} z-30 bg-[#F0F2F5]`} />
                         {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
                             <div
                                 key={day}
-                                className="flex-1 text-center text-[9px] font-bold text-slate-400"
+                                className="heatmap-day-label flex-1 text-center text-[9px] font-extrabold text-slate-500"
                                 style={{ minWidth: '18px' }}
                             >
                                 {day === 31 ? '31+' : day}
@@ -102,7 +106,7 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                     {rows.map((row) => (
                         <div key={row.id} className="flex items-center h-5 mb-0.5">
                             <div
-                                className={`w-20 shrink-0 ${stickyHeaderClass} ${stickyShadowClass} z-20 bg-[#F0F2F5] text-[9px] font-semibold text-slate-500 truncate capitalize`}
+                                className={`heatmap-row-label w-20 shrink-0 ${stickyHeaderClass} ${stickyShadowClass} z-20 bg-[#F0F2F5] text-[9.5px] font-bold text-slate-700 truncate capitalize`}
                             >
                                 {t(`symptom.${row.label.toLowerCase()}`, row.label)}
                             </div>

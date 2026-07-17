@@ -1,19 +1,33 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PIN_MAX_LENGTH, normalizePinInput } from '../utils/pin';
 
-interface PinLockProps {
+interface BasePinLockProps {
   correctPin: string;
   onUnlock: () => void;
 }
 
-const PinLock: React.FC<PinLockProps> = ({ correctPin, onUnlock }) => {
+type PinLockProps =
+  | (BasePinLockProps & {
+    purpose?: 'unlock';
+    onCancel?: never;
+  })
+  | (BasePinLockProps & {
+    purpose: 'exitDiscreteMode';
+    onCancel: () => void;
+  });
+
+const PinLock: React.FC<PinLockProps> = (props) => {
   const { t } = useTranslation();
   const [input, setInput] = useState('');
   const [error, setError] = useState(false);
+  const prompt = props.purpose === 'exitDiscreteMode'
+    ? t('settings.pin_exit_discrete_prompt')
+    : t('settings.pin_unlock_prompt');
 
   const handleSubmit = () => {
-    if (input === correctPin) {
-      onUnlock();
+    if (input === props.correctPin) {
+      props.onUnlock();
     } else {
       setError(true);
       setTimeout(() => { setInput(''); setError(false); }, 400);
@@ -41,31 +55,44 @@ const PinLock: React.FC<PinLockProps> = ({ correctPin, onUnlock }) => {
           {t('settings.pin_lock') || 'Security'}
         </h2>
         <p className="text-xs font-medium text-slate-400">
-          Enter your password
+          {prompt}
         </p>
       </div>
 
       <div className="w-full max-w-[280px] space-y-4">
         <input
           type="password"
-          placeholder="Password"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={PIN_MAX_LENGTH}
+          placeholder={t('settings.pin_placeholder')}
           value={input}
-          onChange={(e) => { setInput(e.target.value); setError(false); }}
+          onChange={(e) => { setInput(normalizePinInput(e.target.value)); setError(false); }}
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           className={`w-full bg-white border rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#7598a0]/30 outline-none transition-all placeholder:text-slate-400 ${error ? 'border-rose-400' : 'border-slate-300'}`}
           style={error ? { boxShadow: '0 0 0 2px rgba(251, 113, 133, 0.3)' } : {}}
           autoFocus
-          autoComplete="current-password"
+          autoComplete="one-time-code"
         />
         {error && (
-          <p className="text-xs text-rose-600 text-center">Incorrect password.</p>
+          <p className="text-xs text-rose-600 text-center">{t('settings.incorrect_pin', 'Incorrect PIN.')}</p>
         )}
         <button
+          type="button"
           onClick={handleSubmit}
           className="w-full py-3 rounded-xl font-bold text-sm bg-[#7598a0] text-white shadow-md shadow-[#7598a0]/20 active:scale-[0.98] transition-all"
         >
-          Unlock
+          {t('common.unlock', 'Unlock')}
         </button>
+        {props.purpose === 'exitDiscreteMode' && (
+          <button
+            type="button"
+            onClick={props.onCancel}
+            className="w-full py-2 text-sm font-semibold text-slate-500"
+          >
+            {t('common.cancel')}
+          </button>
+        )}
       </div>
     </div>
   );

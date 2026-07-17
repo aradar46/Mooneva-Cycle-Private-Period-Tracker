@@ -36,7 +36,7 @@ export interface DailyLog {
   flow: FlowIntensity;
   symptoms: string[];
   notes: string;
-  mood?: MoodType;
+  mood?: MoodType | string[];
   discharge?: DischargeType;
   sexDrive?: SexDriveType;
   sexType?: SexType;
@@ -240,7 +240,7 @@ export interface DayMeta {
   // Visuals
   intensity?: FlowIntensity;
   symptoms?: string[];
-  mood?: string | null;
+  mood?: string[];
   /** Header (Dashboard state for the day, typically consumed for Today) */
   header?: {
     title: string;

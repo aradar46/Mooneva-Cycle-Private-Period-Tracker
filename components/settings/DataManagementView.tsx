@@ -31,6 +31,11 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
     const appImportInputRef = useRef<HTMLInputElement>(null);
 
     const handleBackup = async () => {
+        if (isBackupEncrypted && backupPassword.trim().length === 0) {
+            alert(t('errors.backup_password'));
+            return;
+        }
+
         setIsProcessing(true);
         try {
             const allData = await loadData();
@@ -228,7 +233,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                 <button
                                     onClick={() => fileInputRef.current?.click()}
                                     disabled={isProcessing}
-                                    className="w-full py-3 bg-[#fccfb7] text-slate-700 rounded-xl text-xs font-bold transition-all active:scale-95 border border-[#fbd8c1] shadow-sm"
+                                    className="data-management-import-button w-full py-3 bg-[#fccfb7] text-slate-700 rounded-xl text-xs font-bold transition-all active:scale-95 border border-[#fbd8c1] shadow-sm"
                                 >
                                     {t('common.import')}
                                 </button>

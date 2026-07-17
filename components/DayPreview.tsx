@@ -35,7 +35,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
 
     return (
         <div
-            className="relative z-0 w-[95%] max-w-[95%] mx-auto bg-[#F0F2F5] rounded-b-[24px] px-3 py-3 animate-fade-in"
+            className="day-preview-panel relative z-0 w-[95%] max-w-[95%] mx-auto bg-[#F0F2F5] rounded-b-[24px] px-3 py-3 animate-fade-in"
             style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.3), -6px -6px 12px rgba(255, 255, 255, 0.7)' }}
         >
             {/* Line 1: Flow, Mood and Close Button */}
@@ -44,7 +44,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                     <div className="flex items-center gap-2">
                         {activePeriod && (
                             <span
-                                className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider px-2 h-[20px] rounded-lg flex items-center flex-shrink-0"
+                                className="day-preview-chip day-preview-cycle-chip text-[10px] font-bold text-indigo-400 uppercase tracking-wider px-2 h-[20px] rounded-lg flex items-center flex-shrink-0"
                                 style={{
                                     backgroundColor: '#F0F2F5',
                                     boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)'
@@ -55,7 +55,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                         )}
                         {log?.flow && (
                             <div
-                                className="flex items-center gap-1 px-2 h-[20px] rounded-lg flex-shrink-0"
+                                className="day-preview-chip day-preview-flow-chip flex items-center gap-1 px-2 h-[20px] rounded-lg flex-shrink-0"
                                 style={{
                                     backgroundColor: '#F0F2F5',
                                     boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)'
@@ -78,7 +78,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                 return (
                                     <div
                                         key={m}
-                                        className="px-2 h-[20px] rounded-lg flex items-center justify-center flex-shrink-0"
+                                        className="day-preview-chip day-preview-mood-chip px-2 h-[20px] rounded-lg flex items-center justify-center flex-shrink-0"
                                         style={{
                                             backgroundColor: '#F0F2F5',
                                             boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)',
@@ -110,26 +110,26 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                 {(log?.symptoms?.length > 0 || log?.discharge || log?.sexDrive || log?.sexType || log?.pillTakenAt || activePeriod?.isWithdrawalBleed || activePeriod?.ignoreForAverages) && (
                     <div className="flex flex-wrap items-center gap-1.5">
                         {log?.symptoms?.map((s) => (
-                            <span key={s} className="text-[10px] font-bold text-slate-500 bg-white/50 px-2 py-0.5 rounded-full">
+                            <span key={s} className="day-preview-tag day-preview-tag-neutral text-[10px] font-bold text-slate-500 bg-white/50 px-2 py-0.5 rounded-full">
                                 {t(`symptom.${s.toLowerCase()}`, s)}
                             </span>
                         ))}
                         {log?.discharge && (
-                            <span className="text-[10px] font-bold text-teal-600 bg-teal-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                            <span className="day-preview-tag day-preview-tag-fertility text-[10px] font-bold text-teal-600 bg-teal-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                                 {isRtl
                                     ? `${t('log.secretions')} ${t(`log.discharge_${log.discharge}`, log.discharge)}`
                                     : `${t(`log.discharge_${log.discharge}`, log.discharge)} ${t('log.secretions')}`}
                             </span>
                         )}
                         {log?.sexDrive && (
-                            <span className="text-[10px] font-bold text-amber-600 bg-amber-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                            <span className="day-preview-tag day-preview-tag-libido text-[10px] font-bold text-amber-600 bg-amber-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                                 {isRtl
                                     ? `${t('log.libido')} ${t(`log.libido_${log.sexDrive}`, log.sexDrive)}`
                                     : `${t(`log.libido_${log.sexDrive}`, log.sexDrive)} ${t('log.libido')}`}
                             </span>
                         )}
                         {log?.sexType && (
-                            <span className="text-[10px] font-bold text-purple-600 bg-purple-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                            <span className="day-preview-tag day-preview-tag-sex text-[10px] font-bold text-purple-600 bg-purple-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                                 {isRtl
                                     ? `${t('log.sex_activity')} ${t(`log.sex_${log.sexType}`, log.sexType)}`
                                     : `${t(`log.sex_${log.sexType}`, log.sexType)} ${t('log.sex_activity')}`}
@@ -138,23 +138,23 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                         {log?.pillTakenAt && (
                             <span
                                 aria-label={t('log.pill_taken_at', { time: log.pillTakenAt })}
-                                className="inline-flex h-[20px] overflow-hidden rounded-full border border-cyan-100/80 shadow-[1px_1px_3px_rgba(14,116,144,0.12),-1px_-1px_3px_rgba(255,255,255,0.75)]"
+                                className="day-preview-pill-badge inline-flex h-[20px] overflow-hidden rounded-full border border-cyan-100/80 shadow-[1px_1px_3px_rgba(14,116,144,0.12),-1px_-1px_3px_rgba(255,255,255,0.75)]"
                             >
-                                <span className="flex items-center bg-cyan-500 px-2 text-[10px] font-black uppercase tracking-tighter text-white">
+                                <span className="day-preview-pill-label flex items-center bg-cyan-500 px-2 text-[10px] font-black uppercase tracking-tighter text-white">
                                     {t('log.pill_badge', 'Pill')}
                                 </span>
-                                <span className="flex items-center bg-cyan-50 px-2 text-[10px] font-black tabular-nums tracking-tight text-cyan-800">
+                                <span className="day-preview-pill-time flex items-center bg-cyan-50 px-2 text-[10px] font-black tabular-nums tracking-tight text-cyan-800">
                                     {log.pillTakenAt}
                                 </span>
                             </span>
                         )}
                         {activePeriod?.isWithdrawalBleed && (
-                            <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter flex items-center gap-1">
+                            <span className="day-preview-tag day-preview-tag-pill text-[10px] font-bold text-indigo-600 bg-indigo-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter flex items-center gap-1">
                                 💊 {t('log.withdrawal_bleed_label')}
                             </span>
                         )}
                         {activePeriod?.ignoreForAverages && (
-                            <span className="text-[10px] font-bold text-rose-500 bg-rose-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter flex items-center gap-1">
+                            <span className="day-preview-tag day-preview-tag-alert text-[10px] font-bold text-rose-500 bg-rose-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter flex items-center gap-1">
                                 ⚠️ {t('log.excluded_label')}
                             </span>
                         )}
@@ -164,8 +164,8 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                 {/* Notes - Subtler */}
                 {log?.notes && (
                     <div className="relative group">
-                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-slate-200 rounded-full" />
-                        <p className="text-[12px] text-slate-600 font-medium pl-3 py-0.5 leading-relaxed max-h-[80px] overflow-y-auto scrollbar-hide">
+                        <div className="day-preview-note-rail absolute left-0 top-0 bottom-0 w-0.5 bg-slate-200 rounded-full" />
+                        <p className="day-preview-note-text text-[12px] text-slate-600 font-medium pl-3 py-0.5 leading-relaxed max-h-[80px] overflow-y-auto scrollbar-hide">
                             {log.notes}
                         </p>
                     </div>
@@ -174,7 +174,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                 {/* Action Footer: Tap to Edit */}
                 <button
                     onClick={() => onEdit(date)}
-                    className="w-full mt-2 py-2 px-4 rounded-xl text-slate-400 font-bold text-[9px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:text-slate-600 transition-colors"
+                    className="day-preview-edit-button w-full mt-2 py-2 px-4 rounded-xl text-slate-400 font-bold text-[9px] uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:text-slate-600 transition-colors"
                     style={{
                         backgroundColor: '#F0F2F5',
                         boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.8)'

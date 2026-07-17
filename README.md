@@ -20,8 +20,6 @@
   <img src="https://img.shields.io/github/license/aradar46/Mooneva-Cycle-Private-Period-Tracker?style=flat-square" alt="License: GPL-3.0" />
   <img src="https://img.shields.io/github/v/tag/aradar46/Mooneva-Cycle-Private-Period-Tracker?label=version&style=flat-square" alt="Version" />
   <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey?style=flat-square" alt="Platform" />
-  <br /><br />
-  <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fgithub.com%2Fkitswas%2Ffdroid-metrics-dashboard%2Fraw%2Frefs%2Fheads%2Fmain%2Fprocessed%2Ftotal%2Fcom.mooneva.app.json&query=%24.total_downloads&logo=fdroid&label=F-Droid%20Downloads" alt="F-Droid Downloads (all time)" />
 </div>
 
 ---
@@ -53,8 +51,6 @@ There are no Mooneva servers. Your cycle data is encrypted on your device using 
 
 Mooneva Cycle is developed by **[Mooneva](https://mooneva.se/)**, a Swedish femtech company dedicated to building thoughtful tools for women's health. Learn more at [mooneva.se/pages/mooneva_cycle](https://mooneva.se/pages/mooneva_cycle).
 
-All your cycle data stays on your device. No server ever sees it.
- 
 ---
 
 ## Features
@@ -69,13 +65,15 @@ All your cycle data stays on your device. No server ever sees it.
 - **PIN lock** with configurable timeout
 - **Reminder notifications** (period, ovulation, daily log, PMS, Pill)
 - **Birth control mode** — hides fertile window, tags bleeds as withdrawal
-- **No data transmission** — no internet permission declared, no health data ever leaves the device
+- **Pill tracking** — log intake time, see adherence per cycle day in Trends
+- **Dark theme**
+- **Data import** from drip, Flo, and Clue
 
 ---
 
 ## Privacy
 
-Mooneva Cycle collects no data. There are no analytics, no crash reporters, no third-party SDKs that phone home. Everything you log stays on your device, encrypted in local storage.
+Mooneva Cycle collects no data. There are no analytics, no crash reporters, no third-party SDKs that phone home.
 
 | Cloud-based trackers | Mooneva |
 |---|---|
@@ -144,11 +142,18 @@ Any modified version you distribute must also be open-sourced under GPL-3.0.
 
 ## Release Log
 
+### 2.0.7
+- Reworked calendar month swiping: the grid now follows your finger and slides between months, with proper tap/flick thresholds.
+- Fixed the period-start star and day-selection rings being cut off at the calendar edges.
+- Protected-sex marker is now a filled shield; both sex markers are larger and no longer overlap the date on narrow screens.
+- Clearer calendar guide text for logging periods and daily symptoms, updated in all seven languages.
+- Added a pill timeline to Trends showing on which cycle days the pill was taken.
+
 ### 2.0.6
 - Added importers for data from other period trackers (drip, Flo, Clue).
 - Added French as a new app language.
 - Added Joint Pain, Fever, and Chills symptom tags.
-- Translation fixes across all languages 
+- Translation fixes across all languages
 
 ### 2.0.5
 - Included the logo and fonts (public/) in the F-Droid public repo sync so the open-source build renders correctly.
@@ -173,7 +178,6 @@ Any modified version you distribute must also be open-sourced under GPL-3.0.
 
 ### In progress
 - fixing bugs and tweak user friendliness
-- dark theme
 
 ### Planned
 - Zero-knowledge cross-device sync — encrypted client-side,
@@ -181,7 +185,6 @@ Any modified version you distribute must also be open-sourced under GPL-3.0.
   and ECDH key exchange. Opt-in and sandboxed so the
   zero-internet-permission guarantee holds for users who
   skip it.
-- Import and migrate data from other period and cycle tracking apps
 
 Have a feature request? Open an [issue](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues) and let us know.
 

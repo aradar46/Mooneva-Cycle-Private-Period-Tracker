@@ -276,6 +276,34 @@ const useTrendStats = ({
   }, [symptomHeatmap]);
 
 
+  // Pill adherence vs Day of Cycle: count of cycles where the pill was taken on that day
+  const pillHeatmap = useMemo(() => {
+    const data: Record<number, number> = {};
+
+    const todayPill = new Date();
+    todayPill.setHours(0, 0, 0, 0);
+
+    filteredCycles.forEach((cycle) => {
+      const [y, m, d_val] = cycle.startDate.split('-').map(Number);
+      const cycleStart = new Date(y, m - 1, d_val);
+      const maxDay = cycle.length
+        ? cycle.length
+        : Math.max(1, Math.floor((todayPill.getTime() - cycleStart.getTime()) / 86400000) + 1);
+      for (let day = 1; day <= maxDay; day++) {
+        const d = new Date(cycleStart);
+        d.setDate(d.getDate() + (day - 1));
+        const dStr = toLocalISOString(d);
+
+        if (filteredLogs[dStr]?.pillTakenAt) {
+          const cycleDay = Math.min(day, 31);
+          data[cycleDay] = (data[cycleDay] || 0) + 1;
+        }
+      }
+    });
+
+    return data;
+  }, [filteredLogs, filteredCycles]);
+
   return {
     filteredLogs,
     filteredCycles,
@@ -287,7 +315,8 @@ const useTrendStats = ({
     maxMoodFreq,
     symptomHeatmap,
     maxSymptomFreq,
-    topSymptomNames
+    topSymptomNames,
+    pillHeatmap
   };
 };
 
@@ -328,7 +357,9 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
     maxMoodFreq,
     symptomHeatmap,
     maxSymptomFreq,
-    topSymptomNames
+    topSymptomNames,
+    pillHeatmap,
+    filteredCycles
   } = useTrendStats({
     logs,
     cycles,
@@ -500,6 +531,30 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
                 blob: `blob-${(idx % 5) + 1}`
               }
             }))}
+          />
+        )}
+
+        {/* Pill Adherence (Cycle Days) — intensity = fraction of cycles where the pill was taken that day */}
+        {Object.keys(pillHeatmap).length > 0 && (
+          <HeatmapSection
+            title={t('trends.pill_timeline')}
+            gradientFrom="teal-100"
+            gradientTo="teal-500"
+            colorScale="teal"
+            maxValue={Math.max(filteredCycles.length, 1)}
+            lowLabel={t('trends.pill_low')}
+            highLabel={t('trends.pill_high')}
+            rows={[{
+              id: 'pill',
+              label: `💊 ${t('trends.pill_taken')}`,
+              data: pillHeatmap,
+              config: {
+                color: 'rgb(45, 212, 191)',
+                secondary: 'rgb(13, 148, 136)',
+                wash: 'rgba(45, 212, 191, 0.1)',
+                blob: 'blob-1'
+              }
+            }]}
           />
         )}
       </div>

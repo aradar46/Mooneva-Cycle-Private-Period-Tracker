@@ -300,14 +300,14 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
             )}
 
             <div
-                className="relative z-0 w-[95%] max-w-[95%] mx-auto bg-[#F0F2F5] rounded-b-[32px] px-4 py-4 animate-fade-in space-y-4"
+                className="daily-log-panel relative z-0 w-[95%] max-w-[95%] mx-auto bg-[#F0F2F5] rounded-b-[32px] px-4 py-4 animate-fade-in space-y-4"
                 style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
             >
 
                 <div className="flex items-center gap-2 mb-4 mt-4">
                     {!meta.isUnavailableFuture && (
                         <div
-                            className="flex-1 min-w-0 flex flex-nowrap gap-0 p-1.5 bg-[#F0F2F5] rounded-2xl overflow-x-auto no-scrollbar mt-[5px]"
+                            className="daily-log-tabs flex-1 min-w-0 flex flex-nowrap gap-0 p-1.5 bg-[#F0F2F5] rounded-2xl overflow-x-auto no-scrollbar mt-[5px]"
                             aria-label={t('log.daily_log_tabs', 'Daily log tabs')}
                             style={{ boxShadow: 'inset 3px 3px 6px rgba(163, 177, 198, 0.4), inset -3px -3px 6px rgba(255, 255, 255, 0.8)' }}
                         >
@@ -315,8 +315,8 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex-shrink-0 flex items-center justify-center px-3 py-2 rounded-xl text-[11px] font-semibold tracking-wide uppercase transition-all duration-200
-                                    ${activeTab === tab.id ? 'text-slate-700' : 'text-slate-400 hover:text-slate-600'}`}
+                                    className={`daily-log-tab flex-shrink-0 flex items-center justify-center px-3 py-2 rounded-xl text-[11px] font-semibold tracking-wide uppercase transition-all duration-200
+                                    ${activeTab === tab.id ? 'daily-log-tab-active text-slate-700' : 'daily-log-tab-inactive text-slate-400 hover:text-slate-600'}`}
                                     style={activeTab === tab.id ? {
                                         backgroundColor: '#F0F2F5',
                                         boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.8)'
@@ -330,7 +330,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                     {onClose && (
                         <button
                             onClick={onClose}
-                            className="flex-shrink-0 p-2 text-slate-500 hover:text-slate-700 transition-colors rounded-xl mt-[5px]"
+                            className="daily-log-close flex-shrink-0 p-2 text-slate-500 hover:text-slate-700 transition-colors rounded-xl mt-[5px]"
                             style={{
                                 backgroundColor: '#F0F2F5',
                                 boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.8)'
@@ -354,7 +354,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                         {activeTab === 'flow' && (
                             <section className="flex flex-col gap-4">
                                 {!activePeriod && (
-                                    <p className="text-[11px] text-slate-500 text-center px-4">
+                                    <p className="daily-log-hint text-[11px] text-slate-500 text-center px-4">
                                         {t('log.spotting_hint_no_period')}
                                     </p>
                                 )}
@@ -404,7 +404,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                         type="button"
                                         onClick={() => setIsAdvancedOpen(open => !open)}
                                         aria-expanded={isAdvancedOpen}
-                                        className="mx-auto flex items-center gap-1 px-3 py-1 text-[11px] font-semibold text-slate-500 hover:text-slate-700 transition-colors"
+                                        className="daily-log-advanced-button mx-auto flex items-center gap-1 px-3 py-1 text-[11px] font-semibold text-slate-500 hover:text-slate-700 transition-colors"
                                     >
                                         <span>{t('log.advanced', 'Advanced')}</span>
                                         <svg
@@ -565,7 +565,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                         {activeTab === 'pill' && (
                             <section className="flex flex-col gap-4 py-2">
                                 <label
-                                    className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-cyan-100/60 cursor-pointer transition-all active:scale-[0.99]"
+                                    className="daily-log-control-card flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-cyan-100/60 cursor-pointer transition-all active:scale-[0.99]"
                                     style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
                                 >
                                     <div className="flex-1">
@@ -583,10 +583,10 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                         className="sr-only"
                                     />
                                     <div
-                                        className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 border-2
+                                        className={`daily-log-check w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 border-2
                                         ${pillTakenAt
-                                                ? 'bg-cyan-50 border-cyan-400 text-cyan-600'
-                                                : 'bg-white border-transparent text-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.4)]'}`}
+                                                ? 'daily-log-check-on bg-cyan-50 border-cyan-400 text-cyan-600'
+                                                : 'daily-log-check-off bg-white border-transparent text-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.4)]'}`}
                                     >
                                         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                                             <polyline points="20 6 9 17 4 12" />
@@ -595,7 +595,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                 </label>
 
                                 {pillTakenAt && (
-                                    <label className="flex items-center justify-between gap-3 p-4 bg-white/50 rounded-xl border border-cyan-100/70">
+                                    <label className="daily-log-pill-time-card flex items-center justify-between gap-3 p-4 bg-white/50 rounded-xl border border-cyan-100/70">
                                         <span className="text-[11px] font-bold text-slate-600">
                                             {t('log.pill_time', 'Pill time')}
                                         </span>
@@ -604,7 +604,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                             aria-label={t('log.pill_time', 'Pill time')}
                                             value={pillTakenAt}
                                             onChange={(event) => setPillTakenAt(event.target.value || undefined)}
-                                            className="text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-cyan-300/40 outline-none"
+                                            className="daily-log-pill-time-input text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-cyan-300/40 outline-none"
                                         />
                                     </label>
                                 )}
@@ -636,32 +636,41 @@ interface SelectionCircleProps {
     isSelected: boolean;
     onClick: () => void;
     colorConfig: { color: string; dark: string; shadow: string };
+    className?: string;
     children: React.ReactNode;
 }
 
-const SelectionCircle: React.FC<SelectionCircleProps> = ({ isSelected, onClick, colorConfig, children }) => (
-    <button
-        onClick={onClick}
-        className={`relative flex flex-col items-center justify-center w-[58px] h-[58px] rounded-full transition-all duration-300 active:scale-95 ${isSelected ? 'z-10' : 'bg-[#F0F2F5]'}`}
-        style={isSelected ? {
+const SelectionCircle: React.FC<SelectionCircleProps> = ({ isSelected, onClick, colorConfig, className = '', children }) => {
+    const selectedStyle = {
             boxShadow: `8px 8px 16px ${colorConfig.shadow}, -4px -4px 12px rgba(255, 255, 255, 0.8)`,
             border: `3px solid ${colorConfig.color}`,
             backgroundColor: `${colorConfig.color}1A`,
-            color: colorConfig.dark
-        } : {
+            color: colorConfig.dark,
+            '--daily-log-selection-color': colorConfig.color,
+            '--daily-log-selection-bg': `${colorConfig.color}2E`,
+            '--daily-log-selection-glow': colorConfig.shadow,
+        } as React.CSSProperties;
+    const idleStyle = {
             boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8)',
             color: '#94a3b8',
             border: '1px solid transparent'
-        }}
-    >
-        {children}
-    </button>
-);
+        } as React.CSSProperties;
+
+    return (
+        <button
+            onClick={onClick}
+            className={`daily-log-selection-circle ${isSelected ? 'daily-log-selection-circle-selected z-10' : 'daily-log-selection-circle-idle bg-[#F0F2F5]'} ${className} relative flex flex-col items-center justify-center w-[58px] h-[58px] rounded-full transition-all duration-300 active:scale-95`}
+            style={isSelected ? selectedStyle : idleStyle}
+        >
+            {children}
+        </button>
+    );
+};
 
 const MoodCircle: React.FC<{ config: MoodOptionConfig; isSelected: boolean; onClick: () => void; children: React.ReactNode }> = ({
     config, isSelected, onClick, children
 }) => (
-    <SelectionCircle isSelected={isSelected} onClick={onClick} colorConfig={config}>
+    <SelectionCircle isSelected={isSelected} onClick={onClick} colorConfig={config} className="daily-log-mood-circle">
         <span className="text-[9px] font-black uppercase tracking-[0.12em] text-center px-1">{children}</span>
     </SelectionCircle>
 );
@@ -671,7 +680,7 @@ const FlowCircle: React.FC<{ isSelected: boolean; onClick: () => void; label: st
 }) => {
     const config = { color: '#fb7185', dark: '#9f1239', shadow: 'rgba(251, 113, 133, 0.4)' };
     return (
-        <SelectionCircle isSelected={isSelected} onClick={onClick} colorConfig={config}>
+        <SelectionCircle isSelected={isSelected} onClick={onClick} colorConfig={config} className="daily-log-flow-circle">
             <div className="flex flex-col items-center gap-1">
                 <div className={`${dotClass} rounded-full transition-colors ${isSelected ? 'bg-rose-600' : 'bg-rose-300'}`} />
                 <span className="text-[9px] font-black uppercase tracking-[0.05em]">{label}</span>
@@ -685,7 +694,7 @@ const ActionCircle: React.FC<{ onClick: () => void; label: string; icon: React.R
 }) => {
     const config = { color: '#fb7185', dark: '#9f1239', shadow: 'rgba(251, 113, 133, 0.3)' };
     return (
-        <SelectionCircle isSelected={false} onClick={onClick} colorConfig={config}>
+        <SelectionCircle isSelected={false} onClick={onClick} colorConfig={config} className="daily-log-action-circle">
             <div className="flex flex-col items-center gap-1">
                 {icon}
                 <span className="text-[9px] font-black uppercase tracking-[0.05em]">{label}</span>

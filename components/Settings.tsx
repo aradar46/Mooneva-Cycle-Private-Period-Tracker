@@ -10,6 +10,7 @@ import DataManagementView from './settings/DataManagementView';
 import NumberSettingRow from './settings/NumberSettingRow';
 import { ClinicalReportView } from './settings/ClinicalReportView';
 import { addDays, getTodayStr } from '../utils/dateUtils';
+import { PIN_MAX_LENGTH, isValidPin, normalizePinInput } from '../utils/pin';
 import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
 
 import { SubViewType, ViewType } from '../hooks/useAppNavigation';
@@ -62,6 +63,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
   const [pendingAction, setPendingAction] = useState<'bc' | 'pause' | null>(null);
   const [periodForDialog, setPeriodForDialog] = useState<PeriodRecord | null>(null);
   const effectiveFirstDayOfWeek = resolveFirstDayOfWeek(i18n.language, settings.firstDayOfWeek);
+  const pinEntryReady = isValidPin(pinInput) && isValidPin(pinConfirm);
 
   const activePeriod = useMemo(() => {
     const todayStr = getTodayStr();
@@ -636,7 +638,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
             <SettingCard title={t('settings.pin_lock')}>
               <SettingRow
                 label={t('settings.pin_lock')}
-                desc={settings.pin ? t('settings.pin_active') : t('common.disabled')}
+                desc={settings.pin ? t('settings.pin_active') : t('settings.pin_disabled_desc')}
                 icon={<Icons.Lock />}
                 onClick={() => !settings.pin && setPinExpanded(!pinExpanded)}
                 last={!pinExpanded || !!settings.pin}
@@ -696,29 +698,35 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
 
               {/* Expandable PIN setup form */}
               {!settings.pin && pinExpanded && (
-                <div className="px-5 pb-5 space-y-3">
+                <div className="pin-setup-panel px-5 pb-5 space-y-3">
                   <input
                     type="password"
-                    placeholder={t('settings.enter_password')}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={PIN_MAX_LENGTH}
+                    placeholder={t('settings.enter_pin')}
                     value={pinInput}
-                    onChange={(e) => { setPinInput(e.target.value); setPinMismatch(false); }}
-                    className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm focus:border-[#7598a0] focus:ring-1 focus:ring-[#7598a0] outline-none transition-all placeholder:text-slate-400"
-                    autoComplete="new-password"
+                    onChange={(e) => { setPinInput(normalizePinInput(e.target.value)); setPinMismatch(false); }}
+                    className="pin-setup-input w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm focus:border-[#7598a0] focus:ring-1 focus:ring-[#7598a0] outline-none transition-all placeholder:text-slate-400"
+                    autoComplete="off"
                   />
                   <input
                     type="password"
-                    placeholder={t('settings.repeat_password')}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={PIN_MAX_LENGTH}
+                    placeholder={t('settings.repeat_pin')}
                     value={pinConfirm}
-                    onChange={(e) => { setPinConfirm(e.target.value); setPinMismatch(false); }}
-                    className={`w-full bg-white border rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-[#7598a0] outline-none transition-all placeholder:text-slate-400 ${pinMismatch ? 'border-rose-400 focus:border-rose-400' : 'border-slate-300 focus:border-[#7598a0]'}`}
-                    autoComplete="new-password"
+                    onChange={(e) => { setPinConfirm(normalizePinInput(e.target.value)); setPinMismatch(false); }}
+                    className={`pin-setup-input w-full bg-white border rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-[#7598a0] outline-none transition-all placeholder:text-slate-400 ${pinMismatch ? 'border-rose-400 focus:border-rose-400' : 'border-slate-300 focus:border-[#7598a0]'}`}
+                    autoComplete="off"
                   />
                   {pinMismatch && (
-                    <p className="text-xs text-rose-600 text-center">{t('settings.pins_dont_match')}</p>
+                    <p className="pin-setup-error text-xs text-rose-600 text-center">{t('settings.pins_dont_match')}</p>
                   )}
                   <button
                     onClick={() => {
-                      if (pinInput.length < 4) {
+                      if (!pinEntryReady) {
                         alert(t('settings.pin_error'));
                         return;
                       }
@@ -732,15 +740,15 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                       setPinMismatch(false);
                       setPinExpanded(false);
                     }}
-                    className={`w-full py-3 rounded-xl font-bold text-sm transition-all transform active:scale-[0.98] ${pinInput.length >= 4 && pinInput === pinConfirm
+                    className={`pin-setup-button w-full py-3 rounded-xl font-bold text-sm transition-all transform active:scale-[0.98] ${pinEntryReady && pinInput === pinConfirm
                       ? 'bg-[#7598a0] text-white shadow-md shadow-[#7598a0]/20'
                       : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                       }`}
                   >
-                    {t('common.enable_protection')}
+                    {t('settings.enable_pin')}
                   </button>
-                  <p className="text-[10px] text-center text-slate-400 px-4">
-                    {t('settings.security_desc_long')}
+                  <p className="pin-setup-helper text-[10px] text-center text-slate-400 px-4">
+                    {t('settings.pin_security_desc')}
                   </p>
                 </div>
               )}

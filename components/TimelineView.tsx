@@ -77,8 +77,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
               style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
             >
               <div className="flex items-center gap-3 mb-6">
-                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 pt-[9px]">{t('common.history')}</span>
-                <div className="h-px flex-1 bg-slate-200"></div>
+                <span className="timeline-history-heading text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 pt-[9px]">{t('common.history')}</span>
+                <div className="timeline-history-divider h-px flex-1 bg-slate-300"></div>
               </div>
 
               <div className="flex flex-col gap-8">
@@ -104,12 +104,12 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
                   return (
                     <div key={`${cycle.startDate}-${idx}`} className="flex flex-col">
                       <div className="flex justify-between items-end mb-[2px]">
-                        <span className="text-[11px] font-semibold text-black uppercase tracking-wide">
+                        <span className="timeline-date-label text-[11px] font-bold text-slate-800 uppercase tracking-wide">
                           {formatPeriodRange(cycle.startDate, spanLen)}
                         </span>
                         {cycle.length != null && (
                           <span
-                            className={`text-xs font-bold tabular-nums ${isInvalid ? 'text-slate-400' : 'text-primary'}`}
+                            className={`timeline-cycle-length text-xs font-extrabold tabular-nums ${isInvalid ? 'text-slate-500' : 'text-slate-800'}`}
                             title={isGap
                               ? t('timeline.gap_hint')
                               : isShort
@@ -125,7 +125,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
 
                       {/* Progress Bar Container - Neumorphic Inset */}
                       <div
-                        className="relative w-full h-4 bg-[#e4e7eb] rounded-full overflow-hidden border border-white/50"
+                        className="timeline-history-bar relative w-full h-4 bg-[#d9dde4] rounded-full overflow-hidden border border-slate-200/80"
                         style={{ boxShadow: 'inset 2px 2px 5px rgba(163, 177, 198, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.7)' }}
                       >
 
