@@ -3,7 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 // --- Translation Resources ---
-// Supported Languages: English, Swedish, Spanish, German, Chinese, Persian, French
+// Supported Languages: English, Swedish, Spanish, German, Chinese, Persian, French, Ukrainian
 
 import en from '../locales/en.json';
 import sv from '../locales/sv.json';
