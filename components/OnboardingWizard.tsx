@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSettings, DailyLog, INITIAL_SYMPTOMS } from '../types';
 import { requestNotificationPermission } from '../services/notifications';
+import CycleSetupStep, { CycleSetupValues } from './onboarding/CycleSetupStep';
 
 interface OnboardingWizardProps {
   onComplete: (settings: AppSettings, initialLog?: { date: string, log: DailyLog }) => void;
@@ -14,12 +15,22 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   // --- Form State ---
   const [lastPeriodDate, setLastPeriodDate] = useState<string | null>(null);
   const [dontRemember, setDontRemember] = useState(false);
-  const [cycleLength, setCycleLength] = useState(28);
-  const [periodLength, setPeriodLength] = useState(5);
 
   // Goals
   const [goal, setGoal] = useState<'track' | 'fertility' | 'pregnancy' | 'birthControl'>('track');
-  const [adaptivePrediction, setAdaptivePrediction] = useState(false);
+
+  // Cycle management, mirrored from Settings. Seeded by the goal preset on step 3.
+  const [cycleSetup, setCycleSetup] = useState<CycleSetupValues>({
+    adaptivePrediction: false,
+    cycleLength: 28,
+    periodLength: 5,
+    lutealPhaseLength: 14,
+    showFertileWindow: false,
+    showPMS: true,
+    pmsLength: 3,
+    isOnBirthControl: false,
+    predictionsPaused: false
+  });
 
   // Spycraft / Discrete
   const [discreteUnlocked, setDiscreteUnlocked] = useState(false);
@@ -33,34 +44,21 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     // Request notification permission before finishing
     await requestNotificationPermission();
 
-    // Determine settings based on goal
-    let predictionsPaused = false;
-    let isOnBirthControl = false;
-    let showFertileWindow = false;
-
-    if (goal === 'pregnancy') predictionsPaused = true;
-    if (goal === 'birthControl') {
-      isOnBirthControl = true;
-      showFertileWindow = false;
-    }
-    if (goal === 'fertility') {
-      showFertileWindow = true;
-    }
-
     const newSettings: AppSettings = {
       userName: 'User',
       discreteMode: false,
       onboardingCompleted: true,
-      isOnBirthControl,
+      isOnBirthControl: cycleSetup.isOnBirthControl,
       symptoms: INITIAL_SYMPTOMS,
-      predictionsPaused,
-      adaptivePrediction,
+      predictionsPaused: cycleSetup.predictionsPaused,
+      adaptivePrediction: cycleSetup.adaptivePrediction,
       pin: undefined,
-      cycleLength,
-      periodLength,
-      lutealPhaseLength: 14,
-      pmsLength: 3,
-      showFertileWindow
+      cycleLength: cycleSetup.cycleLength,
+      periodLength: cycleSetup.periodLength,
+      lutealPhaseLength: cycleSetup.lutealPhaseLength,
+      pmsLength: cycleSetup.pmsLength,
+      showPMS: cycleSetup.showPMS,
+      showFertileWindow: cycleSetup.showFertileWindow
     };
 
     let initialLog;
@@ -79,9 +77,24 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     onComplete(newSettings, initialLog);
   };
 
+  // Picking a focus seeds the cycle management step. The user can still adjust
+  // every value there before finishing.
+  const selectGoal = (id: 'track' | 'fertility' | 'pregnancy' | 'birthControl') => {
+    setGoal(id);
+    setCycleSetup(s => ({
+      ...s,
+      predictionsPaused: id === 'pregnancy',
+      isOnBirthControl: id === 'birthControl',
+      showFertileWindow: id === 'fertility',
+      // Birth control and paused predictions both rule out adaptive prediction
+      ...(id === 'birthControl' ? { adaptivePrediction: false, cycleLength: 28 } : {}),
+      ...(id === 'pregnancy' ? { adaptivePrediction: false, showPMS: false } : {})
+    }));
+  };
+
   // --- Navigation Helpers ---
   const nextStep = () => {
-    if (step === 3 && (goal === 'pregnancy' || goal === 'birthControl')) {
+    if (step === 4 && (goal === 'pregnancy' || goal === 'birthControl')) {
       setStep(6); // skip spycraft, go to get started
     } else if (step === 5) {
       setStep(6); // spycraft → get started
@@ -94,11 +107,9 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
 
   const prevStep = () => {
     if (step === 6 && (goal === 'pregnancy' || goal === 'birthControl')) {
-      setStep(3);
+      setStep(4);
     } else if (step === 6) {
       setStep(5);
-    } else if (step === 5 && (goal === 'pregnancy' || goal === 'birthControl')) {
-      setStep(3);
     } else {
       setStep(s => Math.max(0, s - 1));
     }
@@ -154,6 +165,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
       { code: 'zh', label: 'Chinese', native: '中文', flag: '🇨🇳' },
       { code: 'fa', label: 'Persian', native: 'فارسی', flag: '🇮🇷' },
       { code: 'fr', label: 'French', native: 'Français', flag: '🇫🇷' },
+      { code: 'uk', label: 'Ukrainian', native: 'Українська', flag: '🇺🇦' },
+      { code: 'it', label: 'Italian', native: 'Italiano', flag: '🇮🇹' },
     ];
 
     return (
@@ -313,13 +326,13 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
               style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.2), -8px -8px 16px rgba(255, 255, 255, 0.6)' }}
             >
               <button
-                onClick={() => setCycleLength(c => Math.max(21, c - 1))}
+                onClick={() => setCycleSetup(s => ({ ...s, cycleLength: Math.max(21, s.cycleLength - 1) }))}
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-500 text-xl font-bold bg-[#F0F2F5] active:scale-95 transition-all"
                 style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
               >-</button>
-              <span className="text-2xl font-black text-slate-700">{cycleLength} <span className="text-sm font-bold text-slate-400">{t('common.days')}</span></span>
+              <span className="text-2xl font-black text-slate-700">{cycleSetup.cycleLength} <span className="text-sm font-bold text-slate-400">{t('common.days')}</span></span>
               <button
-                onClick={() => setCycleLength(c => Math.min(45, c + 1))}
+                onClick={() => setCycleSetup(s => ({ ...s, cycleLength: Math.min(45, s.cycleLength + 1) }))}
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-500 text-xl font-bold bg-[#F0F2F5] active:scale-95 transition-all"
                 style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
               >+</button>
@@ -335,13 +348,13 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
               style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.2), -8px -8px 16px rgba(255, 255, 255, 0.6)' }}
             >
               <button
-                onClick={() => setPeriodLength(p => Math.max(2, p - 1))}
+                onClick={() => setCycleSetup(s => ({ ...s, periodLength: Math.max(2, s.periodLength - 1) }))}
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-500 text-xl font-bold bg-[#F0F2F5] active:scale-95 transition-all"
                 style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
               >-</button>
-              <span className="text-2xl font-black text-slate-700">{periodLength} <span className="text-sm font-bold text-slate-400">{t('common.days')}</span></span>
+              <span className="text-2xl font-black text-slate-700">{cycleSetup.periodLength} <span className="text-sm font-bold text-slate-400">{t('common.days')}</span></span>
               <button
-                onClick={() => setPeriodLength(p => Math.min(10, p + 1))}
+                onClick={() => setCycleSetup(s => ({ ...s, periodLength: Math.min(10, s.periodLength + 1) }))}
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-slate-500 text-xl font-bold bg-[#F0F2F5] active:scale-95 transition-all"
                 style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
               >+</button>
@@ -385,7 +398,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             return (
               <button
                 key={g.id}
-                onClick={() => setGoal(g.id)}
+                onClick={() => selectGoal(g.id)}
                 className={`w-full p-4 rounded-2xl text-left rtl:text-right transition-all flex items-center gap-4 group relative overflow-hidden ${active ? 'text-[#7598a0]' : 'text-slate-600'}`}
                 style={active
                   ? { boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)', backgroundColor: '#F0F2F5' }
@@ -417,40 +430,11 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     );
   };
 
-  const renderAdaptivePrediction = () => {
+  const renderCycleSetup = () => {
     return (
       <div className="flex flex-col h-full min-h-0 py-2 px-2">
-        <h2 className="flex-shrink-0 text-2xl font-black text-slate-800 tracking-tight text-center mb-3">{t('onboarding.adaptive.title')}</h2>
-        <div className="flex-1 min-h-0 space-y-4 overflow-y-auto no-scrollbar pb-2">
-          <div className="bg-[#F0F2F5] p-5 rounded-3xl space-y-3" style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.7)' }}>
-            <p className="text-sm text-slate-600 leading-relaxed font-medium">{t('onboarding.adaptive.desc')}</p>
-            <p className="text-xs text-slate-400 leading-relaxed">{t('onboarding.adaptive.hint')}</p>
-            <p className="text-xs text-[#7598a0] font-semibold leading-relaxed border-t border-slate-200/60 pt-3">{t('onboarding.adaptive.activation_note')}</p>
-          </div>
-          <button
-            onClick={() => setAdaptivePrediction(!adaptivePrediction)}
-            className={`w-full p-5 rounded-2xl text-left rtl:text-right transition-all duration-300 flex items-center justify-between relative overflow-hidden ${adaptivePrediction ? 'text-white' : 'text-slate-500'}`}
-            style={adaptivePrediction
-              ? { background: 'linear-gradient(135deg, #7598a0, #5a7d87)', boxShadow: '6px 6px 14px rgba(117, 152, 160, 0.5), -3px -3px 8px rgba(255, 255, 255, 0.6)' }
-              : { backgroundColor: '#F0F2F5', boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.3), -6px -6px 12px rgba(255, 255, 255, 0.7)' }
-            }
-          >
-            <div className="flex items-center gap-4">
-              <span className="text-2xl">{adaptivePrediction ? '🧠' : '🗓️'}</span>
-              <div>
-                <div className={`text-sm font-black uppercase tracking-wider ${adaptivePrediction ? 'text-white' : 'text-slate-600'}`}>{t('onboarding.adaptive.label')}</div>
-                <div className={`text-[10px] font-medium mt-0.5 ${adaptivePrediction ? 'text-white/70' : 'text-slate-400'}`}>
-                  {adaptivePrediction ? t('onboarding.adaptive.sub_on') : t('onboarding.adaptive.sub_off')}
-                </div>
-              </div>
-            </div>
-            <div className={`w-12 h-6 rounded-full relative transition-all duration-300 ${adaptivePrediction ? 'bg-white/30' : 'bg-slate-200'}`}>
-              <div className={`absolute top-1 w-4 h-4 shadow-sm rounded-full transition-all duration-300 ${adaptivePrediction
-                ? 'ltr:translate-x-7 rtl:-translate-x-7 bg-white'
-                : 'ltr:translate-x-1 rtl:-translate-x-1 bg-slate-400'
-                } ltr:left-0 rtl:right-0`} />
-            </div>
-          </button>
+        <div className="flex-1 min-h-0">
+          <CycleSetupStep values={cycleSetup} onChange={setCycleSetup} />
         </div>
         <div className="flex-shrink-0 pt-3 space-y-3">
           <button
@@ -461,6 +445,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
             {t('common.continue')}
           </button>
           <button onClick={prevStep} className="w-full text-[10px] font-bold uppercase tracking-widest text-slate-400">{t('common.back')}</button>
+          <p className="text-[9px] text-center text-slate-400">{t('onboarding.calibration.settings_hint')}</p>
         </div>
       </div>
     );
@@ -665,7 +650,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
           {step === 1 && renderTrust()}
           {step === 2 && renderCalibration()}
           {step === 3 && renderGoal()}
-          {step === 4 && renderAdaptivePrediction()}
+          {step === 4 && renderCycleSetup()}
           {step === 5 && renderSpycraft()}
           {step === 6 && renderGetStarted()}
         </div>

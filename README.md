@@ -137,6 +137,7 @@ Any modified version you distribute must also be open-sourced under GPL-3.0.
 ## Contributors
 
 - [@octantblow](https://github.com/octantblow) — French translation
+- [@reginanka](https://github.com/reginanka) — Ukrainian translation
 
 ---
 
