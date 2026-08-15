@@ -710,7 +710,7 @@ body[data-theme="dark-neumorphism"] .daily-log-action-circle {
 
 body[data-theme="dark-neumorphism"] .pin-setup-panel {
   background: #1f262c;
-  border-top: 1px solid rgba(184, 198, 201, 0.12);
+  border-top: 0;
 }
 
 body[data-theme="dark-neumorphism"] .pin-setup-input {
@@ -794,6 +794,14 @@ body[data-theme="dark-neumorphism"] [class*="border-white"] {
   border-color: var(--border-soft) !important;
 }
 
+body[data-theme="dark-neumorphism"] .setting-row-merge-next {
+  border-bottom-color: transparent !important;
+}
+
+body[data-theme="dark-neumorphism"] .setting-row-merge-previous {
+  border-top-color: transparent !important;
+}
+
 body[data-theme="dark-neumorphism"] input,
 body[data-theme="dark-neumorphism"] select,
 body[data-theme="dark-neumorphism"] textarea {
@@ -857,7 +865,8 @@ body[data-theme="dark-neumorphism"] #report-content {
 }
 
 body[data-theme="dark-neumorphism"] #report-content [class*="bg-white"],
-body[data-theme="dark-neumorphism"] #report-content [class*="bg-slate-50"] {
+body[data-theme="dark-neumorphism"] #report-content [class*="bg-slate-50"],
+body[data-theme="dark-neumorphism"] #report-content [class*="bg-slate-100"] {
   background-color: #f8fafc !important;
 }
 
@@ -904,6 +913,30 @@ body[data-theme="dark-neumorphism"] #report-content [class*="border-slate-"] {
 
   100% {
     transform: scale(1);
+  }
+}
+
+@keyframes calendar-guide-pulse {
+  0%, 100% {
+    opacity: 0.72;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+.calendar-guide-trigger-pulse {
+  display: inline-block;
+  transform-origin: left center;
+  animation: calendar-guide-pulse 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar-guide-trigger-pulse {
+    animation: none;
   }
 }
 

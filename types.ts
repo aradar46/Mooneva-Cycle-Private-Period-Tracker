@@ -2,7 +2,7 @@ export type FlowIntensity = 'light' | 'medium' | 'heavy' | 'spotting' | null;
 export type FirstDayOfWeek = 'monday' | 'sunday' | 'saturday';
 
 // Big 5 Menstrual Moods - covers 95% of cycle-related mood shifts
-export type MoodType = 'energetic' | 'calm' | 'sad' | 'anxious' | 'irritable' | null;
+export type MoodType = 'energetic' | 'calm' | 'sad' | 'anxious' | 'irritable' | 'mood_swings' | 'sensitive' | null;
 
 export interface MoodOptionConfig {
   id: string;
@@ -24,6 +24,8 @@ export const MOOD_OPTIONS: MoodOptionConfig[] = [
   { id: 'sad', labelKey: 'log.mood_sad', color: '#9BA4CC', dark: '#3b4263', shadow: 'rgba(155, 164, 204, 0.4)', emoji: '😔' },
   { id: 'anxious', labelKey: 'log.mood_anxious', color: '#f97316', dark: '#9a3412', shadow: 'rgba(249, 115, 22, 0.4)', emoji: '😰' },
   { id: 'irritable', labelKey: 'log.mood_irritable', color: '#fb7185', dark: '#9f1239', shadow: 'rgba(251, 113, 133, 0.4)', emoji: '😠' },
+  { id: 'mood_swings', labelKey: 'log.mood_mood_swings', color: '#c084fc', dark: '#6b21a8', shadow: 'rgba(192, 132, 252, 0.4)', emoji: '🎭' },
+  { id: 'sensitive', labelKey: 'log.mood_sensitive', color: '#fda4af', dark: '#9f1239', shadow: 'rgba(253, 164, 175, 0.4)', emoji: '🫶' },
 ];
 
 // Fertility & Libido Tracking
@@ -96,6 +98,17 @@ export interface SymptomConfig {
   isHidden: boolean;
 }
 
+export type ContraceptionReminder =
+  | { enabled: boolean; method: 'pill'; time: string }
+  | { enabled: boolean; method: 'patch' | 'ring'; time: string; anchorDate: string }
+  | {
+      enabled: boolean;
+      method: 'injection' | 'iud' | 'implant';
+      time: string;
+      nextDate: string;
+      warningDays?: number;
+    };
+
 export interface AppSettings {
   // Security Feature: Disguises app as Task Manager
   discreteMode: boolean;
@@ -147,8 +160,11 @@ export interface AppSettings {
   showPMS?: boolean; // Show PMS warning zone on calendar
 
   // Pill / Birth Control Reminders
+  /** @deprecated Use contraceptionReminder for new settings; retained for migration compatibility. */
   reminderPillDaily?: boolean;
+  /** @deprecated Use contraceptionReminder.time for new settings; retained for migration compatibility. */
   reminderPillDailyTime?: string;
+  contraceptionReminder?: ContraceptionReminder;
 
   // Global Behaviour
   firstDayOfWeek?: FirstDayOfWeek;

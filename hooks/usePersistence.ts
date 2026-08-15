@@ -4,7 +4,6 @@ import { loadData, saveData, loadSettings, saveSettings, loadPeriods, savePeriod
 import { addDays, diffInDays } from '../utils/dateUtils';
 import { hasDailyLogContent } from '../utils/dailyLogContent';
 import Logger from '../services/logger';
-import { syncReminderNotifications } from '../services/notifications';
 
 // Simple helper to sort periods by start date
 const sortPeriods = (periods: PeriodRecord[]): PeriodRecord[] =>
@@ -79,7 +78,6 @@ export const usePersistence = (): UsePersistenceResult => {
                 }
 
                 setSettings(loadedSettings);
-                syncReminderNotifications(loadedSettings).catch(() => { });
 
                 // Load periods and normalize to ensure all have the new fields
                 const loadedPeriods = await loadPeriods();
@@ -236,7 +234,6 @@ export const usePersistence = (): UsePersistenceResult => {
     const updateSettingsWrapper = useCallback((newSettings: AppSettings) => {
         setSettings(newSettings);
         saveSettings(newSettings); // Settings are rare, instant save is fine/better
-        syncReminderNotifications(newSettings).catch(() => { });
     }, []);
 
 

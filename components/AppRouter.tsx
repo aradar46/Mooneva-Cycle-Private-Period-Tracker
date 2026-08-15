@@ -10,6 +10,7 @@ import { useAppReview } from '../hooks/useAppReview';
 
 import OnboardingWizard from './OnboardingWizard';
 import PinLock from './PinLock';
+import { WhatsNewModal } from './WhatsNewModal';
 
 import { CalendarScreen } from './screens/CalendarScreen';
 import { TrendsScreen } from './screens/TrendsScreen';
@@ -17,6 +18,8 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { NotificationManagerScreen } from './screens/NotificationManagerScreen';
 
 type PendingPinAction = 'exitDiscreteMode' | null;
+const WHATS_NEW_VERSION = '2.0.9';
+const WHATS_NEW_STORAGE_KEY = `mooneva_whats_new_seen_${WHATS_NEW_VERSION}`;
 
 export const AppRouter = () => {
     const {
@@ -35,14 +38,37 @@ export const AppRouter = () => {
     // --- Security & Onboarding State ---
     const [isLocked, setIsLocked] = useState(true);
     const [pendingPinAction, setPendingPinAction] = useState<PendingPinAction>(null);
+    const [showWhatsNew, setShowWhatsNew] = useState(false);
     const backgroundedAt = useRef<number | null>(null);
     const initialLockResolved = useRef(false);
+    const hasData = Object.keys(logs).length > 0;
+    const showOnboarding = !settings.onboardingCompleted && !hasData;
 
     useEffect(() => {
         if (loading || initialLockResolved.current) return;
         initialLockResolved.current = true;
         setIsLocked(Boolean(settings.pin));
     }, [loading, settings.pin]);
+
+    useEffect(() => {
+        if (loading || showOnboarding || (settings.pin && isLocked)) return;
+        try {
+            if (localStorage.getItem(WHATS_NEW_STORAGE_KEY) !== 'seen') {
+                setShowWhatsNew(true);
+            }
+        } catch {
+            setShowWhatsNew(true);
+        }
+    }, [loading, showOnboarding, settings.pin, isLocked]);
+
+    const closeWhatsNew = () => {
+        try {
+            localStorage.setItem(WHATS_NEW_STORAGE_KEY, 'seen');
+        } catch {
+            // The dialog can still be dismissed if storage is unavailable.
+        }
+        setShowWhatsNew(false);
+    };
 
     // --- Security Lifecycle ---
 
@@ -109,31 +135,35 @@ export const AppRouter = () => {
         );
     }
 
-    // Logic to determine if we show onboarding
-    const hasData = Object.keys(logs).length > 0;
-    const showOnboarding = !settings.onboardingCompleted && !hasData;
-
     if (showOnboarding) return <OnboardingWizard onComplete={completeOnboarding} />;
 
-    if (view === 'settings') {
-        return <SettingsScreen subView={subView} setSubView={setSubView} setView={setView} isCloaked={settings.discreteMode} />;
-    }
+    const content = (() => {
+        if (view === 'settings') {
+            return <SettingsScreen subView={subView} setSubView={setSubView} setView={setView} isCloaked={settings.discreteMode} />;
+        }
 
-    if (view === 'notifications') {
-        return <NotificationManagerScreen setView={setView} returnTo={previousView ?? 'calendar'} isCloaked={settings.discreteMode} />;
-    }
+        if (view === 'notifications') {
+            return <NotificationManagerScreen setView={setView} returnTo={previousView ?? 'calendar'} isCloaked={settings.discreteMode} />;
+        }
 
-    if (view === 'trends') {
-        return <TrendsScreen setSubView={setSubView} setView={setView} isCloaked={settings.discreteMode} />;
-    }
+        if (view === 'trends') {
+            return <TrendsScreen setSubView={setSubView} setView={setView} isCloaked={settings.discreteMode} />;
+        }
 
-    // Default: Calendar
+        return (
+            <CalendarScreen
+                setSubView={setSubView}
+                setView={setView}
+                isCloaked={settings.discreteMode}
+                onRequestExitDiscreteMode={requestExitDiscreteMode}
+            />
+        );
+    })();
+
     return (
-        <CalendarScreen
-            setSubView={setSubView}
-            setView={setView}
-            isCloaked={settings.discreteMode}
-            onRequestExitDiscreteMode={requestExitDiscreteMode}
-        />
+        <>
+            {content}
+            {showWhatsNew && <WhatsNewModal onClose={closeWhatsNew} />}
+        </>
     );
 };

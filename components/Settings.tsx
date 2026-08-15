@@ -157,7 +157,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
               <SettingRow
                 label={t('settings.show_fertile_window')}
                 desc={settings.isOnBirthControl ? t('settings.on_bc_disabled') : t('settings.show_fertile_window_desc')}
-                icon={<Icons.Sparkles />}
+                icon={<Icons.Egg />}
+                mergeWithNext
               >
                 <Toggle
                   active={settings.showFertileWindow && !settings.isOnBirthControl}
@@ -189,7 +190,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
             </SettingCard>
 
             <SettingCard title={t('settings.pms_window_section')}>
-              <SettingRow label={t('settings.show_pms_window')} desc={t('settings.show_pms_window_desc')} icon={<Icons.Alert />}>
+              <SettingRow label={t('settings.show_pms_window')} desc={t('settings.show_pms_window_desc')} icon={<Icons.Alert />} mergeWithNext>
                 <Toggle active={!!settings.showPMS} onClick={() => onUpdate({ ...settings, showPMS: !settings.showPMS })} />
               </SettingRow>
 
@@ -203,6 +204,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                   min={1}
                   max={7}
                   defaultValue={3}
+                  mergeWithPrevious
                 />
               )}
             </SettingCard>
@@ -212,6 +214,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                 label={t('settings.birth_control')}
                 desc={t('settings.birth_control_sub_desc')}
                 icon={<Icons.Pill />}
+                mergeWithNext
               >
                 <Toggle
                   active={settings.isOnBirthControl}
@@ -526,7 +529,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
           {/* 2. Language */}
           <section>
             <SettingCard title={t('settings.language')}>
-              <SettingRow label={t('settings.language')} icon={<Icons.Globe />}>
+              <SettingRow label={t('settings.language')} icon={<Icons.Globe />} mergeWithNext>
                 <select
                   value={i18n.language}
                   onChange={(e) => {
@@ -644,6 +647,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                 icon={<Icons.Lock />}
                 onClick={() => !settings.pin && setPinExpanded(!pinExpanded)}
                 last={!pinExpanded || !!settings.pin}
+                mergeWithNext={!settings.pin && pinExpanded}
                 rightElement={
                   settings.pin ? (
                     <button

@@ -11,6 +11,7 @@ interface NumberSettingRowProps {
     defaultValue: number;
     suffix?: string;
     isLast?: boolean;
+    mergeWithPrevious?: boolean;
 }
 
 const NumberSettingRow: React.FC<NumberSettingRowProps> = ({
@@ -23,7 +24,8 @@ const NumberSettingRow: React.FC<NumberSettingRowProps> = ({
     max,
     defaultValue,
     suffix = 'days',
-    isLast = false
+    isLast = false,
+    mergeWithPrevious = false
 }) => {
     const handleDecrement = () => {
         onChange(Math.max(min, value - 1));
@@ -34,7 +36,7 @@ const NumberSettingRow: React.FC<NumberSettingRowProps> = ({
     };
 
     return (
-        <div className={`px-4 py-4 bg-slate-50 flex items-center justify-between ${!isLast ? 'border-t border-slate-100' : ''}`}>
+        <div className={`px-4 py-4 bg-slate-50 flex items-center justify-between ${!isLast ? 'border-t border-slate-100' : ''} ${mergeWithPrevious ? 'setting-row-merge-previous' : ''}`}>
             <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-lg border border-slate-100 shadow-sm">
                     {icon}

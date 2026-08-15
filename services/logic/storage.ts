@@ -3,7 +3,14 @@
  * Handles encryption, legacy migrations, and schema versioning.
  */
 
-import { DailyLog, AppSettings, INITIAL_SYMPTOMS, PeriodRecord, BackupData } from '../../types';
+import { INITIAL_SYMPTOMS } from '../../types';
+import type {
+    AppSettings,
+    BackupData,
+    ContraceptionReminder,
+    DailyLog,
+    PeriodRecord,
+} from '../../types';
 import Logger from '../logger';
 
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
@@ -26,6 +33,65 @@ const PBKDF2_ITERATIONS_DEVICE = 100000;
 const PBKDF2_ITERATIONS_BACKUP = 100000;
 const DEVICE_LOCAL_SALT = "mooneva_local_salt_v1";
 const DEVICE_SECRET_KEY = 'mooneva_device_secret';
+
+const isPlainRecord = (value: unknown): value is Record<string, unknown> => {
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+        return false;
+    }
+
+    const prototype = Object.getPrototypeOf(value);
+    return prototype === Object.prototype || prototype === null;
+};
+
+const isContraceptionReminder = (value: unknown): value is ContraceptionReminder => {
+    if (!isPlainRecord(value)) {
+        return false;
+    }
+
+    if (
+        !Object.hasOwn(value, 'enabled') ||
+        typeof value.enabled !== 'boolean' ||
+        !Object.hasOwn(value, 'method') ||
+        typeof value.method !== 'string' ||
+        !Object.hasOwn(value, 'time') ||
+        typeof value.time !== 'string'
+    ) {
+        return false;
+    }
+
+    if (value.method === 'pill') {
+        return true;
+    }
+
+    if (value.method === 'patch' || value.method === 'ring') {
+        return Object.hasOwn(value, 'anchorDate') && typeof value.anchorDate === 'string';
+    }
+
+    if (value.method === 'injection' || value.method === 'iud' || value.method === 'implant') {
+        if (!Object.hasOwn(value, 'nextDate') || typeof value.nextDate !== 'string') {
+            return false;
+        }
+
+        if (!Object.hasOwn(value, 'warningDays')) {
+            return true;
+        }
+
+        return typeof value.warningDays === 'number' &&
+            Number.isInteger(value.warningDays) &&
+            value.warningDays >= 0 &&
+            value.warningDays <= 365;
+    }
+
+    return false;
+};
+
+const bytesToBase64 = (bytes: Uint8Array): string => {
+    const chunks: string[] = [];
+    for (let i = 0; i < bytes.length; i += 0x8000) {
+        chunks.push(String.fromCharCode(...bytes.subarray(i, i + 0x8000)));
+    }
+    return btoa(chunks.join(''));
+};
 
 export const loadData = async (): Promise<Record<string, DailyLog>> => {
     const encryptedBase64 = localStorage.getItem(STORAGE_KEY_ENCRYPTED);
@@ -90,7 +156,7 @@ export const saveData = async (data: Record<string, DailyLog>) => {
         combined.set(iv);
         combined.set(new Uint8Array(encrypted), iv.length);
 
-        const base64 = btoa(String.fromCharCode(...combined));
+        const base64 = bytesToBase64(combined);
         localStorage.setItem(STORAGE_KEY_ENCRYPTED, base64);
     } catch (e) {
         Logger.error("Failed to save encrypted data:", e);
@@ -120,7 +186,10 @@ export const loadSettings = (): AppSettings => {
 
     if (settings) {
         try {
-            const parsed = JSON.parse(settings);
+            const parsed: unknown = JSON.parse(settings);
+            if (!isPlainRecord(parsed)) {
+                return defaults;
+            }
 
             // Legacy migrations
             if (parsed.theme === 'discrete' || parsed.cloakedMode) {
@@ -134,10 +203,44 @@ export const loadSettings = (): AppSettings => {
                 delete parsed.firstDayOfWeek;
             }
 
-            return {
+            const hasModernProfile = Object.hasOwn(parsed, 'contraceptionReminder');
+            const modernProfile = hasModernProfile &&
+                isContraceptionReminder(parsed.contraceptionReminder)
+                ? parsed.contraceptionReminder
+                : undefined;
+
+            const normalizedSettings: AppSettings = {
                 ...defaults,
                 ...parsed
             };
+
+            if (hasModernProfile) {
+                delete normalizedSettings.contraceptionReminder;
+            }
+            if (modernProfile) {
+                normalizedSettings.contraceptionReminder = modernProfile;
+            }
+
+            const hasValidLegacyPillSetting =
+                (Object.hasOwn(parsed, 'reminderPillDaily') &&
+                    typeof parsed.reminderPillDaily === 'boolean') ||
+                (Object.hasOwn(parsed, 'reminderPillDailyTime') &&
+                    typeof parsed.reminderPillDailyTime === 'string');
+            if (!modernProfile && hasValidLegacyPillSetting) {
+                normalizedSettings.contraceptionReminder = {
+                    enabled: Object.hasOwn(parsed, 'reminderPillDaily') &&
+                        typeof parsed.reminderPillDaily === 'boolean'
+                        ? parsed.reminderPillDaily
+                        : false,
+                    method: 'pill',
+                    time: Object.hasOwn(parsed, 'reminderPillDailyTime') &&
+                        typeof parsed.reminderPillDailyTime === 'string'
+                        ? parsed.reminderPillDailyTime
+                        : '09:00',
+                };
+            }
+
+            return normalizedSettings;
         } catch (e) {
             Logger.error("Failed to load settings:", e);
         }
@@ -209,7 +312,7 @@ export const savePeriods = async (periods: PeriodRecord[]) => {
         combined.set(iv);
         combined.set(new Uint8Array(encrypted), iv.length);
 
-        const base64 = btoa(String.fromCharCode(...combined));
+        const base64 = bytesToBase64(combined);
         localStorage.setItem(STORAGE_KEY_PERIODS, base64);
     } catch (e) {
         Logger.error("Failed to save encrypted periods:", e);

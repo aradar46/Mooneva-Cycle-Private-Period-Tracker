@@ -3,9 +3,12 @@ import React from 'react';
 // 1. Neumorphic Toggle
 export const Toggle = ({ active, onClick, disabled }: { active: boolean; onClick: () => void; disabled?: boolean }) => (
     <button
+        type="button"
+        role="switch"
+        aria-checked={active}
         onClick={disabled ? undefined : onClick}
         disabled={disabled}
-        className={`w-14 h-8 rounded-full relative transition-all duration-300 focus:outline-none ${active ? 'bg-[#7598a0]' : 'bg-[#E8EAED]'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`w-14 h-8 rounded-full relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0] focus-visible:ring-offset-2 ${active ? 'bg-[#7598a0]' : 'bg-[#E8EAED]'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         style={{
             boxShadow: active
                 ? 'inset 2px 2px 4px rgba(0,0,0,0.1), 0 0 8px rgba(117, 152, 160, 0.3)'
@@ -35,11 +38,11 @@ export const SettingCard = ({ children, title }: { children: React.ReactNode, ti
 );
 
 // 3. Neumorphic Row
-export const SettingRow = ({ label, desc, icon, children, last, onClick, tooltip, rightElement }: { label: string, desc?: React.ReactNode, icon?: React.ReactNode, children?: React.ReactNode, last?: boolean, onClick?: () => void, tooltip?: string, rightElement?: React.ReactNode }) => (
+export const SettingRow = ({ label, desc, icon, children, last, mergeWithNext, onClick, tooltip, rightElement }: { label: string, desc?: React.ReactNode, icon?: React.ReactNode, children?: React.ReactNode, last?: boolean, mergeWithNext?: boolean, onClick?: () => void, tooltip?: string, rightElement?: React.ReactNode }) => (
     <div
         onClick={onClick}
         title={tooltip}
-        className={`py-3 px-4 ${!last ? 'border-b border-slate-200/50' : ''} ${onClick ? 'cursor-pointer active:bg-slate-100/50 transition-colors' : ''}`}
+        className={`py-3 px-4 ${!last ? 'border-b border-slate-200/50' : ''} ${mergeWithNext ? 'setting-row-merge-next' : ''} ${onClick ? 'cursor-pointer active:bg-slate-100/50 transition-colors' : ''}`}
     >
         <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -63,4 +66,3 @@ export const SettingRow = ({ label, desc, icon, children, last, onClick, tooltip
         </div>
     </div>
 );
-

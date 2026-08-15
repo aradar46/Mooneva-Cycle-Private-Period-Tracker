@@ -65,12 +65,25 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
 
     // Sync Smart Notifications (Side Effect)
     React.useEffect(() => {
+        if (loading) return;
+
+        let cancelled = false;
+
         // Sync notifications whenever settings or predictions change
         // We pass the full predictions to enable date-specific one-shot reminders
-        import('../services/notifications').then(({ syncReminderNotifications }) => {
-            syncReminderNotifications(settings, model.predictions);
-        });
-    }, [settings, model.predictions.nextPeriodStart]);
+        import('../services/notifications')
+            .then(({ syncReminderNotifications }) => {
+                if (cancelled) return;
+                return syncReminderNotifications(settings, model.predictions);
+            })
+            .catch(() => {
+                if (!cancelled) Logger.warn('Failed to sync reminder notifications');
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [loading, settings, model.predictions]);
 
     // Sync App Icon (Discrete Mode)
     React.useEffect(() => {

@@ -226,7 +226,7 @@ const Calendar: React.FC<CalendarProps> = ({
           <div className="flex gap-4 justify-self-start items-center">
             <button
               onClick={() => setShowLegend(!showLegend)}
-              className="text-[9px] text-slate-600 font-bold uppercase tracking-[0.15em] hover:text-slate-800 transition-colors"
+              className={`calendar-guide-trigger text-[9px] text-slate-600 font-bold uppercase tracking-[0.15em] hover:text-slate-800 transition-colors ${!showLegend ? 'calendar-guide-trigger-pulse' : ''}`}
             >
               {showLegend ? t('calendar.guide.hide') : t('calendar.guide.show')}
             </button>

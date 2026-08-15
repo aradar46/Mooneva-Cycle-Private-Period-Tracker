@@ -1,12 +1,33 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScreenWrapper } from '../ScreenWrapper';
 import { useMooneva } from '../../contexts/MoonevaContext';
 import { SettingRow, Toggle } from '../settings/SettingsUI';
-import { ViewType } from '../../hooks/useAppNavigation';
-import { requestNotificationPermission, openNotificationSettings } from '../../services/notifications';
+import type { ViewType } from '../../hooks/useAppNavigation';
+import {
+  isContraceptionReminderSchedulable,
+  openNotificationSettings,
+  REMINDER_DEFAULT_TIMES,
+  requestNotificationPermission,
+} from '../../services/notifications';
 import { Capacitor } from '@capacitor/core';
-import { AppSettings } from '../../types';
+import type { AppSettings, ContraceptionReminder } from '../../types';
+
+const isValidReminderTime = (value: string) => /^([01]\d|2[0-3]):([0-5]\d)$/.test(value);
+const isValidReminderDate = (value: string) => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  return date.getFullYear() === Number(match[1])
+    && date.getMonth() === Number(match[2]) - 1
+    && date.getDate() === Number(match[3]);
+};
+const isFutureReminderDateTime = (dateValue: string, timeValue: string) => {
+  if (!isValidReminderDate(dateValue) || !isValidReminderTime(timeValue)) return false;
+  const [year, month, day] = dateValue.split('-').map(Number);
+  const [hour, minute] = timeValue.split(':').map(Number);
+  return new Date(year, month - 1, day, hour, minute).getTime() > Date.now();
+};
 
 interface NotificationManagerScreenProps {
   setView: (view: ViewType) => void;
@@ -22,13 +43,56 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
   const { t } = useTranslation();
   const { settings, actions } = useMooneva();
   const { updateSettings } = actions;
+  const settingsRef = React.useRef(settings);
+  React.useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
   const discrete = !!settings.discreteMode;
-
-  useEffect(() => {
-    requestNotificationPermission().catch(() => { });
-  }, []);
-
   const DEFAULT_REMINDER_TIME = '09:00';
+  const contraceptionReminder = settings.contraceptionReminder ?? {
+    enabled: false,
+    method: 'pill',
+    time: DEFAULT_REMINDER_TIME,
+  } satisfies ContraceptionReminder;
+  const canScheduleContraceptionReminder = isContraceptionReminderSchedulable(contraceptionReminder);
+  const validReminderTime = isValidReminderTime(contraceptionReminder.time);
+  const isDatedMethod = contraceptionReminder.method !== 'pill';
+  let dateValue = '';
+  if (contraceptionReminder.method === 'patch' || contraceptionReminder.method === 'ring') {
+    dateValue = contraceptionReminder.anchorDate;
+  } else if (contraceptionReminder.method === 'injection' || contraceptionReminder.method === 'iud' || contraceptionReminder.method === 'implant') {
+    dateValue = contraceptionReminder.nextDate;
+  }
+  const invalidReminderTime = !validReminderTime;
+  const validReminderDate = !isDatedMethod || isValidReminderDate(dateValue);
+  const invalidReminderDate = isDatedMethod && !validReminderDate;
+  const isDueDateMethod = contraceptionReminder.method === 'injection' || contraceptionReminder.method === 'iud' || contraceptionReminder.method === 'implant';
+  const invalidReminderPastDate = isDueDateMethod && validReminderDate && validReminderTime && !isFutureReminderDateTime(dateValue, contraceptionReminder.time);
+  const warningDaysInvalid = isDueDateMethod && contraceptionReminder.warningDays !== undefined && (
+    !Number.isInteger(contraceptionReminder.warningDays) || contraceptionReminder.warningDays < 0 || contraceptionReminder.warningDays > 365
+  );
+  const validationKey = invalidReminderTime
+    ? 'notifications.contraception_time_required'
+    : invalidReminderDate
+      ? 'notifications.contraception_date_invalid'
+      : invalidReminderPastDate
+        ? 'notifications.contraception_date_past'
+        : warningDaysInvalid
+          ? 'notifications.contraception_warning_invalid'
+          : 'notifications.contraception_invalid_schedule';
+  const scheduleDescriptionKey = contraceptionReminder.method === 'patch'
+    ? 'notifications.contraception_schedule_patch'
+    : contraceptionReminder.method === 'ring'
+      ? 'notifications.contraception_schedule_ring'
+      : 'notifications.contraception_schedule_due';
+  const anchorDateLabelKey = contraceptionReminder.method === 'patch'
+    ? 'notifications.contraception_anchor_date_patch'
+    : 'notifications.contraception_anchor_date_ring';
+  const scheduleDescriptionFallback = contraceptionReminder.method === 'patch'
+    ? '4 weeks: change weekly ×3, then remove.'
+    : contraceptionReminder.method === 'ring'
+      ? '4 weeks: in for 3 weeks, out for 1.'
+      : 'Due date reminder; early warning optional.';
 
   const handleToggle = async (key: keyof AppSettings, currentValue: boolean) => {
     const nextState = !currentValue;
@@ -43,6 +107,58 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
       }
     }
     updateSettings({ ...settings, [key]: nextState });
+  };
+
+  const updateContraceptionReminder = (profile: ContraceptionReminder) => {
+    updateSettings({ ...settings, contraceptionReminder: profile });
+  };
+
+  const handleContraceptionToggle = async () => {
+    if (contraceptionReminder.enabled) {
+      updateContraceptionReminder({ ...contraceptionReminder, enabled: false });
+      return;
+    }
+    if (!canScheduleContraceptionReminder) return;
+
+    const granted = await requestNotificationPermission();
+    if (!granted && Capacitor.isNativePlatform()) {
+      const msg = t('notifications.permission_denied_message', 'Notifications are disabled. Please enable them in your device settings to receive reminders.');
+      if (confirm(msg)) openNotificationSettings();
+      return;
+    }
+    const latestSettings = settingsRef.current;
+    const latestReminder = latestSettings.contraceptionReminder ?? {
+      enabled: false,
+      method: 'pill',
+      time: DEFAULT_REMINDER_TIME,
+    } satisfies ContraceptionReminder;
+    if (JSON.stringify(latestReminder) !== JSON.stringify(contraceptionReminder)) return;
+    if (!isContraceptionReminderSchedulable(latestReminder, new Date())) return;
+    updateSettings({
+      ...latestSettings,
+      contraceptionReminder: { ...latestReminder, enabled: true },
+    });
+  };
+
+  const handleContraceptionMethod = (method: string) => {
+    switch (method) {
+      case 'pill':
+        updateContraceptionReminder({
+          enabled: contraceptionReminder.enabled,
+          method,
+          time: contraceptionReminder.time,
+        });
+        return;
+      case 'patch':
+      case 'ring':
+        updateContraceptionReminder({ enabled: false, method, time: contraceptionReminder.time, anchorDate: '' });
+        return;
+      case 'injection':
+      case 'iud':
+      case 'implant':
+        updateContraceptionReminder({ enabled: false, method, time: contraceptionReminder.time, nextDate: '' });
+        return;
+    }
   };
 
   return (
@@ -85,7 +201,9 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
                   { key: 'reminderPeriodLate', timeKey: 'reminderPeriodLateTime', labelKey: 'notifications.late_period', descKey: 'notifications.late_period_desc' },
                 ].map((item, index, arr) => {
                   const isOn = !!(settings[item.key as keyof typeof settings]);
-                  const timeValue = (settings[item.timeKey as keyof typeof settings] as string) || DEFAULT_REMINDER_TIME;
+                  const timeValue = (settings[item.timeKey as keyof typeof settings] as string)
+                    || REMINDER_DEFAULT_TIMES[item.timeKey as keyof typeof REMINDER_DEFAULT_TIMES]
+                    || DEFAULT_REMINDER_TIME;
                   const descKey = item.descKey ? (discrete ? item.descKey.replace('_desc', '_desc_discrete') : item.descKey) : undefined;
                   return (
                     <React.Fragment key={item.key}>
@@ -116,40 +234,124 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
               </div>
             </section>
 
-            {/* 2.5. Medication/Pill Reminder (General) */}
+            {/* 2.5. Contraception reminder */}
             <section className="space-y-3">
               <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">
-                {t('notifications.section_birth_control', 'Medication')}
+                {t('notifications.section_contraception')}
               </h2>
               <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-                {(() => {
-                  const isOn = !!settings.reminderPillDaily;
-                  const timeValue = settings.reminderPillDailyTime || DEFAULT_REMINDER_TIME;
-                  return (
+                <div className="space-y-3 px-4 py-4 bg-slate-50/80 border-t border-slate-50">
+                  <label className="flex items-center justify-between gap-3" htmlFor="contraception-method">
+                    <span className="text-[13px] text-slate-600 font-medium">{t('notifications.contraception_method')}</span>
+                    <select
+                      id="contraception-method"
+                      value={contraceptionReminder.method}
+                      onChange={(event) => handleContraceptionMethod(event.target.value)}
+                      className="text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-[#7598a0]/30 outline-none"
+                    >
+                      {(['pill', 'patch', 'ring', 'injection', 'iud', 'implant'] as const).map((method) => (
+                        <option key={method} value={method}>{t(`notifications.contraception_method_${method}`)}</option>
+                      ))}
+                    </select>
+                  </label>
+
+                  {(contraceptionReminder.method === 'patch' || contraceptionReminder.method === 'ring') && (
                     <>
-                      <SettingRow
-                        label={t('notifications.pill_reminder')}
-                        desc={t(discrete ? 'notifications.pill_reminder_desc_discrete' : 'notifications.pill_reminder_desc')}
-                      >
-                        <Toggle
-                          active={isOn}
-                          onClick={() => handleToggle('reminderPillDaily', isOn)}
+                      <label className="flex items-center justify-between gap-3" htmlFor="contraception-anchor-date">
+                        <span className="text-[13px] text-slate-600 font-medium">{t(anchorDateLabelKey, contraceptionReminder.method === 'patch' ? 'First patch day' : 'First ring day')}</span>
+                        <input
+                          id="contraception-anchor-date"
+                          type="date"
+                          required
+                          aria-invalid={invalidReminderDate}
+                          aria-describedby={!canScheduleContraceptionReminder ? 'contraception-standard-schedule contraception-date-validation' : 'contraception-standard-schedule'}
+                          value={contraceptionReminder.anchorDate}
+                          onChange={(event) => updateContraceptionReminder({ ...contraceptionReminder, anchorDate: event.target.value })}
+                          className="text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-[#7598a0]/30 outline-none"
                         />
-                      </SettingRow>
-                      {isOn && (
-                        <div className="flex items-center justify-between gap-3 px-4 py-3 bg-slate-50/80 border-t border-slate-50">
-                          <span className="text-[13px] text-slate-600 font-medium">{t('notifications.remind_at')}</span>
-                          <input
-                            type="time"
-                            value={timeValue}
-                            onChange={(e) => updateSettings({ ...settings, reminderPillDailyTime: e.target.value })}
-                            className="text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-[#7598a0]/30 outline-none"
-                          />
-                        </div>
-                      )}
+                      </label>
+                      <p id="contraception-standard-schedule" className="text-[12px] text-slate-400">
+                        {t(scheduleDescriptionKey, scheduleDescriptionFallback)}
+                      </p>
                     </>
-                  );
-                })()}
+                  )}
+
+                  {(contraceptionReminder.method === 'injection' || contraceptionReminder.method === 'iud' || contraceptionReminder.method === 'implant') && (
+                    <>
+                      <label className="flex items-center justify-between gap-3" htmlFor="contraception-next-date">
+                        <span className="text-[13px] text-slate-600 font-medium">{t('notifications.contraception_next_date')}</span>
+                        <input
+                          id="contraception-next-date"
+                          type="date"
+                          required
+                          aria-invalid={invalidReminderDate || invalidReminderPastDate}
+                          aria-describedby={!canScheduleContraceptionReminder ? 'contraception-date-validation' : undefined}
+                          value={contraceptionReminder.nextDate}
+                          onChange={(event) => updateContraceptionReminder({ ...contraceptionReminder, nextDate: event.target.value })}
+                          className="text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-[#7598a0]/30 outline-none"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between gap-3" htmlFor="contraception-warning-days">
+                        <span className="text-[13px] text-slate-600 font-medium">{t('notifications.contraception_warning_days')}</span>
+                        <input
+                          id="contraception-warning-days"
+                          type="number"
+                          min="0"
+                          max="365"
+                          step="1"
+                          aria-invalid={warningDaysInvalid}
+                          aria-describedby={warningDaysInvalid ? 'contraception-date-validation' : undefined}
+                          value={contraceptionReminder.warningDays ?? ''}
+                          onChange={(event) => {
+                            if (event.target.value === '') {
+                              const { warningDays: _warningDays, ...profile } = contraceptionReminder;
+                              updateContraceptionReminder(profile);
+                              return;
+                            }
+                            const warningDays = Number(event.target.value);
+                            if (Number.isInteger(warningDays) && warningDays >= 0 && warningDays <= 365) {
+                              updateContraceptionReminder({ ...contraceptionReminder, warningDays });
+                            }
+                          }}
+                          className="w-24 text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-[#7598a0]/30 outline-none"
+                        />
+                      </label>
+                    </>
+                  )}
+
+                  <label className="flex items-center justify-between gap-3" htmlFor="contraception-time">
+                    <span className="text-[13px] text-slate-600 font-medium">{t('notifications.contraception_time')}</span>
+                    <input
+                      id="contraception-time"
+                      type="time"
+                      required
+                      aria-invalid={invalidReminderTime}
+                      aria-describedby={!canScheduleContraceptionReminder ? 'contraception-date-validation' : undefined}
+                      value={contraceptionReminder.time}
+                      onChange={(event) => updateContraceptionReminder({ ...contraceptionReminder, time: event.target.value })}
+                      className="text-[13px] font-bold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-[#7598a0]/30 outline-none"
+                    />
+                  </label>
+
+                  {!canScheduleContraceptionReminder && (
+                    <p id="contraception-date-validation" role="alert" className="text-[12px] font-medium text-rose-600">
+                      {t(validationKey)}
+                    </p>
+                  )}
+                </div>
+                <SettingRow
+                  label={t('notifications.contraception_reminder')}
+                  desc={t(discrete ? 'notifications.contraception_reminder_desc_discrete' : 'notifications.contraception_reminder_desc')}
+                  last
+                >
+                  <label>
+                    <span className="sr-only">{t('notifications.contraception_reminder')}</span>
+                    <Toggle
+                      active={contraceptionReminder.enabled}
+                      onClick={handleContraceptionToggle}
+                    />
+                  </label>
+                </SettingRow>
               </div>
             </section>
 

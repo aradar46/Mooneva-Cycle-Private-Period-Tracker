@@ -113,6 +113,9 @@ const DRIP_MOOD: Record<string, string> = {
     'mood.energetic': 'energetic',
     'mood.fatigue': 'tired',
     'mood.angry': 'irritable',
+    'mood.moodSwings': 'mood_swings',
+    'mood.mood_swing': 'mood_swings',
+    'mood.sensitive': 'sensitive',
 };
 const DRIP_PROTECTED = ['sex.condom', 'sex.pill', 'sex.iud', 'sex.patch', 'sex.ring', 'sex.implant', 'sex.diaphragm'];
 
@@ -211,6 +214,7 @@ const CLUE_PAIN: Record<string, string> = {
 };
 const CLUE_FEELINGS: Record<string, string> = {
     happy: 'happy', sad: 'sad', angry: 'irritable', anxious: 'anxious', indifferent: 'calm',
+    mood_swings: 'mood_swings', mood_swing: 'mood_swings', sensitive: 'sensitive', sensitivity: 'sensitive',
 };
 const CLUE_ENERGY: Record<string, string> = {
     energetic: 'energetic', fully_energized: 'energetic', tired: 'tired', exhausted: 'tired',

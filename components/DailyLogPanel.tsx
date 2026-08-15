@@ -151,7 +151,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
         if (mood.includes(m)) {
             setMood(mood.filter(x => x !== m));
         } else {
-            if (mood.length < 3) {
+            if (mood.length < 5) {
                 setMood([...mood, m]);
             }
         }
@@ -671,7 +671,7 @@ const MoodCircle: React.FC<{ config: MoodOptionConfig; isSelected: boolean; onCl
     config, isSelected, onClick, children
 }) => (
     <SelectionCircle isSelected={isSelected} onClick={onClick} colorConfig={config} className="daily-log-mood-circle">
-        <span className="text-[9px] font-black uppercase tracking-[0.12em] text-center px-1">{children}</span>
+        <span className="min-w-0 max-w-full px-1 text-[clamp(7px,2.5vw,9px)] font-black uppercase leading-[1.1] tracking-[0.08em] text-center [overflow-wrap:anywhere]">{children}</span>
     </SelectionCircle>
 );
 
