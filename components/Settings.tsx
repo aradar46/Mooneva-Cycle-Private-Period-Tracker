@@ -548,7 +548,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                     { code: 'de', label: 'Deutsch' },
                     { code: 'fr', label: 'Français' },
                     { code: 'uk', label: 'Українська' },
-                    { code: 'it', label: 'Italiano' }
+                    { code: 'it', label: 'Italiano' },
+                    { code: 'hu', label: 'Magyar' }
                   ].map(lang => (
                     <option key={lang.code} value={lang.code}>{lang.label}</option>
                   ))}

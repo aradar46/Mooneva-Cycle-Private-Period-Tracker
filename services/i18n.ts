@@ -3,7 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 // --- Translation Resources ---
-// Supported Languages: English, Swedish, Spanish, German, Chinese, Persian, French, Ukrainian, Italian
+// Supported Languages: English, Swedish, Spanish, German, Chinese, Persian, French, Ukrainian, Italian, Hungarian
 
 import en from '../locales/en.json';
 import sv from '../locales/sv.json';
@@ -14,6 +14,7 @@ import fa from '../locales/fa.json';
 import fr from '../locales/fr.json';
 import uk from '../locales/uk.json';
 import it from '../locales/it.json';
+import hu from '../locales/hu.json';
 
 const resources = {
     en: { translation: en },
@@ -24,7 +25,8 @@ const resources = {
     fa: { translation: fa },
     fr: { translation: fr },
     uk: { translation: uk },
-    it: { translation: it }
+    it: { translation: it },
+    hu: { translation: hu }
 };
 
 i18n
