@@ -41,11 +41,7 @@
     },
     "whats_new": {
         "title": "Novedades",
-        "intro": "Desde la última versión:",
-        "moods": "Registra hasta cinco estados de ánimo al día.",
-        "new_moods": "Nuevos estados: cambios de ánimo y sensible.",
-        "contraception": "Recordatorios de anticoncepción más flexibles.",
-        "imports": "Importaciones mejoradas y horarios más claros."
+        "intro": "Desde la última versión:"
     },
     "share_message": {
         "text": "Echa un vistazo a Mooneva. Es un calendario menstrual privado y sin conexión, hecho en Suecia. Sin anuncios, sin rastreo."

@@ -41,11 +41,7 @@
     },
     "whats_new": {
         "title": "What's new",
-        "intro": "Since the last release:",
-        "moods": "Track up to five moods per day.",
-        "new_moods": "Added Mood swings and Sensitive moods.",
-        "contraception": "Added flexible contraception reminders.",
-        "imports": "Improved imports and clearer schedules."
+        "intro": "Since the last release:"
     },
     "share_message": {
         "text": "Check out Mooneva. A private, offline period tracker from Sweden. No ads, no tracking."

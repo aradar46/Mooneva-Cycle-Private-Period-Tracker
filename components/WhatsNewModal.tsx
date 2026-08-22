@@ -22,13 +22,12 @@ export const WhatsNewModal: React.FC<WhatsNewModalProps> = ({ onClose }) => {
         <p className="mt-2 text-sm text-slate-500">
           {t('whats_new.intro', 'Since the last release:')}
         </p>
+        {/* Release notes are intentionally English-only and hard-coded -- see RELEASE.md.
+            Replace this list every release; do not add these strings to the locale files. */}
         <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-600">
-          <li>{t('whats_new.moods', 'Track up to five moods per day.')}</li>
-          <li>{t('whats_new.new_moods', 'Added Mood swings and Sensitive moods.')}</li>
-          <li>{t('whats_new.contraception', 'Added flexible contraception reminders.')}</li>
-          <li>{t('whats_new.imports', 'Improved imports and clearer schedules.')}</li>
-          <li>Added Ukrainian and Italian translations.</li>
-          <li>Fixed reported bugs and improved reliability.</li>
+          <li>Added Hungarian, Russian and Portuguese — now in 12 languages.</li>
+          <li>The app opens faster and uses less memory.</li>
+          <li>Also in Mooneva: contraception reminders for the pill, patch, ring, injection, IUD and implant.</li>
         </ul>
         <button
           type="button"

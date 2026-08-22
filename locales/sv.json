@@ -41,11 +41,7 @@
     },
     "whats_new": {
         "title": "Nyheter",
-        "intro": "Sedan den senaste versionen:",
-        "moods": "Följ upp till fem sinnesstämningar per dag.",
-        "new_moods": "Nya sinnesstämningar: humörsvängningar och känslig.",
-        "contraception": "Flexiblare preventivmedelspåminnelser.",
-        "imports": "Förbättrade importer och tydligare scheman."
+        "intro": "Sedan den senaste versionen:"
     },
     "share_message": {
         "text": "Kolla in Mooneva. En privat, svensk menskalender som körs helt offline. Ingen reklam, ingen spårning."

@@ -1,37 +1,49 @@
 import i18n from 'i18next';
+import type { BackendModule, ReadCallback } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 // --- Translation Resources ---
-// Supported Languages: English, Swedish, Spanish, German, Chinese, Persian, French, Ukrainian, Italian
-
+// English is bundled so there is always a working fallback on first paint.
+// Every other locale is a separate chunk fetched only when actually selected,
+// which keeps all-but-one translation out of the boot payload and out of RAM.
 import en from '../locales/en.json';
-import sv from '../locales/sv.json';
-import es from '../locales/es.json';
-import de from '../locales/de.json';
-import zh from '../locales/zh.json';
-import fa from '../locales/fa.json';
-import fr from '../locales/fr.json';
-import uk from '../locales/uk.json';
-import it from '../locales/it.json';
 
-const resources = {
-    en: { translation: en },
-    sv: { translation: sv },
-    es: { translation: es },
-    de: { translation: de },
-    zh: { translation: zh },
-    fa: { translation: fa },
-    fr: { translation: fr },
-    uk: { translation: uk },
-    it: { translation: it }
+// Vite turns this into a code-split loader per file WITHOUT reading any of them,
+// so the language list stays derived from locales/ instead of hand-maintained.
+const localeLoaders = import.meta.glob<{ default: Record<string, unknown> }>('../locales/*.json');
+
+const codeFromPath = (path: string) => path.slice(path.lastIndexOf('/') + 1, -'.json'.length);
+
+const loaderByCode: Record<string, () => Promise<{ default: Record<string, unknown> }>> =
+    Object.fromEntries(Object.entries(localeLoaders).map(([path, load]) => [codeFromPath(path), load]));
+
+const lazyLocaleBackend: BackendModule = {
+    type: 'backend',
+    init: () => { },
+    read: (language: string, _namespace: string, callback: ReadCallback) => {
+        const load = loaderByCode[language];
+        if (!load) {
+            // Unknown language: report failure so i18next falls back to `en`.
+            callback(new Error(`No locale file for "${language}"`), false);
+            return;
+        }
+        load()
+            .then((mod) => callback(null, mod.default))
+            .catch((err: unknown) => callback(err instanceof Error ? err : new Error(String(err)), false));
+    },
 };
 
-i18n
+export const i18nReady = i18n
+    .use(lazyLocaleBackend)
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
-        resources,
+        resources: { en: { translation: en } },
+        partialBundledLanguages: true,
+        supportedLngs: Object.keys(loaderByCode),
+        // Map regional tags (pt-BR, en-US) onto the base file we actually ship.
+        load: 'languageOnly',
         fallbackLng: 'en',
         interpolation: {
             escapeValue: false, // react already safes from xss

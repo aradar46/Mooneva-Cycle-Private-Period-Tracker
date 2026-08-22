@@ -1,22 +1,33 @@
-Mooneva is a private, fully offline period and cycle tracker. All data stays on your device — no account, no cloud sync, no ads.
+Mooneva Cycle is a private, fully offline period tracker and menstrual cycle calendar. Track your period, predict your next cycle, follow your fertile window and ovulation, and log daily symptoms and mood — all without an account, and without a single byte leaving your phone.
+
+<b>Why offline matters</b>
+Most period tracking apps upload your cycle data to company servers, where it can be sold to advertisers, exposed in a breach, or demanded by law enforcement. Mooneva has no servers at all. Your data is encrypted on your device using PBKDF2 and AES-GCM, and the app does not even request the internet permission — there is nothing to transmit, and nothing to hand over.
 
 <b>Features</b>
 <ul>
-<li>Period and cycle tracking with predictions</li>
+<li>Period and menstrual cycle tracking with adaptive predictions</li>
 <li>Fertile window and ovulation estimates</li>
-<li>Daily log: mood, symptoms, flow intensity, discharge</li>
 <li>PMS window warnings</li>
-<li>Trends and cycle history</li>
-<li>Clinical report export</li>
-<li>Discrete mode (disguises app icon)</li>
+<li>Daily log: mood, symptoms, flow intensity, discharge, sex and libido</li>
+<li>Pill and contraception reminders — pill, patch, ring, injection, IUD, implant</li>
+<li>Trends, cycle history and symptom heatmaps by cycle day</li>
+<li>Clinical PDF report to share with your doctor</li>
+<li>Birth control mode — hides fertility, tags withdrawal bleeds</li>
+<li>Pregnancy mode — pauses predictions and alerts</li>
+<li>Discrete mode — disguises the app as a task list, icon and name included</li>
 <li>PIN lock with configurable timeout</li>
-<li>Reminder notifications</li>
-<li>Birth control mode (hides fertile window)</li>
-<li>Fully offline — no internet permission required</li>
+<li>Encrypted backup and restore</li>
+<li>Import your history from drip, Flo and Clue</li>
+<li>Persian (Jalaali) calendar and full right-to-left support</li>
+<li>Configurable first day of week</li>
+<li>Dark theme</li>
 </ul>
 
+<b>Available in 12 languages</b>
+English, German, Spanish, Swedish, Chinese, Persian, French, Ukrainian, Italian, Hungarian, Russian and Portuguese.
+
 <b>Privacy</b>
-No data ever leaves your device. No analytics, no tracking, no third-party services.
+No accounts. No cloud. No analytics, no crash reporters, no advertising SDKs, no third-party services of any kind. Mooneva cannot see your data, because it never receives it.
 
 <b>Open Source</b>
-Licensed under GPL-3.0. Source code available on GitHub.
+Licensed under GPL-3.0-or-later. Full source code available on GitHub.

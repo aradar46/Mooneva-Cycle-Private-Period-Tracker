@@ -1,8 +1,15 @@
 {
   "name": "mooneva-private-period-tracker",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.2.0",
   "type": "module",
+  "author": "Mooneva (https://mooneva.se/)",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://mooneva.se/pages/mooneva_cycle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

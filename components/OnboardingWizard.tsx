@@ -158,21 +158,24 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   // --- Render Steps ---
   const renderLanguage = () => {
     const languages = [
-      { code: 'en', label: 'English', native: 'English', flag: '🇬🇧' },
-      { code: 'de', label: 'German', native: 'Deutsch', flag: '🇩🇪' },
-      { code: 'es', label: 'Spanish', native: 'Español', flag: '🇪🇸' },
-      { code: 'sv', label: 'Swedish', native: 'Svenska', flag: '🇸🇪' },
-      { code: 'zh', label: 'Chinese', native: '中文', flag: '🇨🇳' },
-      { code: 'fa', label: 'Persian', native: 'فارسی', flag: '🇮🇷' },
-      { code: 'fr', label: 'French', native: 'Français', flag: '🇫🇷' },
-      { code: 'uk', label: 'Ukrainian', native: 'Українська', flag: '🇺🇦' },
-      { code: 'it', label: 'Italian', native: 'Italiano', flag: '🇮🇹' },
+      { code: 'en', native: 'English' },
+      { code: 'de', native: 'Deutsch' },
+      { code: 'es', native: 'Español' },
+      { code: 'sv', native: 'Svenska' },
+      { code: 'zh', native: '中文' },
+      { code: 'fa', native: 'فارسی' },
+      { code: 'fr', native: 'Français' },
+      { code: 'uk', native: 'Українська' },
+      { code: 'it', native: 'Italiano' },
+      { code: 'hu', native: 'Magyar' },
+      { code: 'ru', native: 'Русский' },
+      { code: 'pt', native: 'Português' },
     ];
 
     return (
       <div className="flex flex-col h-full min-h-0">
-        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col justify-center items-center py-4 px-2">
-          <div className="w-16 mb-4">
+        <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col items-center py-4 px-2">
+          <div className="w-40 mb-5 mt-auto">
             <img
               src="/bitmap.png"
               alt="Mooneva"
@@ -182,10 +185,9 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
               }}
             />
           </div>
-          <h1 className="text-2xl font-bold text-slate-800 mb-1">Mooneva</h1>
-          <p className="text-xs text-slate-400 font-medium mb-6 tracking-wide">Choose your language</p>
+          <h1 className="text-xs text-slate-400 font-medium mb-6 tracking-wide">Choose your language</h1>
           <div
-            className="w-full max-w-sm bg-[#F0F2F5] rounded-2xl p-4"
+            className="w-full max-w-sm bg-[#F0F2F5] rounded-2xl p-4 mb-auto"
             style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)' }}
           >
             <div className="grid grid-cols-3 gap-2">
@@ -205,8 +207,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
                       boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.9)'
                     }}
                   >
-                    <span className="text-xl mb-1">{lang.flag}</span>
-                    <span className={`text-[10px] font-bold ${isSelected ? 'text-white' : 'text-slate-600'}`}>{lang.native}</span>
+                    <span className={`text-sm font-bold ${isSelected ? 'text-white' : 'text-slate-600'}`}>{lang.native}</span>
                   </button>
                 );
               })}

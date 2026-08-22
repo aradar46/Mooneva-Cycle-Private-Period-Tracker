@@ -47,6 +47,11 @@ There are no Mooneva servers. Your cycle data is encrypted on your device using 
 
 ---
 
+## Demo
+
+https://github.com/user-attachments/assets/2ae076d8-84af-4258-b0a4-16b5ff9aa081
+
+
 ## About
 
 Mooneva Cycle is developed by **[Mooneva](https://mooneva.se/)**, a Swedish femtech company dedicated to building thoughtful tools for women's health. Learn more at [mooneva.se/pages/mooneva_cycle](https://mooneva.se/pages/mooneva_cycle).
@@ -64,10 +69,13 @@ Mooneva Cycle is developed by **[Mooneva](https://mooneva.se/)**, a Swedish femt
 - **Discrete mode** — disguises the app icon and name
 - **PIN lock** with configurable timeout
 - **Reminder notifications** (period, ovulation, daily log, PMS, Pill)
+- **Contraception reminders** — pill, patch, ring, injection, IUD, implant
 - **Birth control mode** — hides fertile window, tags bleeds as withdrawal
 - **Pill tracking** — log intake time, see adherence per cycle day in Trends
 - **Dark theme**
 - **Data import** from drip, Flo, and Clue
+- **12 languages** — English, German, Spanish, Swedish, Chinese, Persian, French, Ukrainian, Italian, Hungarian, Russian, Portuguese
+- **Persian (Jalaali) calendar** and full RTL support
 
 ---
 
@@ -118,9 +126,11 @@ npx cap open ios
 
 ## License
 
-Licensed under the [GNU General Public License v3.0](LICENSE).
+Copyright (C) 2026 Måneva AB
 
-Any modified version you distribute must also be open-sourced under GPL-3.0.
+Licensed under the [GNU General Public License v3.0 or later](LICENSE).
+
+Any modified version you distribute must also be open-sourced under GPL-3.0-or-later.
 
 ---
 
@@ -138,62 +148,13 @@ Any modified version you distribute must also be open-sourced under GPL-3.0.
 
 - [@octantblow](https://github.com/octantblow) — French translation
 - [@reginanka](https://github.com/reginanka) — Ukrainian translation
+- [@pihentagy](https://github.com/pihentagy) — Hungarian translation
 
 ---
 
 ## Release Log
 
-### 2.1.0 — Android versionCode 15, iOS build 17
-
-- Fixed reported UI bugs and improved dark-mode settings/report surfaces.
-- Added responsive mood labels and a subtle calendar guide pulse.
-
-### 2.0.9 — Android versionCode 14, iOS build 16
-
-- Added a first-open **What’s New** popup with short release notes and a close button.
-- Increased daily mood selection to five and added Mood swings and Sensitive moods.
-- Added contraception reminders, improved imports, and clearer schedules.
-
-### 2.0.8 — Android versionCode 13, iOS build 15
-
-- Added Ukrainian and Italian locales.
-- Mirrored Cycle Management as an onboarding step.
-
-### 2.0.7 — Android versionCode 12, iOS build 14
-
-- Reworked calendar month swiping: the grid now follows your finger and slides between months, with proper tap/flick thresholds.
-- Fixed the period-start star and day-selection rings being cut off at the calendar edges.
-- Protected-sex marker is now a filled shield; both sex markers are larger and no longer overlap the date on narrow screens.
-- Clearer calendar guide text for logging periods and daily symptoms, updated in all seven languages.
-- Added a pill timeline to Trends showing on which cycle days the pill was taken.
-
-### 2.0.6
-
-- Added importers for data from other period trackers (drip, Flo, Clue).
-- Added French as a new app language.
-- Added Joint Pain, Fever, and Chills symptom tags.
-- Translation fixes across all languages
-
-### 2.0.5
-
-- Included the logo and fonts (public/) in the F-Droid public repo sync so the open-source build renders correctly.
-
-### 2.0.4
-
-- Fixed a timezone bug where dates in the PDF clinical report (including registered sex logs) could appear one day earlier than the calendar.
-
-### 2.0.3
-
-- Fixed the F-Droid build by removing the proprietary in-app-review plugin from the public build (Play Store build is unaffected).
-- Pinned Capacitor core/android/ios/cli to 8.4.1 to stop version drift.
-
-### 2.0.2
-
-- Added a first-day-of-week setting so calendars can start on Monday, Sunday, or Saturday independent of app language.
-- Added pill time logging with editable 24-hour times, calendar/preview badges, backup support, and clinical report output.
-- Added the pill logged marker to the calendar guide.
-- Moved advanced period options under the Flow tab and kept them visible but disabled until a period day is selected.
-- Fixed trend heatmaps so mood and symptom row headers stay visible while scrolling across cycle days, including RTL layouts.
+See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
 ---
 
@@ -202,6 +163,7 @@ Any modified version you distribute must also be open-sourced under GPL-3.0.
 ### In progress
 
 - fixing bugs and tweak user friendliness
+- adding more language support
 
 ### Planned
 
@@ -210,6 +172,13 @@ Any modified version you distribute must also be open-sourced under GPL-3.0.
   and ECDH key exchange. Opt-in and sandboxed so the
   zero-internet-permission guarantee holds for users who
   skip it.
+
+  **This one is funding-gated.** Unlike everything else in Mooneva, sync
+  cannot be built and forgotten - it needs relay infrastructure to run
+  and an independent security audit before it touches anyone's data.
+  Both cost real money, and there is no data model here to pay for them.
+  If you want this feature, [sponsoring the project](https://github.com/sponsors/aradar46)
+  is what makes it possible.
 
 Have a feature request? Open an [issue](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues) and let us know.
 
@@ -223,3 +192,4 @@ Mooneva Cycle is free, open source, and built without any VC funding or commerci
 - Star the repo
 - Report bugs or suggest features via [GitHub Issues](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues)
 - Share it with anyone who cares about health data privacy
+- [Sponsor the project](https://github.com/sponsors/aradar46) — funds the infrastructure and security audit for [zero-knowledge sync](#planned)

@@ -1,0 +1,5 @@
+Added Hungarian, Russian and Portuguese. Mooneva is now available in 12 languages.
+
+The app opens faster and uses less memory — only the language you are using is loaded.
+
+Also in Mooneva: contraception reminders for the pill, patch, ring, injection, IUD and implant, each with its own schedule.

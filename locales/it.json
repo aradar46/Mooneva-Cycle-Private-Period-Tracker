@@ -41,11 +41,7 @@
     },
     "whats_new": {
         "title": "Novità",
-        "intro": "Dall’ultima versione:",
-        "moods": "Registra fino a cinque stati d’animo al giorno.",
-        "new_moods": "Nuovi stati: sbalzi d’umore e sensibilità.",
-        "contraception": "Promemoria anticoncezionali più flessibili.",
-        "imports": "Importazioni migliorate e programmi più chiari."
+        "intro": "Dall’ultima versione:"
     },
     "share_message": {
         "text": "Scopri Mooneva. Un tracker del ciclo privato e offline dalla Svezia. Niente pubblicità, nessun tracciamento."

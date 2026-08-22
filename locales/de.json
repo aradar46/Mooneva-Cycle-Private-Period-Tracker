@@ -41,11 +41,7 @@
     },
     "whats_new": {
         "title": "Neuigkeiten",
-        "intro": "Seit dem letzten Release:",
-        "moods": "Bis zu fünf Stimmungen pro Tag erfassen.",
-        "new_moods": "Neue Stimmungen: Stimmungsschwankungen und Sensibel.",
-        "contraception": "Flexible Verhütungserinnerungen hinzugefügt.",
-        "imports": "Importe verbessert und Zeitpläne klarer gemacht."
+        "intro": "Seit dem letzten Release:"
     },
     "share_message": {
         "text": "Schau dir Mooneva an. Ein privater Offline-Zyklustracker aus Schweden. Keine Werbung, kein Tracking."
