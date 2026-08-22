@@ -24,6 +24,25 @@
 
 ---
 
+
+## Contents
+
+- [Why offline-first?](#why-offline-first)
+- [Screenshots](#screenshots)
+- [Demo](#demo)
+- [About](#about)
+- [Features](#features)
+- [Privacy](#privacy)
+- [Building from Source](#building-from-source)
+- [License](#license)
+- [Links](#links)
+- [Contributors](#contributors)
+- [Release Log](#release-log)
+- [Roadmap](#roadmap)
+- [Support the project](#support-the-project)
+
+---
+
 ## Why offline-first?
 
 Most period trackers upload your data to corporate servers — data that has been sold to advertisers, exposed in breaches, and in some jurisdictions legally demanded by law enforcement. Mooneva is built on a different premise: **data that never leaves your device cannot be leaked or subpoenaed.**
@@ -49,8 +68,11 @@ There are no Mooneva servers. Your cycle data is encrypted on your device using 
 
 ## Demo
 
-https://github.com/user-attachments/assets/2ae076d8-84af-4258-b0a4-16b5ff9aa081
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/2ae076d8-84af-4258-b0a4-16b5ff9aa081" width="320" controls muted playsinline></video>
+</div>
 
+---
 
 ## About
 
@@ -190,6 +212,10 @@ Mooneva Cycle is free, open source, and built without any VC funding or commerci
 
 - Leave a review on [Google Play](https://play.google.com/store/apps/details?id=com.mooneva.app) or the [App Store](https://apps.apple.com/us/app/mooneva-cycle/id6761208425)
 - Star the repo
+- Report bugs or suggest features via [GitHub Issues](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues)
+- Share it with anyone who cares about health data privacy
+- [Sponsor the project](https://github.com/sponsors/aradar46) — funds the infrastructure and security audit for [zero-knowledge sync](#planned)
+
 - Report bugs or suggest features via [GitHub Issues](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues)
 - Share it with anyone who cares about health data privacy
 - [Sponsor the project](https://github.com/sponsors/aradar46) — funds the infrastructure and security audit for [zero-knowledge sync](#planned)
