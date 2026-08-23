@@ -216,6 +216,4 @@ Mooneva Cycle is free, open source, and built without any VC funding or commerci
 - Share it with anyone who cares about health data privacy
 - [Sponsor the project](https://github.com/sponsors/aradar46) — funds the infrastructure and security audit for [zero-knowledge sync](#planned)
 
-- Report bugs or suggest features via [GitHub Issues](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues)
-- Share it with anyone who cares about health data privacy
-- [Sponsor the project](https://github.com/sponsors/aradar46) — funds the infrastructure and security audit for [zero-knowledge sync](#planned)
+ 
