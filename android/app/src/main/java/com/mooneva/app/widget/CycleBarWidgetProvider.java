@@ -57,40 +57,32 @@ public class CycleBarWidgetProvider extends AppWidgetProvider {
         String oText;
 
         if (discreteMode) {
-            // Discrete: Just show days
+            // Discrete mode: show generic text without period/ovulation labels
             pText = (daysUntilPeriod <= 0) ? "Task due" : (daysUntilPeriod + " days");
-            oText = ""; // Hide ovulation in discrete mode? Or just show days? Let's hide for now or
-                        // show generic.
-            // Actually user asked for P and O. Let's keep it minimal.
-            // If discrete, maybe we shouldn't label them P and O?
-            // But the user request was specific about layout.
-            // Let's stick to P: X days, O: Y days for now, assuming "Discrete" users might
-            // toggle it off if they want this widget.
-            // Or better: In discrete mode, we can just blank them out or show "Status: OK".
-            // For now, let's implement the standard requested behavior.
-        }
-
-        // P: Next Period
-        if (daysUntilPeriod <= 0) {
-            pText = "P: Due";
-        } else if (daysUntilPeriod == 1) {
-            pText = "P: 1 day";
+            oText = "";
         } else {
-            pText = "P: " + daysUntilPeriod + " days";
-        }
+            // P: Next Period
+            if (daysUntilPeriod <= 0) {
+                pText = "P: Due";
+            } else if (daysUntilPeriod == 1) {
+                pText = "P: 1 day";
+            } else {
+                pText = "P: " + daysUntilPeriod + " days";
+            }
 
-        // O: Next Ovulation
-        // Retrieve daysUntilOvulation from prefs
-        int daysUntilOvulation = prefs.getInt(KEY_DAYS_UNTIL_OVULATION, -1);
+            // O: Next Ovulation
+            // Retrieve daysUntilOvulation from prefs
+            int daysUntilOvulation = prefs.getInt(KEY_DAYS_UNTIL_OVULATION, -1);
 
-        if (daysUntilOvulation < 0) {
-            oText = "O: --";
-        } else if (daysUntilOvulation == 0) {
-            oText = "O: Today";
-        } else if (daysUntilOvulation == 1) {
-            oText = "O: 1 day";
-        } else {
-            oText = "O: " + daysUntilOvulation + " days";
+            if (daysUntilOvulation < 0) {
+                oText = "O: --";
+            } else if (daysUntilOvulation == 0) {
+                oText = "O: Today";
+            } else if (daysUntilOvulation == 1) {
+                oText = "O: 1 day";
+            } else {
+                oText = "O: " + daysUntilOvulation + " days";
+            }
         }
 
         views.setTextViewText(R.id.status_text_p, pText);

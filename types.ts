@@ -86,6 +86,7 @@ export interface Cycle {
   isWithdrawalBleed?: boolean;
   /** Manual override to exclude this cycle from adaptive predictions */
   ignoreForAverages?: boolean;
+  isOngoing?: boolean;
   // Computed Fertile Window (for historical display)
   ovulationDate?: string;
   fertileStart?: string;
@@ -115,7 +116,9 @@ export interface AppSettings {
   darkNeumorphism?: boolean;
 
   userName: string;
-  pin?: string;
+  pin?: string; // Legacy plaintext PIN (migrated to pinHash/pinSalt on startup)
+  pinHash?: string; // Salted PBKDF2-SHA256 hash of PIN
+  pinSalt?: string; // Random per-device/per-PIN salt
   lockTimeout?: 0 | 30 | 120; // seconds before re-locking after backgrounding; 0 = immediate
   onboardingCompleted?: boolean;
   adaptivePrediction?: boolean; // If true, derive cycle/period length from history
@@ -247,6 +250,7 @@ export interface DayMeta {
   isCycleStart?: boolean; // New cycle start
   isSpotting: boolean;
   dayOfPeriod?: number;
+  periodId?: string;
   isForecastPeriod: boolean; // Predicted
   isFertile: boolean;
   isOvulation: boolean;

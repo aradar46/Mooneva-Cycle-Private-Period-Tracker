@@ -1,0 +1,33 @@
+Mooneva Cycle est une application de suivi des règles et de calendrier menstruel privée et entièrement hors ligne. Suivez vos règles, prédisez votre prochain cycle, suivez votre fenêtre de fertilité et votre ovulation, et enregistrez vos symptômes et votre humeur au quotidien — sans compte, et sans qu'un seul octet ne quitte votre téléphone.
+
+<b>Pourquoi le hors ligne compte</b>
+La plupart des applications de suivi des règles envoient vos données de cycle vers des serveurs d'entreprise, où elles peuvent être vendues à des annonceurs, exposées lors d'une fuite de données, ou réclamées par les autorités. Mooneva n'a aucun serveur. Vos données sont chiffrées sur votre appareil avec PBKDF2 et AES-GCM, et l'application ne demande même pas la permission d'accès à internet — il n'y a rien à transmettre, rien à livrer.
+
+<b>Fonctionnalités</b>
+<ul>
+<li>Suivi des règles et du cycle menstruel avec prédictions adaptatives</li>
+<li>Estimations de la fenêtre de fertilité et de l'ovulation</li>
+<li>Alertes de fenêtre de SPM</li>
+<li>Journal quotidien : humeur, symptômes, intensité du flux, pertes, rapports et libido</li>
+<li>Rappels de pilule et de contraception — pilule, patch, anneau, injection, stérilet, implant</li>
+<li>Tendances, historique des cycles et cartes de chaleur des symptômes par jour de cycle</li>
+<li>Rapport PDF clinique à partager avec votre médecin</li>
+<li>Mode contraception — masque la fertilité, marque les saignements de privation</li>
+<li>Mode grossesse — met en pause les prédictions et alertes</li>
+<li>Mode discret — déguise l'application en liste de tâches, icône et nom inclus</li>
+<li>Verrouillage par PIN avec délai configurable</li>
+<li>Sauvegarde et restauration chiffrées</li>
+<li>Importez votre historique depuis drip, Flo et Clue</li>
+<li>Calendrier persan (Jalaali) et prise en charge complète de droite à gauche</li>
+<li>Premier jour de la semaine configurable</li>
+<li>Thème sombre</li>
+</ul>
+
+<b>Disponible en 12 langues</b>
+Anglais, allemand, espagnol, suédois, chinois, persan, français, ukrainien, italien, hongrois, russe et portugais.
+
+<b>Confidentialité</b>
+Aucun compte. Aucun cloud. Aucune analyse, aucun rapport de plantage, aucun SDK publicitaire, aucun service tiers d'aucune sorte. Mooneva ne peut pas voir vos données, car elle ne les reçoit jamais.
+
+<b>Open Source</b>
+Sous licence GPL-3.0-or-later. Code source complet disponible sur GitHub.

@@ -1,0 +1,33 @@
+Mooneva Cycle är en privat, helt offline mensspårare och menscykelkalender. Följ din mens, förutspå din nästa cykel, håll koll på ditt fertila fönster och ägglossning, och logga symtom och humör dagligen – helt utan konto och utan att en enda byte lämnar din telefon.
+
+<b>Varför offline spelar roll</b>
+De flesta mensappar laddar upp din cykeldata till företagsservrar, där den kan säljas till annonsörer, exponeras vid ett dataintrång eller begäras ut av myndigheter. Mooneva har inga servrar alls. Din data krypteras på din enhet med PBKDF2 och AES-GCM, och appen begär inte ens internetbehörighet – det finns inget att skicka och inget att lämna ut.
+
+<b>Funktioner</b>
+<ul>
+<li>Mens- och menscykelspårning med adaptiva förutsägelser</li>
+<li>Uppskattningar av fertilt fönster och ägglossning</li>
+<li>PMS-varningar</li>
+<li>Dagslogg: humör, symtom, flödesintensitet, flytningar, sex och lust</li>
+<li>Påminnelser för p-piller och preventivmedel – piller, plåster, ring, injektion, spiral, implantat</li>
+<li>Trender, cykelhistorik och symtomvärmekartor per cykeldag</li>
+<li>Klinisk PDF-rapport att dela med din läkare</li>
+<li>Preventivmedelsläge – döljer fertilitet, taggar avbrottsblödningar</li>
+<li>Graviditetsläge – pausar förutsägelser och varningar</li>
+<li>Diskret läge – förkläder appen till en att göra-lista, ikon och namn inkluderat</li>
+<li>PIN-kod med inställbar timeout</li>
+<li>Krypterad säkerhetskopiering och återställning</li>
+<li>Importera din historik från drip, Flo och Clue</li>
+<li>Persisk (Jalaali) kalender och fullt stöd för höger till vänster</li>
+<li>Inställbar första veckodag</li>
+<li>Mörkt tema</li>
+</ul>
+
+<b>Finns på 12 språk</b>
+Engelska, tyska, spanska, svenska, kinesiska, persiska, franska, ukrainska, italienska, ungerska, ryska och portugisiska.
+
+<b>Integritet</b>
+Inga konton. Inget moln. Ingen analys, inga kraschrapporter, inga annons-SDK:er, inga tredjepartstjänster av något slag. Mooneva kan inte se din data, eftersom den aldrig tar emot den.
+
+<b>Öppen källkod</b>
+Licensierad under GPL-3.0-or-later. Fullständig källkod finns på GitHub.

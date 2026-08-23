@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DailyLog, AppSettings, INITIAL_SYMPTOMS, PeriodRecord } from '../types';
-import { loadData, saveData, loadSettings, saveSettings, loadPeriods, savePeriods, findNearbyPeriod, MIN_GAP_DAYS } from '../services/logic';
+import { loadData, saveData, loadSettings, saveSettings, loadPeriods, savePeriods, findNearbyPeriod, MIN_GAP_DAYS, cleanupStaleBackupFiles } from '../services/logic';
 import { addDays, diffInDays } from '../utils/dateUtils';
 import { hasDailyLogContent } from '../utils/dailyLogContent';
+import { hashPin } from '../utils/pin';
 import Logger from '../services/logger';
 
 // Simple helper to sort periods by start date
@@ -77,6 +78,19 @@ export const usePersistence = (): UsePersistenceResult => {
                     }
                 }
 
+                // Migrate legacy plaintext PIN to salted PBKDF2 hash
+                if (loadedSettings && loadedSettings.pin && (!loadedSettings.pinHash || !loadedSettings.pinSalt)) {
+                    try {
+                        const { hash, salt } = await hashPin(loadedSettings.pin);
+                        loadedSettings.pinHash = hash;
+                        loadedSettings.pinSalt = salt;
+                        delete loadedSettings.pin;
+                        saveSettings(loadedSettings);
+                    } catch (e) {
+                        Logger.error("Failed to migrate legacy PIN to salted hash:", e);
+                    }
+                }
+
                 setSettings(loadedSettings);
 
                 // Load periods and normalize to ensure all have the new fields
@@ -92,6 +106,9 @@ export const usePersistence = (): UsePersistenceResult => {
                 if (JSON.stringify(normalized) !== JSON.stringify(loadedPeriods)) {
                     savePeriods(normalized);
                 }
+
+                // Clean up any stale backup export files from cache
+                cleanupStaleBackupFiles().catch(() => {});
 
             } catch (error) {
                 Logger.error("CRITICAL: Failed to load app data", error);

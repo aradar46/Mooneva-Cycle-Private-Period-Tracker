@@ -12,7 +12,6 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Poppins', 'sans-serif'],
-                arabic: ['Vazirmatn', 'sans-serif'],
             },
             colors: {
                 accent: '#7598a0',

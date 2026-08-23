@@ -30,7 +30,7 @@ interface MoonevaContextType {
         startPeriod: (startDate: string, days?: number) => Promise<void>;
         editPeriod: (id: string, days: number) => Promise<void>;
         deletePeriod: (id: string) => Promise<void>;
-        toggleBleedingDay: (date: string) => Promise<void>;
+        toggleBleedingDay: (date: string, effectivePeriodLength?: number) => Promise<void>;
         updatePeriodWithdrawalBleed: (id: string, isWithdrawalBleed: boolean) => Promise<void>;
         updatePeriodIgnoreForAverages: (id: string, ignoreForAverages: boolean) => Promise<void>;
         restorePeriods: (snapshot: PeriodRecord[]) => void;

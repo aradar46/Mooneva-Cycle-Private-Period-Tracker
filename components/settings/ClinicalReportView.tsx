@@ -4,7 +4,7 @@ import Logger from '../../services/logger';
 import { useMooneva } from '../../contexts/MoonevaContext';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { addDays } from '../../utils/dateUtils';
+import { addDays, diffInDays, toLocalISOString } from '../../utils/dateUtils';
 import { hasDailyLogContent } from '../../utils/dailyLogContent';
 import { formatNumber } from '../../services/i18n';
 import { Cycle, DailyLog, MOOD_OPTIONS } from '../../types';
@@ -100,11 +100,10 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
             // Check if last period is already in cycles (it shouldn't be if it's ongoing)
             const exists = allCycles.some(c => c.startDate === lastPeriodStart);
             if (!exists) {
-                const todayMs = Date.now();
-                const startMs = new Date(lastPeriodStart).getTime();
-                const diffDays = Math.ceil((todayMs - startMs) / (1000 * 60 * 60 * 24));
+                const todayStr = toLocalISOString(new Date());
+                const diffDays = Math.max(0, diffInDays(todayStr, lastPeriodStart));
 
-                const ongoingCycle: any = {
+                const ongoingCycle: Cycle = {
                     startDate: lastPeriodStart,
                     isOngoing: true,
                     length: diffDays + 1, // Include today
@@ -200,7 +199,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
     const isRtl = i18n.dir() === 'rtl';
 
     return (
-        <div className={`fixed inset-0 z-50 bg-white overflow-y-auto font-sans text-black animate-fade-in ${isRtl ? 'font-arabic tracking-normal' : ''}`} dir={isRtl ? 'rtl' : 'ltr'}>
+        <div className={`fixed inset-0 z-50 bg-white overflow-y-auto font-sans text-black animate-fade-in ${isRtl ? 'tracking-normal' : ''}`} dir={isRtl ? 'rtl' : 'ltr'}>
             {/* Toolbar */}
             <div className="no-print sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md text-white shadow-md px-4 pb-3 pt-[calc(env(safe-area-inset-top)+12px)] border-b border-slate-700/50">
                 <div className="flex justify-between items-center mb-3">

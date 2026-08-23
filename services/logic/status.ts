@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import { AppSettings, PredictionResults, DayMeta } from '../../types';
 
 export interface CycleStatusData {
@@ -27,7 +28,7 @@ export const calculateCycleStatus = (
     meta: DayMeta,
     predictions: PredictionResults,
     settings: AppSettings,
-    t: (key: string, options?: any) => string,
+    t: TFunction,
     anchorDate?: string // New Parameter: Specific cycle start for this view date
 ): CycleStatusData => {
     // 1. Terminate if predictions are paused

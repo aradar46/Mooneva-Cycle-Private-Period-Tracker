@@ -2,6 +2,16 @@
 
 All notable changes to Mooneva Cycle. Versions follow the Android `versionCode` / iOS build numbers used at release time.
 
+## 2.2.1 — Android versionCode 17, iOS build 19
+
+- PIN is now stored as a salted PBKDF2-SHA256 hash instead of plain text, with a 5-attempt/30-second lockout against guessing. Existing PINs migrate automatically on next launch.
+- Encrypted backups now use 600,000 PBKDF2 iterations (up from 100,000); older backups still restore correctly.
+- Backup export defaults to password-protected, with an explicit warning if you disable it.
+- Removed the storage permission entirely — the app no longer requests it at all.
+- Fixed a bug where returning from the system file picker while importing a backup could incorrectly re-lock the app.
+- Discrete mode now also hides the "P:"/"O:" countdown labels on the home-screen widget.
+- Added a 25% voucher for Mooneva's own period-care products, reachable from Settings. Worth explaining why it's there: this app has no data model — no ads, no analytics, no selling what you log — so it earns nothing from you being here. The voucher points at the one thing that does fund development: Mooneva's physical products. It's opt-in, tucked in Settings, and asks nothing of you if you ignore it.
+
 ## 2.2.0 — Android versionCode 16, iOS build 18
 
 - Added Hungarian, Russian and Portuguese (Brazilian) translations — 12 languages in total.

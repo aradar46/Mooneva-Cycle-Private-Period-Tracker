@@ -15,7 +15,7 @@
     <img src="https://img.shields.io/badge/F--Droid-Download-1976D2?style=for-the-badge&logo=f-droid&logoColor=white" alt="Get it on F-Droid" />
   </a>
 
-  <br /><br />
+  <br /> 
 
   <img src="https://img.shields.io/github/license/aradar46/Mooneva-Cycle-Private-Period-Tracker?style=flat-square" alt="License: GPL-3.0" />
   <img src="https://img.shields.io/github/v/tag/aradar46/Mooneva-Cycle-Private-Period-Tracker?label=version&style=flat-square" alt="Version" />
@@ -23,7 +23,6 @@
 </div>
 
 ---
-
 
 ## Contents
 
@@ -33,6 +32,7 @@
 - [About](#about)
 - [Features](#features)
 - [Privacy](#privacy)
+- [Security](#security)
 - [Building from Source](#building-from-source)
 - [License](#license)
 - [Links](#links)
@@ -112,6 +112,12 @@ Mooneva Cycle collects no data. There are no analytics, no crash reporters, no t
 | Subject to legal subpoenas | No centralised data to subpoena |
 | Requires account with personal info | No account, no registration |
 | Company can analyse your data | We cannot see your data — ever |
+
+---
+
+## Security
+
+Threat model, exact crypto parameters (AES-256-GCM, PBKDF2 iteration counts), permission list, and known limitations are all in [SECURITY.md](SECURITY.md). Report vulnerabilities there, not as a public issue.
 
 ---
 
@@ -195,13 +201,6 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
   zero-internet-permission guarantee holds for users who
   skip it.
 
-  **This one is funding-gated.** Unlike everything else in Mooneva, sync
-  cannot be built and forgotten - it needs relay infrastructure to run
-  and an independent security audit before it touches anyone's data.
-  Both cost real money, and there is no data model here to pay for them.
-  If you want this feature, [sponsoring the project](https://github.com/sponsors/aradar46)
-  is what makes it possible.
-
 Have a feature request? Open an [issue](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues) and let us know.
 
 ---
@@ -210,10 +209,10 @@ Have a feature request? Open an [issue](https://github.com/aradar46/Mooneva-Cycl
 
 Mooneva Cycle is free, open source, and built without any VC funding or commercial data model. If it is useful to you, the best things you can do are:
 
-- Leave a review on [Google Play](https://play.google.com/store/apps/details?id=com.mooneva.app) or the [App Store](https://apps.apple.com/us/app/mooneva-cycle/id6761208425)
-- Star the repo
-- Report bugs or suggest features via [GitHub Issues](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues)
-- Share it with anyone who cares about health data privacy
-- [Sponsor the project](https://github.com/sponsors/aradar46) — funds the infrastructure and security audit for [zero-knowledge sync](#planned)
 
+- Star the repo
+- Share it with anyone who cares about health data privacy
+- Help us to list the app in privacy-focused listings
+- Report bugs or suggest features via [GitHub Issues](https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker/issues)
+- Leave a review on [Google Play](https://play.google.com/store/apps/details?id=com.mooneva.app) or the [App Store](https://apps.apple.com/us/app/mooneva-cycle/id6761208425)
  

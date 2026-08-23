@@ -15,9 +15,9 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
     const { t } = useTranslation();
     const [backupPassword, setBackupPassword] = useState('');
 
-    const [isBackupEncrypted, setIsBackupEncrypted] = useState(false);
+    const [isBackupEncrypted, setIsBackupEncrypted] = useState(true);
     const [importPassword, setImportPassword] = useState('');
-    const [isImportEncrypted, setIsImportEncrypted] = useState(false);
+    const [isImportEncrypted, setIsImportEncrypted] = useState(true);
     const [isProcessing, setIsProcessing] = useState(false);
 
     // Confirmation states
@@ -29,6 +29,11 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const appImportInputRef = useRef<HTMLInputElement>(null);
+
+    const triggerFileInput = (ref: React.RefObject<HTMLInputElement | null>) => {
+        sessionStorage.setItem('mooneva_picking_file', String(Date.now()));
+        ref.current?.click();
+    };
 
     const handleBackup = async () => {
         if (isBackupEncrypted && backupPassword.trim().length === 0) {
@@ -169,7 +174,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                         </div>
                                     </label>
 
-                                    {isBackupEncrypted && (
+                                    {isBackupEncrypted ? (
                                         <div className="mt-3 animate-fade-in">
                                             <input
                                                 placeholder={t('settings.enter_password') + '...'}
@@ -180,6 +185,15 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                             />
                                             <p className="text-[10px] text-slate-400 mt-1.5 px-1">
                                                 {t('settings.password_warning')}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="mt-3 p-2.5 bg-amber-50 rounded-lg border border-amber-200/80 animate-fade-in flex items-start gap-2">
+                                            <span className="text-amber-600 text-xs">⚠️</span>
+                                            <p className="text-[10px] text-amber-700 leading-tight">
+                                                {t('settings.plaintext_backup_warning', {
+                                                    defaultValue: 'Warning: This backup file will NOT be password-protected. Anyone who receives this file can read your entire health history in plaintext.'
+                                                })}
                                             </p>
                                         </div>
                                     )}
@@ -231,7 +245,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                 </div>
 
                                 <button
-                                    onClick={() => fileInputRef.current?.click()}
+                                    onClick={() => triggerFileInput(fileInputRef)}
                                     disabled={isProcessing}
                                     className="data-management-import-button w-full py-3 bg-[#fccfb7] text-slate-700 rounded-xl text-xs font-bold transition-all active:scale-95 border border-[#fbd8c1] shadow-sm"
                                 >
@@ -247,7 +261,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                 />
 
                                 <button
-                                    onClick={() => appImportInputRef.current?.click()}
+                                    onClick={() => triggerFileInput(appImportInputRef)}
                                     disabled={isProcessing}
                                     className="w-full py-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-sm"
                                 >

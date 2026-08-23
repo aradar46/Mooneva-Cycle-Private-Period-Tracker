@@ -30,7 +30,11 @@ const STORAGE_KEY_PERIODS = 'mooneva_periods_enc';
 const STORAGE_KEY_LEGACY = 'mooneva_data';
 const SETTINGS_KEY = 'mooneva_settings';
 const PBKDF2_ITERATIONS_DEVICE = 100000;
-const PBKDF2_ITERATIONS_BACKUP = 100000;
+const PBKDF2_ITERATIONS_BACKUP_V1 = 100000;
+// OWASP-recommended minimum for PBKDF2-HMAC-SHA256. Backups are the only
+// password-derived keys in the app, so the iteration count actually matters here.
+const PBKDF2_ITERATIONS_BACKUP_V2 = 600000;
+const BACKUP_VERSION = 2;
 const DEVICE_LOCAL_SALT = "mooneva_local_salt_v1";
 const DEVICE_SECRET_KEY = 'mooneva_device_secret';
 
@@ -381,7 +385,7 @@ const getDeviceMasterKey = async (): Promise<CryptoKey> => {
 };
 
 export const generateEncryptedBackup = async (data: BackupData, password: string): Promise<Blob> => {
-    const version = new Uint8Array([1]); // Version 1
+    const version = new Uint8Array([BACKUP_VERSION]);
     const textEncoder = new TextEncoder();
     const encodedData = textEncoder.encode(JSON.stringify(data));
     const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -395,7 +399,7 @@ export const generateEncryptedBackup = async (data: BackupData, password: string
     );
 
     const key = await crypto.subtle.deriveKey(
-        { name: "PBKDF2", salt: salt, iterations: PBKDF2_ITERATIONS_BACKUP, hash: "SHA-256" },
+        { name: "PBKDF2", salt: salt, iterations: PBKDF2_ITERATIONS_BACKUP_V2, hash: "SHA-256" },
         keyMaterial,
         { name: "AES-GCM", length: 256 },
         false,
@@ -421,12 +425,17 @@ export const decryptBackup = async (file: File, password: string): Promise<Backu
 
     let offset = 0;
     const version = view[0];
-    if (version === 1) {
+    if (version === 1 || version === 2) {
         offset = 1;
-    } else if (version > 1) {
+    } else if (version > 2) {
         throw new Error(`Unsupported backup version (v${version}). Please update the app to import this backup.`);
     }
     // version 0 (legacy, no version byte): offset stays 0
+
+    // v2 raised the iteration count; older backups must still decrypt with theirs.
+    const iterations = version === 2
+        ? PBKDF2_ITERATIONS_BACKUP_V2
+        : PBKDF2_ITERATIONS_BACKUP_V1;
 
     const salt = buffer.slice(offset, offset + 16);
     const iv = buffer.slice(offset + 16, offset + 28);
@@ -442,7 +451,7 @@ export const decryptBackup = async (file: File, password: string): Promise<Backu
     );
 
     const key = await crypto.subtle.deriveKey(
-        { name: "PBKDF2", salt: salt, iterations: PBKDF2_ITERATIONS_BACKUP, hash: "SHA-256" },
+        { name: "PBKDF2", salt: salt, iterations: iterations, hash: "SHA-256" },
         keyMaterial,
         { name: "AES-GCM", length: 256 },
         false,
@@ -519,6 +528,18 @@ export const shareOrDownloadBackup = async (blob: Blob, filename = 'mooneva-back
             files: [result.uri],
         });
 
+        // Clean up temporary cache export file after sharing
+        setTimeout(async () => {
+            try {
+                await Filesystem.deleteFile({
+                    path: filename,
+                    directory: Directory.Cache,
+                });
+            } catch {
+                // Best effort cleanup
+            }
+        }, 60000);
+
     } catch (e) {
         // Fallback to classic download (Browsers / Desktop)
         const url = URL.createObjectURL(blob);
@@ -529,5 +550,28 @@ export const shareOrDownloadBackup = async (blob: Blob, filename = 'mooneva-back
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+    }
+};
+
+export const cleanupStaleBackupFiles = async () => {
+    try {
+        const files = await Filesystem.readdir({
+            path: '',
+            directory: Directory.Cache,
+        });
+        for (const file of files.files) {
+            if (file.name.startsWith('mooneva-backup') || file.name.endsWith('.enc')) {
+                try {
+                    await Filesystem.deleteFile({
+                        path: file.name,
+                        directory: Directory.Cache,
+                    });
+                } catch {
+                    // Ignore individual removal errors
+                }
+            }
+        }
+    } catch {
+        // Cache directory read not supported on web
     }
 };

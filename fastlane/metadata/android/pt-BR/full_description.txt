@@ -1,0 +1,33 @@
+O Mooneva Cycle é um rastreador de menstruação e calendário de ciclo menstrual privado e totalmente offline. Registre sua menstruação, preveja seu próximo ciclo, acompanhe sua janela fértil e ovulação, e anote sintomas e humor diariamente — tudo sem conta, e sem que um único byte saia do seu celular.
+
+<b>Por que offline importa</b>
+A maioria dos aplicativos de rastreamento de menstruação envia os dados do seu ciclo para servidores de empresas, onde podem ser vendidos a anunciantes, expostos em um vazamento de dados ou exigidos por autoridades. O Mooneva não tem nenhum servidor. Seus dados são criptografados no seu dispositivo com PBKDF2 e AES-GCM, e o aplicativo nem sequer solicita permissão de internet — não há nada para transmitir, nada para entregar.
+
+<b>Recursos</b>
+<ul>
+<li>Rastreamento de menstruação e ciclo menstrual com previsões adaptativas</li>
+<li>Estimativas de janela fértil e ovulação</li>
+<li>Avisos de janela de TPM</li>
+<li>Registro diário: humor, sintomas, intensidade do fluxo, corrimento, sexo e libido</li>
+<li>Lembretes de pílula e contracepção — pílula, adesivo, anel, injeção, DIU, implante</li>
+<li>Tendências, histórico de ciclos e mapas de calor de sintomas por dia do ciclo</li>
+<li>Relatório clínico em PDF para compartilhar com seu médico</li>
+<li>Modo contracepção — oculta a fertilidade, marca sangramentos de escape</li>
+<li>Modo gravidez — pausa previsões e alertas</li>
+<li>Modo discreto do app — disfarça o app como lista de tarefas, com ícone e nome incluídos</li>
+<li>Bloqueio por PIN com tempo limite configurável</li>
+<li>Backup e restauração criptografados</li>
+<li>Importe seu histórico do drip, Flo e Clue</li>
+<li>Calendário persa (Jalaali) e suporte completo da direita para a esquerda</li>
+<li>Primeiro dia da semana configurável</li>
+<li>Tema escuro</li>
+</ul>
+
+<b>Disponível em 12 idiomas</b>
+Inglês, alemão, espanhol, sueco, chinês, persa, francês, ucraniano, italiano, húngaro, russo e português.
+
+<b>Privacidade</b>
+Sem contas. Sem nuvem. Sem análise, sem relatórios de falhas, sem SDKs de publicidade, sem serviços de terceiros de qualquer tipo. O Mooneva não pode ver seus dados, porque nunca os recebe.
+
+<b>Código aberto</b>
+Licenciado sob GPL-3.0-or-later. Código-fonte completo disponível no GitHub.

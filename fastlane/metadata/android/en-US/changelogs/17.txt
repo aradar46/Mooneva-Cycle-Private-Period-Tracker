@@ -1,0 +1,5 @@
+Backups are now encrypted by default, and your PIN is stored as a secure hash instead of plain text, with a lockout after repeated wrong guesses. The app no longer requests any storage permission at all.
+
+Fixed a bug where returning from the file picker while importing a backup could unexpectedly lock the app.
+
+Settings also has a 25% voucher for Mooneva's own period-care products. This app has no data model, so buying those is what funds it, not your data. Optional, easy to ignore.

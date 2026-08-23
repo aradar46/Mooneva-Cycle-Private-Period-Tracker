@@ -10,7 +10,7 @@ import DataManagementView from './settings/DataManagementView';
 import NumberSettingRow from './settings/NumberSettingRow';
 import { ClinicalReportView } from './settings/ClinicalReportView';
 import { addDays, getTodayStr } from '../utils/dateUtils';
-import { PIN_MAX_LENGTH, isValidPin, normalizePinInput } from '../utils/pin';
+import { PIN_MAX_LENGTH, isValidPin, normalizePinInput, hasPin, hashPin } from '../utils/pin';
 import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
 
 import { SubViewType, ViewType } from '../hooks/useAppNavigation';
@@ -46,7 +46,8 @@ const Icons = {
   Bell: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>,
   Calendar: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h18" /></svg>,
   Database: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /></svg>,
-  Share: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" /></svg>
+  Share: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" /></svg>,
+  Gift: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
 };
 
 const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subView, onSubViewChange, periods, onUpdatePeriodWithdrawalBleed, onViewChange }) => {
@@ -56,6 +57,8 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
   const [pinMismatch, setPinMismatch] = useState(false);
   const [pinExpanded, setPinExpanded] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showGiftModal, setShowGiftModal] = useState(false);
+  const [copiedCoupon, setCopiedCoupon] = useState(false);
   const [showPrivacyWarning, setShowPrivacyWarning] = useState(false);
   const [viewReport, setViewReport] = useState(false);
   const [showBirthControlDialog, setShowBirthControlDialog] = useState(false);
@@ -64,6 +67,14 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
   const [periodForDialog, setPeriodForDialog] = useState<PeriodRecord | null>(null);
   const effectiveFirstDayOfWeek = resolveFirstDayOfWeek(i18n.language, settings.firstDayOfWeek);
   const pinEntryReady = isValidPin(pinInput) && isValidPin(pinConfirm);
+
+  const handleCopyCoupon = () => {
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText('MOONEVAAPP25').catch(() => {});
+    }
+    setCopiedCoupon(true);
+    setTimeout(() => setCopiedCoupon(false), 2000);
+  };
 
   const activePeriod = useMemo(() => {
     const todayStr = getTodayStr();
@@ -441,22 +452,18 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <a
-                  href="https://mooneva.se/pages/mooneva_cycle"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.open('https://mooneva.se/pages/mooneva_cycle', '_system');
-                  }}
-                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#F0F2F5] text-slate-600 transition-all active:scale-[0.98] group"
+                <button
+                  onClick={() => setShowGiftModal(true)}
+                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#F0F2F5] text-slate-600 transition-all active:scale-[0.98] group cursor-pointer"
                   style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#e8f4f8] flex items-center justify-center text-[#7598a0] shadow-inner group-hover:scale-110 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wide group-hover:text-[#7598a0] transition-colors">{t('common.about', 'About')}</span>
-                </a>
+                  <span className="text-[10px] font-bold uppercase tracking-wide group-hover:text-emerald-600 transition-colors">
+                    {t('branding.voucher_button', '25% Voucher')}
+                  </span>
+                </button>
 
                 <button
                   onClick={async () => {
@@ -471,7 +478,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                       Logger.error('Error sharing:', error);
                     }
                   }}
-                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#F0F2F5] text-slate-600 transition-all active:scale-[0.98] group"
+                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#F0F2F5] text-slate-600 transition-all active:scale-[0.98] group cursor-pointer"
                   style={{ boxShadow: '5px 5px 10px rgba(163, 177, 198, 0.3), -5px -5px 10px rgba(255, 255, 255, 0.8)' }}
                 >
                   <div className="w-8 h-8 rounded-full bg-[#e0f2fe] flex items-center justify-center text-sky-500 shadow-inner group-hover:scale-110 transition-transform duration-300">
@@ -500,6 +507,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
               )}
             </div>
           </section>
+
           {/* 1. Prediction Settings (grouped) */}
           <section>
             <SettingCard title={t('settings.predictions')}>
@@ -646,15 +654,18 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
             <SettingCard title={t('settings.pin_lock')}>
               <SettingRow
                 label={t('settings.pin_lock')}
-                desc={settings.pin ? t('settings.pin_active') : t('settings.pin_disabled_desc')}
+                desc={hasPin(settings) ? t('settings.pin_active') : t('settings.pin_disabled_desc')}
                 icon={<Icons.Lock />}
-                onClick={() => !settings.pin && setPinExpanded(!pinExpanded)}
-                last={!pinExpanded || !!settings.pin}
-                mergeWithNext={!settings.pin && pinExpanded}
+                onClick={() => !hasPin(settings) && setPinExpanded(!pinExpanded)}
+                last={!pinExpanded || hasPin(settings)}
+                mergeWithNext={!hasPin(settings) && pinExpanded}
                 rightElement={
-                  settings.pin ? (
+                  hasPin(settings) ? (
                     <button
-                      onClick={(e) => { e.stopPropagation(); onUpdate({ ...settings, pin: undefined }); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onUpdate({ ...settings, pin: undefined, pinHash: undefined, pinSalt: undefined });
+                      }}
                       className="text-xs font-semibold text-rose-500 hover:text-rose-600 px-3 py-1.5 bg-rose-50 rounded-lg"
                     >
                       {t('settings.remove_pin')}
@@ -679,7 +690,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
               />
 
               {/* Lock timeout selector — only when PIN is active */}
-              {settings.pin && (
+              {hasPin(settings) && (
                 <SettingRow
                   label={t('settings.lock_after')}
                   desc={t('settings.lock_after_desc')}
@@ -706,7 +717,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
               )}
 
               {/* Expandable PIN setup form */}
-              {!settings.pin && pinExpanded && (
+              {!hasPin(settings) && pinExpanded && (
                 <div className="pin-setup-panel px-5 pb-5 space-y-3">
                   <input
                     type="password"
@@ -734,7 +745,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                     <p className="pin-setup-error text-xs text-rose-600 text-center">{t('settings.pins_dont_match')}</p>
                   )}
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       if (!pinEntryReady) {
                         alert(t('settings.pin_error'));
                         return;
@@ -743,11 +754,17 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                         setPinMismatch(true);
                         return;
                       }
-                      onUpdate({ ...settings, pin: pinInput });
-                      setPinInput('');
-                      setPinConfirm('');
-                      setPinMismatch(false);
-                      setPinExpanded(false);
+                      try {
+                        const { hash, salt } = await hashPin(pinInput);
+                        onUpdate({ ...settings, pinHash: hash, pinSalt: salt, pin: undefined });
+                        setPinInput('');
+                        setPinConfirm('');
+                        setPinMismatch(false);
+                        setPinExpanded(false);
+                      } catch (e) {
+                        Logger.error('Failed to hash PIN', e);
+                        alert(t('settings.pin_error'));
+                      }
                     }}
                     className={`pin-setup-button w-full py-3 rounded-xl font-bold text-sm transition-all transform active:scale-[0.98] ${pinEntryReady && pinInput === pinConfirm
                       ? 'bg-[#7598a0] text-white shadow-md shadow-[#7598a0]/20'
@@ -838,6 +855,99 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
             </div>
           </div>
         </div>
+      )}
+
+      {/* MEMBER GIFT MODAL */}
+      {showGiftModal && createPortal(
+        <>
+          <div
+            className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 animate-fade-in"
+            onClick={() => setShowGiftModal(false)}
+          />
+          <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-sm mx-auto bg-white rounded-3xl p-6 z-50 shadow-2xl animate-scale-up border border-slate-100">
+            <div className="text-center space-y-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-slate-800 tracking-tight">
+                  {t('branding.gift_modal_title', 'Sustainable Period Care')}
+                </h3>
+                <span className="inline-block text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60 shadow-xs">
+                  {t('branding.gift_modal_badge', '25% App Community Voucher')}
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-500 leading-relaxed text-center px-1">
+                {t('branding.gift_modal_desc', "From tracking your rhythm to caring for your body. Experience Mooneva's sustainable, body-kind period care products with an exclusive 25% gift for our app community.")}
+              </p>
+
+              {/* Copy Coupon Box */}
+              <div className="p-3.5 bg-[#F0F2F5] rounded-2xl border border-slate-200/80 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-sm font-black tracking-wider text-slate-800 select-all pl-1">
+                    MOONEVAAPP25
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopyCoupon}
+                    className="px-3 py-1.5 rounded-xl bg-white border border-slate-200/80 shadow-xs text-xs font-bold text-slate-700 hover:text-emerald-600 transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    {copiedCoupon ? (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <span className="text-emerald-600 font-bold">{t('common.copied', 'Copied!')}</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <span>{t('common.copy', 'Copy')}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-500 pt-0.5">
+                  <span className="text-sm">🇪🇺</span>
+                  <span>{t('branding.eu_shipping_only', 'Physical products • EU shipping only')}</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 space-y-2">
+                <a
+                  href="https://mooneva.se"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.open('https://mooneva.se', '_system');
+                  }}
+                  className="w-full py-3.5 rounded-2xl font-bold text-sm shadow-md shadow-[#7598a0]/25 transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer !text-white"
+                  style={{ backgroundColor: '#7598a0', color: '#ffffff' }}
+                >
+                  <span className="font-bold text-sm text-white" style={{ color: '#ffffff' }}>
+                    {t('branding.visit_store', 'Explore Mooneva Store')}
+                  </span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#ffffff' }}>
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => setShowGiftModal(false)}
+                  className="w-full py-2 text-slate-400 font-bold text-xs tracking-wide hover:text-slate-600 transition-colors cursor-pointer"
+                >
+                  {t('common.close', 'Close')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>,
+        document.body
       )}
 
       {/* RENDER REPORT VIEW */}

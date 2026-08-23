@@ -37,7 +37,10 @@
         "free": "Free",
         "private": "Private",
         "forever": "Forever",
-        "share_app": "Share App"
+        "share_app": "Share App",
+        "copy": "Copy",
+        "copied": "Copied!",
+        "shop": "Shop"
     },
     "whats_new": {
         "title": "What's new",
@@ -133,6 +136,12 @@
         "logo_alt": "Mooneva Logo",
         "free_private_forever": "Free. Private. Forever.",
         "passion_not_ads": "Your data stays on your device. We run on passion, not ads.",
+        "gift_modal_title": "Sustainable Period Care",
+        "gift_modal_badge": "25% App Community Voucher",
+        "voucher_button": "25% Voucher",
+        "gift_modal_desc": "From tracking your rhythm to caring for your body. Experience Mooneva's sustainable, body-kind period care products with an exclusive 25% gift for our app community.",
+        "visit_store": "Explore Mooneva Store",
+        "eu_shipping_only": "Physical products • EU shipping only",
         "story_title": "Our Story",
         "story_body": "Mooneva is a Swedish femtech startup reimagining period care. We’re building a sustainable ecosystem that’s kind to your body, your wallet, and the planet."
     },
@@ -333,6 +342,9 @@
         "no_period_advanced": "This date is not part of a period. Start or select a period day to access advanced options."
     },
     "settings": {
+        "community_care": "Community & Care",
+        "member_gift_title": "App Community Gift",
+        "member_gift_desc": "Exclusive 25% voucher for Mooneva period care",
         "language": "Language",
         "more_languages": "More languages coming soon...",
         "first_day_of_week": "First day of week",
@@ -412,6 +424,7 @@
         "pin_unlock_prompt": "Enter your PIN (4-12 digits)",
         "pin_placeholder": "4-12 digit PIN",
         "pin_exit_discrete_prompt": "Enter your PIN to exit discrete mode",
+        "pin_locked_out": "Too many failed attempts. Try again in {{seconds}}s.",
         "incorrect_pin": "Incorrect PIN.",
         "enter_password": "Enter password",
         "repeat_password": "Repeat password",
@@ -425,6 +438,7 @@
         "save_to_file": "Save your data to a file",
         "protect_with_password": "Protect with Password",
         "password_warning": "Don't forget this. There is no way to recover an encrypted backup without the password.",
+        "plaintext_backup_warning": "Warning: This backup file will NOT be password-protected. Anyone who receives this file can read your entire health history in plaintext.",
         "restore_backup": "Restore Backup",
         "import_from_file": "Import data from a file",
         "import_from_app": "Import from another app (experimental)",

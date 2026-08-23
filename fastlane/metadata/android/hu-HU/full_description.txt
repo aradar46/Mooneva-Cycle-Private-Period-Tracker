@@ -1,0 +1,33 @@
+A Mooneva Cycle egy privát, teljesen offline menstruációkövető és menstruációs ciklusnaptár. Kövesd nyomon a menstruációdat, jósold meg a következő ciklusodat, kövesd a termékeny időszakodat és az ovulációt, és naponta jegyezd fel a tüneteket és a hangulatot — mindezt fiók nélkül, és anélkül, hogy akár egyetlen bájt is elhagyná a telefonodat.
+
+<b>Miért fontos az offline működés</b>
+A legtöbb menstruációkövető alkalmazás feltölti a ciklusadataidat cégek szervereire, ahol azokat eladhatják hirdetőknek, adatszivárgás során felfedhetik, vagy hatóságok kérhetik ki. A Moonevának egyáltalán nincs szervere. Az adataidat PBKDF2 és AES-GCM segítségével titkosítjuk az eszközödön, és az alkalmazás még csak internetengedélyt sem kér — nincs mit továbbítani, és nincs mit kiadni.
+
+<b>Funkciók</b>
+<ul>
+<li>Menstruáció- és cikluskövetés adaptív előrejelzésekkel</li>
+<li>Termékeny időszak és ovuláció becslése</li>
+<li>PMS-időszak figyelmeztetések</li>
+<li>Napi napló: hangulat, tünetek, vérzés intenzitása, folyás, szex és libidó</li>
+<li>Tabletta- és fogamzásgátló emlékeztetők — tabletta, tapasz, gyűrű, injekció, spirál, implantátum</li>
+<li>Trendek, ciklustörténet és tünet-hőtérképek ciklusnap szerint</li>
+<li>Klinikai PDF-jelentés, amelyet megoszthatsz az orvosoddal</li>
+<li>Fogamzásgátló mód — elrejti a termékenységet, megjelöli az elvonási vérzéseket</li>
+<li>Terhességi mód — szünetelteti az előrejelzéseket és figyelmeztetéseket</li>
+<li>Diszkrét alkalmazás mód — teendőlistának álcázza az appot, ikonnal és névvel együtt</li>
+<li>PIN-kód zár beállítható időtúllépéssel</li>
+<li>Titkosított biztonsági mentés és visszaállítás</li>
+<li>Előzmények importálása a drip, Flo és Clue alkalmazásokból</li>
+<li>Perzsa (Jalaali) naptár és teljes jobbról balra írás támogatás</li>
+<li>Beállítható hét első napja</li>
+<li>Sötét téma</li>
+</ul>
+
+<b>12 nyelven elérhető</b>
+Angol, német, spanyol, svéd, kínai, perzsa, francia, ukrán, olasz, magyar, orosz és portugál.
+
+<b>Adatvédelem</b>
+Nincs fiók. Nincs felhő. Nincs elemzés, nincs összeomlás-jelentés, nincs hirdetési SDK, semmilyen külső szolgáltatás. A Mooneva nem látja az adataidat, mert soha nem kapja meg azokat.
+
+<b>Nyílt forráskód</b>
+GPL-3.0-or-later licenc alatt. A teljes forráskód elérhető a GitHubon.

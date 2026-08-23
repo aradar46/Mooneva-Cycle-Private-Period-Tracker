@@ -1,11 +1,13 @@
 import React from 'react';
+import type { FallbackProps } from 'react-error-boundary';
 
-interface ErrorFallbackProps {
-    error: any;
-    resetErrorBoundary: () => void;
-}
+export const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBoundary }) => {
+    const errorMessage = error instanceof Error
+        ? error.message
+        : (error && typeof error === 'object' && 'message' in error)
+            ? String((error as { message: unknown }).message)
+            : String(error);
 
-export const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorBoundary }) => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-rose-50 p-6 text-center">
             <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-rose-100">
@@ -17,7 +19,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorB
 
                 <div className="bg-rose-50 p-3 rounded-lg border border-rose-100 mb-6 text-left overflow-auto max-h-32">
                     <code className="text-[10px] text-rose-800 font-mono break-all">
-                        {error.message}
+                        {errorMessage}
                     </code>
                 </div>
 

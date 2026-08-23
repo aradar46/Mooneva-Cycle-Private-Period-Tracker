@@ -1,7 +1,7 @@
 {
   "name": "mooneva-private-period-tracker",
   "private": true,
-  "version": "2.2.0",
+  "version": "2.2.1",
   "type": "module",
   "author": "Mooneva (https://mooneva.se/)",
   "license": "GPL-3.0-or-later",
@@ -33,8 +33,7 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-error-boundary": "^6.1.0",
-    "react-i18next": "^16.5.3",
-    "vazirmatn": "^33.0.3"
+    "react-i18next": "^16.5.3"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",

@@ -1,0 +1,33 @@
+Mooneva Cycle es un rastreador de reglas y calendario de ciclo menstrual privado y totalmente offline. Registra tu regla, predice tu próximo ciclo, sigue tu ventana fértil y ovulación, y anota síntomas y estado de ánimo a diario, todo sin cuenta y sin que un solo byte salga de tu teléfono.
+
+<b>Por qué importa estar offline</b>
+La mayoría de las apps de seguimiento de regla suben tus datos de ciclo a servidores de empresas, donde pueden venderse a anunciantes, quedar expuestos en una filtración o ser exigidos por las autoridades. Mooneva no tiene servidores en absoluto. Tus datos se cifran en tu dispositivo con PBKDF2 y AES-GCM, y la app ni siquiera solicita permiso de internet: no hay nada que transmitir ni que entregar.
+
+<b>Funciones</b>
+<ul>
+<li>Seguimiento de regla y ciclo menstrual con predicciones adaptativas</li>
+<li>Estimaciones de ventana fértil y ovulación</li>
+<li>Avisos de ventana de SPM</li>
+<li>Registro diario: ánimo, síntomas, intensidad del flujo, flujo vaginal, sexo y libido</li>
+<li>Recordatorios de píldora y anticonceptivos: píldora, parche, anillo, inyección, DIU, implante</li>
+<li>Tendencias, historial de ciclos y mapas de calor de síntomas por día de ciclo</li>
+<li>Informe clínico en PDF para compartir con tu médico</li>
+<li>Modo anticonceptivo: oculta la fertilidad, etiqueta los sangrados por deprivación</li>
+<li>Modo embarazo: pausa predicciones y alertas</li>
+<li>Modo discreto: disfraza la app como lista de tareas, con icono y nombre incluidos</li>
+<li>Bloqueo por PIN con tiempo de espera configurable</li>
+<li>Copia de seguridad y restauración cifradas</li>
+<li>Importa tu historial desde drip, Flo y Clue</li>
+<li>Calendario persa (Jalaali) y soporte completo de derecha a izquierda</li>
+<li>Primer día de la semana configurable</li>
+<li>Tema oscuro</li>
+</ul>
+
+<b>Disponible en 12 idiomas</b>
+Inglés, alemán, español, sueco, chino, persa, francés, ucraniano, italiano, húngaro, ruso y portugués.
+
+<b>Privacidad</b>
+Sin cuentas. Sin nube. Sin analítica, sin informes de fallos, sin SDK de publicidad, sin servicios de terceros de ningún tipo. Mooneva no puede ver tus datos porque nunca los recibe.
+
+<b>Código abierto</b>
+Licenciado bajo GPL-3.0-or-later. Código fuente completo disponible en GitHub.
