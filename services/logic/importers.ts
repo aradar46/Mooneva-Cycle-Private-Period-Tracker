@@ -6,15 +6,13 @@
 
 import { DailyLog, FlowIntensity, PeriodRecord, DischargeType, SexDriveType, SexType } from '../../types';
 import { isAnyFlowDay, isFullFlowDay } from './cycle';
-import { addDays, diffInDays, getTodayStr } from '../../utils/dateUtils';
+import { addDays, diffInDays, getTodayStr, parseStrictLocalDate } from '../../utils/dateUtils';
 
 export interface ExternalImportResult {
     source: 'drip' | 'flo' | 'clue';
     logs: Record<string, DailyLog>;
     periods: PeriodRecord[];
 }
-
-const DATE_RE = /^\d{4}-\d{2}-\d{2}/;
 
 const emptyLog = (date: string): DailyLog => ({ date, flow: null, symptoms: [], notes: '' });
 
@@ -26,12 +24,9 @@ const addSymptom = (log: DailyLog, id: string) => {
     if (!log.symptoms.includes(id)) log.symptoms.push(id);
 };
 
-// At runtime the app stores mood as an array of MOOD_OPTIONS ids (see DailyLogPanel),
-// even though the declared type is a single legacy MoodType.
 const addMood = (log: DailyLog, id: string) => {
-    const moods = (Array.isArray(log.mood) ? log.mood : (log.mood ? [log.mood] : [])) as string[];
+    const moods = log.mood ?? (log.mood = []);
     if (!moods.includes(id)) moods.push(id);
-    log.mood = moods as unknown as DailyLog['mood'];
 };
 
 /**
@@ -55,7 +50,7 @@ export const logsToPeriods = (logs: Record<string, DailyLog>): PeriodRecord[] =>
         const days = run.filter(d => d >= start);
         const last = days[days.length - 1];
         periods.push({
-            id: start,
+            id: crypto.randomUUID(),
             startDate: start,
             days: diffInDays(last, start) + 1,
             activeDays: days.map(d => diffInDays(d, start)),
@@ -133,7 +128,7 @@ export const parseDripCsv = (text: string): ExternalImportResult | null => {
         };
         const isTrue = (col: string) => get(col).toLowerCase() === 'true';
         const date = get('date');
-        if (!DATE_RE.test(date)) continue;
+        if (!parseStrictLocalDate(date)) continue;
         const log = emptyLog(date);
 
         const bleeding = get('bleeding.value');
@@ -173,6 +168,11 @@ export const parseDripCsv = (text: string): ExternalImportResult | null => {
 
 interface FloCycle { period_start_date?: string; period_end_date?: string; }
 
+// Flo writes one row per cycle with a start/end pair, so a single corrupt date
+// expands into a log per day between them. Clamp the span: the start date drives
+// every downstream cycle calculation and is worth keeping even when the end is junk.
+const MAX_FLO_PERIOD_SPAN_DAYS = 15;
+
 export const parseFloJson = (json: unknown): ExternalImportResult | null => {
     const cycles = (json as { operationalData?: { cycles?: FloCycle[] } })?.operationalData?.cycles;
     if (!Array.isArray(cycles) || !cycles.length) return null;
@@ -182,17 +182,17 @@ export const parseFloJson = (json: unknown): ExternalImportResult | null => {
     const periods: PeriodRecord[] = [];
     for (const c of cycles) {
         const start = (c.period_start_date ?? '').slice(0, 10);
-        if (!DATE_RE.test(start)) continue;
+        if (!parseStrictLocalDate(start)) continue;
         let end = (c.period_end_date ?? '').slice(0, 10);
-        if (!DATE_RE.test(end) || end < start) end = start;
+        if (!parseStrictLocalDate(end) || end < start) end = start;
         if (end > today) end = today;
-        const days = diffInDays(end, start) + 1;
+        const days = Math.min(diffInDays(end, start) + 1, MAX_FLO_PERIOD_SPAN_DAYS);
         for (let i = 0; i < days; i++) {
             const d = addDays(start, i);
             // Flo exports no intensity; medium is the neutral choice
             logs[d] = { ...emptyLog(d), flow: 'medium' };
         }
-        periods.push({ id: start, startDate: start, days, activeDays: Array.from({ length: days }, (_, i) => i) });
+        periods.push({ id: crypto.randomUUID(), startDate: start, days, activeDays: Array.from({ length: days }, (_, i) => i) });
     }
     if (!periods.length) return null;
     periods.sort((a, b) => a.startDate.localeCompare(b.startDate));
@@ -237,13 +237,15 @@ export const parseClueJson = (json: unknown): ExternalImportResult | null => {
     const logs: Record<string, DailyLog> = {};
     for (const entry of entries) {
         const date = (entry.date ?? '').slice(0, 10);
-        if (!DATE_RE.test(date) || !entry.type) continue;
+        if (!parseStrictLocalDate(date) || !entry.type) continue;
         const log = logs[date] ?? (logs[date] = emptyLog(date));
         const options = clueOptions(entry.value);
 
         switch (entry.type) {
             case 'period':
-                log.flow = CLUE_FLOW[options[0]] ?? 'medium';
+                // No default: Clue exports `none` for "not bleeding", and inventing a
+                // flow the user never logged fabricates whole periods downstream.
+                if (CLUE_FLOW[options[0]]) log.flow = CLUE_FLOW[options[0]];
                 break;
             case 'spotting':
                 log.flow = log.flow ?? 'spotting';

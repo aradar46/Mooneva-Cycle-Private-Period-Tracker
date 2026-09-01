@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AppSettings, DailyLog, INITIAL_SYMPTOMS } from '../types';
+import { AppSettings, DailyLog, FirstDayOfWeek, INITIAL_SYMPTOMS } from '../types';
+import { toLocalISOString } from '../utils/dateUtils';
 import { requestNotificationPermission } from '../services/notifications';
+import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
 import CycleSetupStep, { CycleSetupValues } from './onboarding/CycleSetupStep';
 
 interface OnboardingWizardProps {
@@ -15,9 +17,10 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   // --- Form State ---
   const [lastPeriodDate, setLastPeriodDate] = useState<string | null>(null);
   const [dontRemember, setDontRemember] = useState(false);
+  const [firstDayOfWeek, setFirstDayOfWeek] = useState<FirstDayOfWeek | undefined>(undefined);
 
   // Goals
-  const [goal, setGoal] = useState<'track' | 'fertility' | 'pregnancy' | 'birthControl'>('track');
+  const [goal, setGoal] = useState<'track' | 'fertility' | 'pregnancy' | 'birthControl'>('fertility');
 
   // Cycle management, mirrored from Settings. Seeded by the goal preset on step 3.
   const [cycleSetup, setCycleSetup] = useState<CycleSetupValues>({
@@ -25,7 +28,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     cycleLength: 28,
     periodLength: 5,
     lutealPhaseLength: 14,
-    showFertileWindow: false,
+    showFertileWindow: true,
     showPMS: true,
     pmsLength: 3,
     isOnBirthControl: false,
@@ -58,7 +61,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
       lutealPhaseLength: cycleSetup.lutealPhaseLength,
       pmsLength: cycleSetup.pmsLength,
       showPMS: cycleSetup.showPMS,
-      showFertileWindow: cycleSetup.showFertileWindow
+      showFertileWindow: cycleSetup.showFertileWindow,
+      firstDayOfWeek
     };
 
     let initialLog;
@@ -164,6 +168,8 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
       { code: 'sv', native: 'Svenska' },
       { code: 'zh', native: '中文' },
       { code: 'fa', native: 'فارسی' },
+      { code: 'ar', native: 'العربية' },
+      { code: 'tr', native: 'Türkçe' },
       { code: 'fr', native: 'Français' },
       { code: 'uk', native: 'Українська' },
       { code: 'it', native: 'Italiano' },
@@ -212,6 +218,32 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
                 );
               })}
             </div>
+          </div>
+          <h2 className="text-xs text-slate-400 font-medium mt-6 mb-3 tracking-wide">{t('settings.first_day_of_week')}</h2>
+          <div
+            className="w-full max-w-sm bg-[#F0F2F5] rounded-2xl p-2 flex gap-2"
+            style={{ boxShadow: 'inset 4px 4px 8px rgba(163, 177, 198, 0.4), inset -4px -4px 8px rgba(255, 255, 255, 0.8)' }}
+          >
+            {FIRST_DAY_OPTIONS.map(day => {
+              const isSelected = resolveFirstDayOfWeek(i18n.language, firstDayOfWeek) === day;
+              return (
+                <button
+                  key={day}
+                  onClick={() => setFirstDayOfWeek(day)}
+                  className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all ${isSelected
+                    ? 'bg-[#7598a0] text-white'
+                    : 'bg-white text-slate-600 hover:bg-slate-50'
+                    }`}
+                  style={isSelected ? {
+                    boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.1)'
+                  } : {
+                    boxShadow: '3px 3px 6px rgba(163, 177, 198, 0.4), -3px -3px 6px rgba(255, 255, 255, 0.9)'
+                  }}
+                >
+                  {t(`settings.week_start_${day}`)}
+                </button>
+              );
+            })}
           </div>
         </div>
         <div className="flex-shrink-0 w-full max-w-sm mx-auto pt-4 pb-2">
@@ -291,7 +323,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
                 style={{ boxShadow: 'inset 3px 3px 6px rgba(163, 177, 198, 0.3), inset -3px -3px 6px rgba(255, 255, 255, 0.7)' }}
               >
                 {dates.map((date) => {
-                  const dateStr = date.toISOString().split('T')[0];
+                  const dateStr = toLocalISOString(date);
                   const isSelected = lastPeriodDate === dateStr;
                   return (
                     <button

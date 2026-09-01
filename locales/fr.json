@@ -37,11 +37,17 @@
         "free": "Gratuit",
         "private": "Privé",
         "forever": "Pour toujours",
-        "share_app": "Partager l'application"
+        "share_app": "Partager l'application",
+        "reload": "Recharger",
+        "copy": "Copier",
+        "copied": "Copié !",
+        "shop": "Boutique",
+        "navigation": "Navigation"
     },
     "whats_new": {
         "title": "Nouveautés",
-        "intro": "Depuis la dernière version :"
+        "intro": "Depuis la dernière version :",
+        "tip": "Mooneva paraît minimaliste, mais les <b>Paramètres</b> regorgent d'outils puissants. Une fonction vous manque ? Allez y jeter un œil : nous mettons à jour régulièrement et ajoutons les fonctionnalités demandées."
     },
     "share_message": {
         "text": "Jette un œil à Mooneva. Un suivi de règles suédois, privé et hors ligne. Sans publicités, sans pistage."
@@ -109,7 +115,7 @@
         "contraception_time": "Heure du rappel",
         "contraception_warning_days": "Jours d’anticipation (facultatif)",
         "contraception_standard_schedule": "Les rappels suivent le calendrier standard de cette méthode.",
-        "contraception_schedule_patch": "4 semaines : changer chaque semaine 3 fois, puis retirer.",
+        "contraception_schedule_patch": "4 semaines : changer chaque semaine pendant 3 semaines, puis retirer.",
         "contraception_schedule_ring": "4 semaines : en place 3 semaines, retiré 1 semaine.",
         "contraception_schedule_due": "Rappel à la date prévue ; alerte préalable facultative.",
         "contraception_date_required": "Saisissez une date avant d’activer ce rappel.",
@@ -120,7 +126,9 @@
         "contraception_warning_invalid": "Saisissez un nombre entier de jours d’alerte entre 0 et 365.",
         "remind_at": "Rappeler à",
         "next_period_days": "Prochaines règles – {{count}} jours restants",
-        "next_period_unknown": "Prédiction des prochaines règles"
+        "next_period_unknown": "Prédiction des prochaines règles",
+        "permission_denied_message": "Les notifications sont désactivées. Activez-les dans les réglages de votre appareil pour recevoir des rappels.",
+        "exact_alarm_message": "Les rappels peuvent arriver en retard ou pas du tout. Autorise les alarmes et rappels dans les réglages de l'appareil pour une réception à l'heure."
     },
     "nav": {
         "history": "Historique"
@@ -134,10 +142,17 @@
         "free_private_forever": "Gratuit. Privé. Pour toujours.",
         "passion_not_ads": "Vos données restent sur votre appareil. Nous travaillons avec passion, pas avec les publicités.",
         "story_title": "Notre histoire",
-        "story_body": "Mooneva est une startup femtech suédoise qui réimagine la santé menstruelle. Nous construisons un écosystème durable qui prend soin de votre corps, de votre portefeuille et de la planète."
+        "story_body": "Mooneva est une startup femtech suédoise qui réimagine la santé menstruelle. Nous construisons un écosystème durable qui prend soin de votre corps, de votre portefeuille et de la planète.",
+        "gift_modal_title": "Soins menstruels durables",
+        "gift_modal_badge": "Bon de 25 % pour la communauté de l'app",
+        "voucher_button": "Bon de 25 %",
+        "gift_modal_desc": "Du suivi de ton rythme au soin de ton corps. Découvre les produits de soins menstruels durables et respectueux du corps de Mooneva avec un cadeau exclusif de 25 % pour la communauté de notre app.",
+        "visit_store": "Découvrir la boutique Mooneva",
+        "eu_shipping_only": "Produits physiques • Livraison dans l'UE uniquement"
     },
     "dashboard": {
         "cycle_day": "Jour {{day}}",
+        "cycle_day_progress": "Jour {{day}}/<hl>{{total}}</hl>",
         "period_day": "Jour de règles {{day}}",
         "period_late": "Retard de règles",
         "period_soon": "Règles imminentes",
@@ -175,7 +190,9 @@
         "adaptive_mode": "Mode adaptatif",
         "learning_mode": "Mode apprentissage",
         "cycle_count_one": "Cycle {{count}}",
-        "cycle_count_other": "{{count}} cycles"
+        "cycle_count_other": "{{count}} cycles",
+        "no_recent_data": "Aucune donnée récente",
+        "log_to_resume": "Enregistre des règles pour relancer les prédictions"
     },
     "discrete": {
         "title": "Mes tâches",
@@ -208,7 +225,8 @@
         },
         "guide": {
             "show": "Voir le guide",
-            "hide": "Masquer le guide"
+            "hide": "Masquer le guide",
+            "label": "Guide"
         },
         "period_question": "Règles ?",
         "edit_period": "Modifier les règles",
@@ -225,8 +243,7 @@
         "how_to_log_period_tip": "Pour <strong>ajouter des règles antérieures</strong>, balayez d'abord vers le mois précédent.",
         "how_to_log_daily_title": "Symptômes quotidiens",
         "how_to_log_daily_body": "<strong>Appuyez</strong> (pour ajouter) ou <strong>appuyez deux fois</strong> (pour modifier) sur n'importe quel jour du calendrier.",
-        "category_flow": "Flux & Saignements",
-        "category_fertility": "Fertilité",
+        "category_flow": "Cycle",
         "category_logs": "Détails",
         "legend": {
             "show": "Montrer la légende",
@@ -243,7 +260,7 @@
             "pms": "Jours de SPM",
             "spotting": "Spotting",
             "symptoms": "Symptômes",
-            "pill_logged": "Pilule enregistrée",
+            "pill_logged": "Pilule (cyan) / autre médicament (violet)",
             "protected_sex": "Rapport protégé",
             "unprotected_sex": "Rapport non protégé",
             "notes": "Notes",
@@ -251,7 +268,8 @@
             "selected": "Jour sélectionné",
             "orphan_flow": "Flux (hors règles)",
             "withdrawal_bleed": "Hémorragie de privation (sous pilule)"
-        }
+        },
+        "category_other": "Autre"
     },
     "log": {
         "daily_log": "Enregistrement quotidien",
@@ -271,12 +289,16 @@
         "flow": "Intensité du flux",
         "flow_tab": "Flux",
         "vitals_tab": "Corps",
-        "pill_tab": "Pilule",
+        "pill_tab": "Médic.",
         "pill_taken": "Pilule prise",
+        "pill_taken_hint": "Votre pilule contraceptive",
         "pill_time": "Heure de la pilule",
         "pill_badge": "Pilule",
         "pill_taken_at": "Pilule prise à {{time}}",
         "pill_report_label": "Pilule",
+        "meds_add": "Ajouter un médicament ou complément",
+        "meds_hint": "Antidouleurs, autres médicaments ou compléments",
+        "meds_report_label": "Médic.",
         "intensity_spotting": "Spot.",
         "intensity_light": "Léger",
         "intensity_medium": "Moyen",
@@ -330,7 +352,8 @@
         "withdrawal_bleed_label": "Hémorragie de privation",
         "excluded_label": "Exclu",
         "day_x_of_y": "Jour {{day}} sur {{total}}",
-        "no_period_advanced": "Cette date ne fait pas partie d'une période de règles. Commencez ou sélectionnez un jour de règles pour accéder aux options avancées."
+        "no_period_advanced": "Cette date ne fait pas partie d'une période de règles. Commencez ou sélectionnez un jour de règles pour accéder aux options avancées.",
+        "daily_log_tabs": "Onglets du journal quotidien"
     },
     "settings": {
         "language": "Langue",
@@ -398,7 +421,7 @@
         "set_backup_pwd": "Définir le mot de passe de sauvegarde",
         "enter_import_pwd": "Entrez le mot de passe pour importer",
         "export_doctor_title": "Exporter pour le médecin",
-        "export_doctor_desc": "Rapport PDF (Signes vitaux & Historique)",
+        "export_doctor_desc": "Rapport PDF (Symptômes & historique du cycle)",
         "nuclear_option": "Option radicale : Effacer toutes les données",
         "archive_confirm": "Cela réinitialisera vos prédictions en ignorant tout l'historique avant aujourd'hui. Vos anciennes données seront toujours visibles dans le calendrier, mais l'algorithme repartira de zéro. Continuer ?",
         "import_confirm": "Cela écrasera vos données actuelles avec la sauvegarde. Êtes-vous sûr de vouloir continuer ?",
@@ -418,8 +441,8 @@
         "pins_dont_match": "Les PIN ne correspondent pas.",
         "wipe_confirm": "Êtes-vous sûr ?",
         "feedback_title": "Aidez-nous à construire une application que vous aimez",
-        "feedback_desc": "Donnez-nous votre avis en 30 secondes.",
-        "feedback_button": "Envoyer un e-mail",
+        "feedback_desc": "Vous avez trouvé un bug, une idée de fonctionnalité ou une traduction incorrecte ? Dites-le-nous en 30 secondes.",
+        "feedback_button": "Envoyer un retour",
         "data_management_title": "Gestion des données",
         "create_backup": "Créer une sauvegarde",
         "save_to_file": "Enregistrer vos données dans un fichier",
@@ -502,10 +525,9 @@
         "report_footer_new": "Mooneva Cycle : suivi de règles privé",
         "birth_control_sub_desc": "Masquer la fertilité, marquer les saignements comme privation",
         "birth_control_pill_hint": "Idéal pour pilules combinées, anneaux ou patchs.",
-        "pause_predictions_full_desc": "Mettre en pause toutes les prédictions (grossesse, irrégularités, etc.) — par exemple en cas de grossesse ou si vous préférez ne pas voir d'estimations.",
+        "pause_predictions_full_desc": "Mettre en pause toutes les prédictions (grossesse, irrégularités, etc.), par exemple en cas de grossesse ou si vous préférez ne pas voir d'estimations.",
         "adaptive_prediction_label": "Prédiction adaptative",
         "adaptive_prediction_desc_long": "Moyenne des 3 derniers cycles pour prédire la durée du cycle",
-        "fixed_prediction_hint": "Les prédictions suivent la durée de cycle définie",
         "cycle_length_label": "Durée du cycle",
         "cycle_length_desc": "Jours entre les règles",
         "period_length_label": "Durée des règles",
@@ -517,7 +539,20 @@
         "cycle_config_section": "Configuration du cycle",
         "on_bc_disabled": "Désactivé sous contraception",
         "bc_protected_msg": "🛡️ Mode protection actif. Suivi de fertilité désactivé.",
-        "unarchive": "Désarchiver"
+        "unarchive": "Désarchiver",
+        "community_care": "Communauté et soin",
+        "member_gift_title": "Cadeau pour la communauté de l'app",
+        "member_gift_desc": "Bon exclusif de 25 % sur les soins menstruels Mooneva",
+        "pin_locked_out": "Trop de tentatives échouées. Réessaie dans {{seconds}} s.",
+        "plaintext_backup_warning": "Attention : ce fichier de sauvegarde ne sera PAS protégé par un mot de passe. Toute personne qui reçoit ce fichier peut lire l'intégralité de ton historique de santé en clair.",
+        "cycle_ongoing": "En cours",
+        "tracking_gap": "Interruption du suivi (non enregistré)",
+        "cycle_day_n": "Jour {{count}}",
+        "report_range": "Période",
+        "report_range_from": "Date de début",
+        "report_range_to": "Date de fin",
+        "report_range_max": "Max. 12 mois",
+        "report_share_failed": "Échec du partage du PDF. Essayez une période plus courte."
     },
     "trends": {
         "header": "Aperçus",
@@ -534,6 +569,7 @@
         "90d": "3 mois",
         "180d": "6 mois",
         "year": "1 an",
+        "completed_cycles_note": "Cette page n'affiche que les données des cycles terminés. Votre cycle en cours sera ajouté au début de vos prochaines règles.",
         "cycle_regularity": "Régularité du cycle",
         "average_label": "Moyenne : {{count}} jours",
         "regular": "Régulier",
@@ -571,7 +607,7 @@
         "need_data_chart": "Enregistrez au moins 2 cycles pour voir ce graphique.",
         "need_data_flow": "Enregistrez plus de données de flux pour voir les modèles.",
         "need_data_mood": "Enregistrez des données d'humeur pour voir les modèles émotionnels.",
-        "pill_timeline": "Chronologie de la pilule",
+        "pill_timeline": "Chronologie des médicaments",
         "pill_taken": "Pilule prise",
         "pill_low": "Oubliée",
         "pill_high": "Prise"
@@ -651,10 +687,10 @@
         "get_started": {
             "title": "Voici comment commencer",
             "period_card_title": "Enregistrez vos règles",
-            "period_card_body": "Appuyez sur le bouton ci-dessous, puis sur les jours pour ajouter ou supprimer des jours de règles. Appuyez sur Terminé quand vous avez fini.",
-            "period_card_tip": "Balayez vers un mois passé pour enregistrer des règles précédentes.",
+            "period_card_body": "Appuyez sur « Règles ? » → appuyez sur les jours pour les ajouter ou les supprimer → appuyez sur Terminé.",
+            "period_card_tip": "Pour ajouter des règles passées, balayez d'abord vers un mois précédent.",
             "daily_card_title": "Enregistrer les symptômes quotidiens",
-            "daily_card_body": "Appuyez sur n'importe quel jour du calendrier pour enregistrer votre humeur, vos symptômes ou des notes.",
+            "daily_card_body": "Appuyez sur un jour pour le prévisualiser. Appuyez à nouveau pour le modifier.",
             "cta": "C'est parti"
         }
     },
@@ -662,7 +698,10 @@
         "backup_password": "Veuillez définir un mot de passe pour sécuriser votre sauvegarde.",
         "backup_error": "Nous avons rencontré un problème lors de la création de votre sauvegarde sécurisée. Veuillez réessayer.",
         "import_password": "Veuillez entrer le mot de passe que vous avez utilisé pour crypter ce fichier.",
-        "decryption_failed": "Mot de passe incorrect ou fichier endommagé. Veuillez vérifier votre mot de passe et réessayer."
+        "decryption_failed": "Mot de passe incorrect ou fichier endommagé. Veuillez vérifier votre mot de passe et réessayer.",
+        "load_failed_title": "Impossible de déverrouiller tes données",
+        "load_failed_desc": "Tes données sont toujours sur cet appareil et n'ont pas été modifiées. Redémarrer l'application résout généralement ce problème.",
+        "import_too_large": "Ce fichier est trop volumineux pour être importé (max. 50 Mo)."
     },
     "months": {
         "jan": "Janv.",
@@ -687,7 +726,7 @@
         "acne": "Acné",
         "backache": "Mal de dos",
         "nausea": "Nausées",
-        "digestion": "Digestion",
+        "digestion": "Troubles digestifs",
         "insomnia": "Insomnie",
         "cravings": "Envies",
         "joint pain": "Douleur articulaire",

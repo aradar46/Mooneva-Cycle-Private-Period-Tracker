@@ -37,11 +37,17 @@
         "free": "免费",
         "private": "隐私",
         "forever": "永久",
-        "share_app": "分享应用"
+        "share_app": "分享应用",
+        "reload": "重新加载",
+        "copy": "复制",
+        "copied": "已复制！",
+        "shop": "商店",
+        "navigation": "导航"
     },
     "whats_new": {
         "title": "最新变化",
-        "intro": "自上一版本以来："
+        "intro": "自上一版本以来：",
+        "tip": "Mooneva 界面简洁，<b>设置</b>里却藏着不少实用功能。觉得少了什么？去看看吧，我们定期更新，也会加入大家提出的功能。"
     },
     "share_message": {
         "text": "试试 Mooneva 吧。这是一款来自瑞典的离线隐私经期助手。无广告，无追踪。"
@@ -117,10 +123,12 @@
         "contraception_date_past": "启用此提醒前，请选择未来的日期。",
         "contraception_warning_invalid": "请输入 0 到 365 之间的整数作为提前提醒天数。",
         "remind_at": "提醒时间",
-        "next_period_days": "下次经期 – 剩余 {{count}} 天",
+        "next_period_days": "下次经期：剩余 {{count}} 天",
         "next_period_unknown": "下次经期预测",
         "section_action_needed": "需采取行动",
-        "section_cycle_updates": "周期更新"
+        "section_cycle_updates": "周期更新",
+        "permission_denied_message": "通知已关闭。请在设备设置中启用通知以接收提醒。",
+        "exact_alarm_message": "提醒可能会延迟送达或完全收不到。请在设备设置中允许闹钟和提醒，以便准时收到。"
     },
     "nav": {
         "history": "历史"
@@ -134,10 +142,17 @@
         "free_private_forever": "免费。私密。永远。",
         "passion_not_ads": "您的数据保存在您的设备上。我们靠热情运营，而不是广告。",
         "story_title": "我们的故事",
-        "story_body": "Mooneva 是一家重新构想经期护理的瑞典女性科技初创公司。我们正在通过构建一个可持续的生态系统，呵护您的身体、钱包和地球。"
+        "story_body": "Mooneva 是一家重新构想经期护理的瑞典女性科技初创公司。我们正在通过构建一个可持续的生态系统，呵护您的身体、钱包和地球。",
+        "gift_modal_title": "可持续经期护理",
+        "gift_modal_badge": "应用社区 25% 优惠券",
+        "voucher_button": "25% 优惠券",
+        "gift_modal_desc": "从记录你的节律到呵护你的身体。体验 Mooneva 可持续、温和的经期护理产品，并享受专为应用社区准备的 25% 专属优惠。",
+        "visit_store": "探索 Mooneva 商店",
+        "eu_shipping_only": "实体商品 • 仅限欧盟配送"
     },
     "dashboard": {
         "cycle_day": "第 {{day}} 天",
+        "cycle_day_progress": "第 {{day}}/<hl>{{total}}</hl> 天",
         "period_day": "经期第 {{day}} 天",
         "period_late": "经期推迟",
         "period_soon": "经期将至",
@@ -175,7 +190,9 @@
         "adaptive_mode": "自适应模式",
         "learning_mode": "学习模式",
         "cycle_count_one": "{{count}} 个周期",
-        "cycle_count_other": "{{count}} 个周期"
+        "cycle_count_other": "{{count}} 个周期",
+        "no_recent_data": "暂无近期数据",
+        "log_to_resume": "记录一次经期以恢复预测"
     },
     "discrete": {
         "title": "我的任务",
@@ -208,7 +225,8 @@
         },
         "guide": {
             "show": "显示指南",
-            "hide": "隐藏指南"
+            "hide": "隐藏指南",
+            "label": "指南"
         },
         "period_question": "经期？",
         "edit_period": "编辑经期",
@@ -230,7 +248,7 @@
             "pms": "PMS 天数",
             "spotting": "点滴出血",
             "symptoms": "症状",
-            "pill_logged": "已记录服药",
+            "pill_logged": "避孕药（青色）／ 其他药物（紫色）",
             "protected_sex": "有保护性行为",
             "unprotected_sex": "无保护性行为",
             "notes": "每日备注",
@@ -249,9 +267,9 @@
         "how_to_log_period_tip": "要<strong>添加过去的经期</strong>，请先向左滑动到之前的月份。",
         "how_to_log_daily_title": "记录每日症状",
         "how_to_log_daily_body": "<strong>点击</strong>（添加）或<strong>双击</strong>（编辑）日历上的任意一天。",
-        "category_flow": "经血 & 记录",
-        "category_fertility": "生育力",
-        "category_logs": "日志详情"
+        "category_flow": "周期",
+        "category_logs": "日志详情",
+        "category_other": "其他"
     },
     "log": {
         "daily_log": "日常记录",
@@ -270,12 +288,16 @@
         "mood_sensitive": "敏感",
         "flow": "流量强度",
         "flow_tab": "流量",
-        "pill_tab": "药片",
+        "pill_tab": "药物",
         "pill_taken": "已服药",
+        "pill_taken_hint": "您的避孕药",
         "pill_time": "服药时间",
         "pill_badge": "药片",
         "pill_taken_at": "服药时间 {{time}}",
         "pill_report_label": "药片",
+        "meds_add": "添加药物或补充剂",
+        "meds_hint": "止痛药、其他药物或补充剂",
+        "meds_report_label": "药物",
         "intensity_spotting": "点滴",
         "intensity_light": "少量",
         "intensity_medium": "中等",
@@ -330,7 +352,8 @@
         "withdrawal_bleed_label": "撤退性出血",
         "excluded_label": "已排除",
         "day_x_of_y": "第 {{day}} 天 / 共 {{total}} 天",
-        "spotting_hint_no_period": "记录点滴出血或更改经期"
+        "spotting_hint_no_period": "记录点滴出血或更改经期",
+        "daily_log_tabs": "每日记录标签"
     },
     "settings": {
         "language": "语言",
@@ -389,7 +412,7 @@
         "set_backup_pwd": "设置备份密码",
         "enter_import_pwd": "输入导入密码",
         "export_doctor_title": "导出给医生",
-        "export_doctor_desc": "PDF 报告（生命体征和历史记录）",
+        "export_doctor_desc": "PDF 报告（症状与周期历史）",
         "nuclear_option": "彻底清除：抹除所有数据",
         "archive_confirm": "这将通过忽略今天之前的所有历史记录来重置您的预测。您的旧数据仍可在日历中查看。是否继续？",
         "import_confirm": "这将使用备份覆盖您的当前数据。确定继续吗？",
@@ -406,8 +429,8 @@
         "incorrect_pin": "PIN 不正确。",
         "wipe_confirm": "您确定吗？",
         "feedback_title": "帮助我们做得更好",
-        "feedback_desc": "30 秒告诉我们。",
-        "feedback_button": "填写反馈",
+        "feedback_desc": "发现了问题、有功能建议，或看到不准确的翻译？用 30 秒告诉我们。",
+        "feedback_button": "发送反馈",
         "show_fertile_window_desc": "显示排卵期",
         "fertility_disclaimer_title": "免责声明：",
         "fertility_disclaimer_body": "本应用根据月经周期长度提供排卵期估算，仅供一般参考。这些预测不用于怀孕或避孕目的，也不应作为怀孕计划或避孕的依据。为提高准确性，建议结合基础体温、宫颈黏液观察或使用包含可选 LH 检测的症状体温法。",
@@ -503,10 +526,9 @@
         "report_footer_new": "Mooneva Cycle: 隐私经期追踪器",
         "birth_control_sub_desc": "隐藏生育信息，将出血标记为撤退性出血",
         "birth_control_pill_hint": "最适合使用复方避孕药、阴道环或避孕贴片的用户。",
-        "pause_predictions_full_desc": "暂停所有预测（怀孕、周期不规律等）——例如怀孕期间或您不想看到预测时。",
+        "pause_predictions_full_desc": "暂停所有预测（怀孕、周期不规律等），例如怀孕期间或您不想看到预测时。",
         "adaptive_prediction_label": "自适应预测",
         "adaptive_prediction_desc_long": "根据最近 3 个周期的平均值预测周期长度",
-        "fixed_prediction_hint": "预测将按照您设置的周期长度进行",
         "cycle_length_label": "周期长度",
         "cycle_length_desc": "两次经期之间的天数",
         "period_length_label": "经期长度",
@@ -517,7 +539,20 @@
         "pms_window_section": "经前综合症窗口",
         "cycle_config_section": "周期设置",
         "on_bc_disabled": "使用避孕措施期间已禁用",
-        "bc_protected_msg": "🛡️ 保护模式已启用。生育追踪已禁用。"
+        "bc_protected_msg": "🛡️ 保护模式已启用。生育追踪已禁用。",
+        "community_care": "社区与关怀",
+        "member_gift_title": "应用社区礼遇",
+        "member_gift_desc": "Mooneva 经期护理专属 25% 优惠券",
+        "pin_locked_out": "失败次数过多，请在 {{seconds}} 秒后重试。",
+        "plaintext_backup_warning": "警告：此备份文件不会使用密码保护。任何人拿到该文件都能以明文读取你的全部健康记录。",
+        "cycle_ongoing": "进行中",
+        "tracking_gap": "记录中断（未记录）",
+        "cycle_day_n": "第 {{count}} 天",
+        "report_range": "日期范围",
+        "report_range_from": "起始日期",
+        "report_range_to": "结束日期",
+        "report_range_max": "最多 12 个月",
+        "report_share_failed": "无法分享 PDF。请尝试缩短日期范围。"
     },
     "trends": {
         "header": "洞察",
@@ -534,6 +569,7 @@
         "90d": "3个月",
         "180d": "6个月",
         "year": "1年",
+        "completed_cycles_note": "此页面只显示已结束周期的数据。当前周期会在下次月经开始后加入。",
         "cycle_regularity": "周期规律性",
         "average_label": "平均: {{count}} 天",
         "regular": "规律",
@@ -541,8 +577,8 @@
         "irregular": "不规律",
         "flow_pattern": "经血模式",
         "last_3_periods_avg": "过去3次经期平均",
-        "lighter": "较轻",
-        "heavier": "较重",
+        "lighter": "偏少",
+        "heavier": "偏多",
         "mood_by_phase": "各阶段情绪",
         "mood_emotional_patterns": "情绪模式",
         "phase_menstrual": "月经期",
@@ -571,7 +607,7 @@
         "need_data_chart": "记录至少 2 个周期以查看此图表。",
         "need_data_flow": "记录更多经期流量数据以查看模式。",
         "need_data_mood": "记录整个周期的心情数据以查看情绪模式。",
-        "pill_timeline": "药片时间线",
+        "pill_timeline": "药物时间线",
         "pill_taken": "已服药",
         "pill_low": "漏服",
         "pill_high": "已服"
@@ -583,8 +619,8 @@
         "est_fertile": "预计排卵期",
         "no_cycles": "尚无已完成的周期。",
         "started": "开始于",
-        "gap_hint": "跟踪缺口 – 不用于预测",
-        "short_cycle_hint": "周期过短（<18天）– 不用于预测",
+        "gap_hint": "跟踪缺口，不用于预测",
+        "short_cycle_hint": "周期过短（<18天），不用于预测",
         "show_more_count": "显示更多历史记录（{{count}}）"
     },
     "onboarding": {
@@ -651,10 +687,10 @@
         "get_started": {
             "title": "开始使用",
             "period_card_title": "记录经期",
-            "period_card_body": "点击下方按钮，再点击日期添加或删除经期天数，完成后点击「完成」。",
-            "period_card_tip": "向左滑动到之前的月份，可添加过去的经期。",
+            "period_card_body": "点击\"经期？\" → 点击日期添加或删除经期天数 → 点击\"完成\"。",
+            "period_card_tip": "要添加过去的经期，请先滑动到之前的月份。",
             "daily_card_title": "记录每日症状",
-            "daily_card_body": "点击日历上的任意一天，记录心情、症状或备注。",
+            "daily_card_body": "点按某一天可预览，再次点按可编辑。",
             "cta": "开始吧"
         }
     },
@@ -662,7 +698,10 @@
         "backup_password": "请设置密码以保护您的备份。",
         "backup_error": "创建安全备份时遇到问题。请重试。",
         "import_password": "请输入您用于加密此文件的密码。",
-        "decryption_failed": "密码错误或文件损坏。请验证您的密码并重试。"
+        "decryption_failed": "密码错误或文件损坏。请验证您的密码并重试。",
+        "load_failed_title": "无法解锁你的数据",
+        "load_failed_desc": "你的数据仍在此设备上，未被更改。重启应用通常可以解决此问题。",
+        "import_too_large": "该文件太大，无法导入（最大 50MB）。"
     },
     "months": {
         "jan": "一月",
@@ -687,7 +726,7 @@
         "acne": "痤疮",
         "backache": "背痛",
         "nausea": "恶心",
-        "digestion": "消化",
+        "digestion": "消化不适",
         "insomnia": "失眠",
         "cravings": "食欲渴望",
         "joint pain": "关节疼痛",

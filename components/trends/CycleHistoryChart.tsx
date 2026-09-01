@@ -1,6 +1,7 @@
 import { Cycle } from '../../types';
 import { useTranslation } from 'react-i18next';
 import { formatNumber } from '../../services/i18n';
+import { isCycleEligibleForAverage } from '../../services/logic/cycle';
 
 // Mock data for testing - remove or ignore in production
 export const MOCK_CYCLES: Cycle[] = [
@@ -21,7 +22,7 @@ const CycleHistoryChart: React.FC<CycleHistoryChartProps> = ({ cycles }) => {
 
     // Get last 6 cycles, sorted oldest to newest
     const recentCycles = [...cycles]
-        .filter(c => c.length && c.length >= 21 && c.length <= 60)
+        .filter(c => c.length && isCycleEligibleForAverage(c.length))
         .sort((a, b) => a.startDate.localeCompare(b.startDate))
         .slice(-6);
 

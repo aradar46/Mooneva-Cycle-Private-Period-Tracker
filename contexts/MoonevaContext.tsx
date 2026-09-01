@@ -1,9 +1,11 @@
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, useCallback, useMemo, ReactNode } from 'react';
 import { usePersistence } from '../hooks/usePersistence';
 import { useMoonevaModel } from '../hooks/useMoonevaModel';
+import type { MoonevaModel } from '../hooks/useMoonevaModel';
 import { DailyLog, AppSettings, DayMeta, PredictionResults, PeriodRecord, Cycle } from '../types';
 import Logger from '../services/logger';
+import { toLocalISOString, diffInDays } from '../utils/dateUtils';
 
 // Define the shape of our global context
 interface MoonevaContextType {
@@ -12,13 +14,10 @@ interface MoonevaContextType {
     periods: PeriodRecord[];
     settings: AppSettings;
     isLoading: boolean;
+    loadError: boolean;
 
     // Derived Logic (The Model)
-    model: {
-        cycles: Cycle[];
-        predictions: PredictionResults;
-        getDayMeta: (date: string) => DayMeta;
-    };
+    model: MoonevaModel;
 
     // Actions (Mutations)
     actions: {
@@ -27,7 +26,7 @@ interface MoonevaContextType {
         deleteLog: (date: string) => Promise<void>;
         updateSettings: (newSettings: AppSettings) => void;
         completeOnboarding: (newSettings: AppSettings, initialLog?: { date: string, log: DailyLog }) => Promise<void>;
-        startPeriod: (startDate: string, days?: number) => Promise<void>;
+        startPeriod: (startDate: string, days?: number, isWithdrawalBleed?: boolean) => Promise<void>;
         editPeriod: (id: string, days: number) => Promise<void>;
         deletePeriod: (id: string) => Promise<void>;
         toggleBleedingDay: (date: string, effectivePeriodLength?: number) => Promise<void>;
@@ -45,6 +44,7 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
         logs,
         settings,
         loading,
+        loadError,
         updateLog,
         bulkUpdateLogs,
         deleteLog,
@@ -96,18 +96,16 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
     // Sync Android Widget Data
     React.useEffect(() => {
         import('../services/widgetSync').then(({ WidgetSync }) => {
-            const today = new Date().toISOString().split('T')[0];
+            const today = toLocalISOString(new Date());
             const todayMeta = model.getDayMeta(today);
 
-            const cycleDay = todayMeta.header?.dayOfCycle ?? 1;
+            const cycleDay = todayMeta.dayOfCycle ?? 1;
             const cycleLength = settings.cycleLength ?? 28;
 
             // Calculate days until next period
             let daysUntilPeriod = 14;
             if (model.predictions.nextPeriodStart) {
-                const nextStart = new Date(model.predictions.nextPeriodStart);
-                const todayDate = new Date(today);
-                daysUntilPeriod = Math.ceil((nextStart.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
+                daysUntilPeriod = diffInDays(model.predictions.nextPeriodStart, today);
             }
 
             // Determine current phase
@@ -127,45 +125,70 @@ export const MoonevaProvider: React.FC<{ children: ReactNode }> = ({ children })
                 cycleLength,
                 daysUntilPeriod,
                 currentPhase,
-                daysUntilOvulation: model.predictions.ovulationDate ? Math.ceil((new Date(model.predictions.ovulationDate).getTime() - new Date(today).getTime()) / (1000 * 60 * 60 * 24)) : 14,
+                daysUntilOvulation: model.predictions.ovulationDate ? diffInDays(model.predictions.ovulationDate, today) : 14,
                 discreteMode: settings.discreteMode ?? false
             }).catch(err => Logger.warn('Failed to sync widget data:', err));
         }).catch(() => {
             // Plugin not available (e.g., web platform) - silently ignore
         });
-    }, [settings, model.predictions, model.getDayMeta]);
+        // ponytail: depends on predictions/settings, not getDayMeta's identity (which
+        // changes on every log edit, including notes unrelated to the widget's phase
+        // display) - getDayMeta is still called fresh above, so this only narrows how
+        // often the sync runs, not what it computes when it does.
+    }, [settings, model.predictions]);
 
     // 3. Construct the refined context value
-    const value: MoonevaContextType = {
+    const completeOnboarding = useCallback(async (
+        newSettings: AppSettings,
+        initialLog?: { date: string, log: DailyLog }
+    ) => {
+        updateSettings(newSettings);
+        if (initialLog) {
+            await updateLog(initialLog.date, initialLog.log);
+            if (initialLog.log.flow) {
+                // Pass explicit length and birth-control status to avoid a race with the state update
+                await startPeriod(initialLog.date, newSettings.periodLength, newSettings.isOnBirthControl);
+            }
+        }
+    }, [updateSettings, updateLog, startPeriod]);
+
+    const actions = useMemo(() => ({
+        updateLog,
+        bulkUpdateLogs,
+        deleteLog,
+        updateSettings,
+        completeOnboarding,
+        startPeriod,
+        editPeriod,
+        deletePeriod,
+        toggleBleedingDay,
+        updatePeriodWithdrawalBleed,
+        updatePeriodIgnoreForAverages,
+        restorePeriods
+    }), [
+        updateLog,
+        bulkUpdateLogs,
+        deleteLog,
+        updateSettings,
+        completeOnboarding,
+        startPeriod,
+        editPeriod,
+        deletePeriod,
+        toggleBleedingDay,
+        updatePeriodWithdrawalBleed,
+        updatePeriodIgnoreForAverages,
+        restorePeriods
+    ]);
+
+    const value: MoonevaContextType = useMemo(() => ({
         logs,
         periods,
         settings,
         isLoading: loading,
+        loadError,
         model,
-        actions: {
-            updateLog,
-            bulkUpdateLogs,
-            deleteLog,
-            updateSettings,
-            completeOnboarding: async (newSettings, initialLog) => {
-                updateSettings(newSettings);
-                if (initialLog) {
-                    await updateLog(initialLog.date, initialLog.log);
-                    if (initialLog.log.flow) {
-                        // Pass explicit length to avoid race condition with state update
-                        await startPeriod(initialLog.date, newSettings.periodLength);
-                    }
-                }
-            },
-            startPeriod,
-            editPeriod,
-            deletePeriod,
-            toggleBleedingDay,
-            updatePeriodWithdrawalBleed,
-            updatePeriodIgnoreForAverages,
-            restorePeriods
-        }
-    };
+        actions
+    }), [logs, periods, settings, loading, loadError, model, actions]);
 
     return (
         <MoonevaContext.Provider value={value}>

@@ -16,7 +16,7 @@ const HINT_DAYS = 40;
 function getOrSetInstallDate(): string {
   let d = localStorage.getItem(INSTALL_DATE_KEY);
   if (!d) {
-    d = new Date().toISOString().split('T')[0];
+    d = toLocalISOString(new Date());
     localStorage.setItem(INSTALL_DATE_KEY, d);
   }
   return d;
@@ -151,24 +151,29 @@ const Calendar: React.FC<CalendarProps> = ({
             style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
           >
             <div className="flex flex-col items-center z-10 w-full px-2">
-              <h1 className={`text-[clamp(18px,6vw,42px)] ${i18n.language === 'fa' ? 'font-bold' : 'font-extrabold'} text-slate-800 leading-none tracking-tight text-center px-1 whitespace-nowrap w-full overflow-visible`}>
-                {cycleStatus.dayOfCycle != null && cycleStatus.cycleLength != null ? (
-                  <>
-                    {cycleStatus.title}
-                    <span className="text-[#7598a0] font-normal">/{cycleStatus.cycleLength}</span>
-                  </>
+              <h1 className={`text-[clamp(18px,6vw,42px)] ${i18n.dir?.() === 'rtl' ? 'font-bold' : 'font-extrabold'} text-slate-800 leading-none tracking-tight text-center px-1 whitespace-nowrap w-full overflow-visible`}>
+                {/* The day/total pair is composed inside the translation so each language
+                    can place it: number-first languages (tr, hu) keep "8/28" glued together
+                    instead of stranding "/28" after the noun, and RTL locales control the
+                    order of the pair themselves. */}
+                {cycleStatus.titleIsCycleDay && cycleStatus.dayOfCycle != null && cycleStatus.cycleLength != null ? (
+                  <Trans
+                    i18nKey="dashboard.cycle_day_progress"
+                    values={{ day: cycleStatus.dayOfCycle, total: cycleStatus.cycleLength }}
+                    components={{ hl: <span className="text-[#7598a0] font-normal" /> }}
+                  />
                 ) : cycleStatus.title}
               </h1>
               <div className="flex flex-col items-center mt-3 sm:mt-4 space-y-1.5 sm:space-y-2">
                 {cycleStatus.dayOfPeriod != null && cycleStatus.periodLength != null ? (
                   <div className="flex items-center gap-2 whitespace-nowrap">
                     <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)] flex-shrink-0"></span>
-                    <p className="text-rose-500 font-bold text-[clamp(10px,3vw,14px)] tracking-widest uppercase">
+                    <p className="text-rose-500 font-bold text-[clamp(11px,3.2vw,15px)] tracking-wide">
                       {t('calendar.period_progress')} {formatNumber(cycleStatus.dayOfPeriod)} / {formatNumber(cycleStatus.periodLength)}
                     </p>
                   </div>
                 ) : cycleStatus.subtitle && (
-                  <p className={`font-bold text-[clamp(10px,3vw,14px)] tracking-widest uppercase whitespace-nowrap ${cycleStatus.statusVariant === 'primary' ? 'text-cycle-period' :
+                  <p className={`font-bold text-[clamp(11px,3.2vw,15px)] tracking-wide leading-snug ${cycleStatus.statusVariant === 'primary' ? 'text-cycle-period' :
                     cycleStatus.statusVariant === 'warning' ? 'text-warning' :
                       cycleStatus.statusVariant === 'success' ? 'text-success' :
                         cycleStatus.statusVariant === 'info' ? 'text-slate-600' :
@@ -179,7 +184,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   </p>
                 )}
                 {cycleStatus.chance && (
-                  <p className={`text-[clamp(9px,2.5vw,11px)] font-bold tracking-[0.3em] uppercase whitespace-nowrap ${cycleStatus.chanceVariant === 'peak' ? 'text-success animate-pulse' :
+                  <p className={`text-[clamp(10px,2.7vw,12px)] font-bold tracking-[0.04em] whitespace-nowrap ${cycleStatus.chanceVariant === 'peak' ? 'text-success animate-pulse' :
                     cycleStatus.chanceVariant === 'high' ? 'text-success' :
                       'text-slate-500'
                     }`}>
@@ -226,9 +231,11 @@ const Calendar: React.FC<CalendarProps> = ({
           <div className="flex gap-4 justify-self-start items-center">
             <button
               onClick={() => setShowLegend(!showLegend)}
-              className={`calendar-guide-trigger text-[9px] text-slate-600 font-bold uppercase tracking-[0.15em] hover:text-slate-800 transition-colors ${!showLegend ? 'calendar-guide-trigger-pulse' : ''}`}
+              aria-label={showLegend ? t('calendar.guide.hide') : t('calendar.guide.show')}
+              style={{ boxShadow: showLegend ? 'var(--shadow-inset-xs)' : 'var(--shadow-raised-xs)' }}
+              className="calendar-guide-trigger animate-guide-button rounded-full bg-[#F0F2F5] px-2 py-1 text-[9px] font-bold uppercase tracking-[0.1em] transition-shadow"
             >
-              {showLegend ? t('calendar.guide.hide') : t('calendar.guide.show')}
+              {t('calendar.guide.label')}
             </button>
           </div>
           <h2 className="text-xs font-black uppercase tracking-[0.18em] text-slate-800 text-center">
@@ -433,37 +440,6 @@ const Calendar: React.FC<CalendarProps> = ({
                   <div className="calendar-guide-section-flow text-[9px] font-black uppercase tracking-[0.2em] text-rose-400/90 border-b border-rose-100 pb-1.5 mb-1">{t('calendar.category_flow')}</div>
 
                   <div className="flex items-center gap-3">
-                    <div className="calendar-guide-period-marker w-9 h-9 shrink-0 rounded-full bg-rose-100 ring-1 ring-rose-200 shadow-sm flex items-center justify-center">
-                      <span className="text-xs font-bold text-rose-500">24</span>
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.logged_period', 'Period')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
-                      <span className="text-[10px] font-semibold text-slate-400 leading-none mb-0">12</span>
-                      <svg className="w-[8px] h-[8px] text-rose-500 translate-y-0" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C8 8 4 12 4 16a8 8 0 1016 0c0-4-4-8-8-14z" />
-                      </svg>
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.flow_logged', 'Flow Logged')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-period-soft-marker w-9 h-9 shrink-0 rounded-full bg-rose-50/50 border border-rose-100/30 flex items-center justify-center">
-                      <span className="text-[10px] font-semibold text-rose-400/80">25</span>
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold leading-tight">{t('calendar.legend.mid_flow_pause')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-expected-marker w-9 h-9 shrink-0 rounded-full border-2 border-dashed border-rose-300 bg-transparent flex items-center justify-center">
-                      <span className="text-[10px] font-semibold text-rose-400/80">28</span>
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.predicted_period', 'Expected Period')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
                     <div className="calendar-guide-period-marker relative w-9 h-9 shrink-0 rounded-full bg-rose-100 flex items-center justify-center">
                       <span className="text-xs font-bold text-rose-500">1</span>
                       <div className="absolute top-0 right-0 translate-x-[10%] -translate-y-[10%] bg-white rounded-full p-0.5 shadow-sm border border-rose-100">
@@ -473,6 +449,116 @@ const Calendar: React.FC<CalendarProps> = ({
                       </div>
                     </div>
                     <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.cycle_start')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-period-marker w-9 h-9 shrink-0 rounded-full bg-rose-100 ring-1 ring-rose-200 shadow-sm flex items-center justify-center">
+                      <span className="text-xs font-bold text-rose-500">24</span>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.logged_period', 'Period')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-expected-marker w-9 h-9 shrink-0 rounded-full border-2 border-dashed border-rose-300 bg-transparent flex items-center justify-center">
+                      <span className="text-[10px] font-semibold text-rose-400/80">28</span>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.predicted_period', 'Expected Period')}</span>
+                  </div>
+
+                  {settings.showFertileWindow && (
+                    <div className="flex items-center gap-3">
+                      <div className="calendar-guide-fertile-marker relative w-9 h-9 shrink-0 rounded-full border-2 border-[#b0f4eb] bg-transparent flex items-center justify-center">
+                        <span className="text-[10px] font-semibold text-teal-500">12</span>
+                        <div className="absolute top-0 right-0 translate-x-[15%] -translate-y-[15%] flex items-center justify-center">
+                          <div className="w-2 h-2 bg-teal-500 rounded-full border border-white shadow-sm" />
+                        </div>
+                      </div>
+                      <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.fertile_window')}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-transparent border border-slate-200 shadow-sm flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-blue-400">26</span>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.pms')}</span>
+                  </div>
+
+                  {/* CATEGORY 2: LOGS */}
+                  <div className="calendar-guide-section-logs text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400/80 border-b border-indigo-100 pb-1.5 mt-2 mb-1">{t('calendar.category_logs')}</div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                      <svg className="w-[14px] h-[14px] text-amber-500" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                      </svg>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.symptoms')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                        <svg className="w-[16px] h-[16px] text-cyan-500" viewBox="0 0 24 24" fill="currentColor">
+                          <path fillRule="evenodd" d="M19.5 6.5a3.5 3.5 0 0 0-7 0v11a3.5 3.5 0 1 0 7 0v-11ZM16 2a5.5 5.5 0 0 0-5.5 5.5v11a5.5 5.5 0 1 0 11 0v-11A5.5 5.5 0 0 0 16 2Zm-3.5 5.5v4.25h7V7.5a3.5 3.5 0 1 0-7 0Z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                        <svg className="w-[16px] h-[16px] text-violet-400" viewBox="0 0 24 24" fill="currentColor">
+                          <path fillRule="evenodd" d="M19.5 6.5a3.5 3.5 0 0 0-7 0v11a3.5 3.5 0 1 0 7 0v-11ZM16 2a5.5 5.5 0 0 0-5.5 5.5v11a5.5 5.5 0 1 0 11 0v-11A5.5 5.5 0 0 0 16 2Zm-3.5 5.5v4.25h7V7.5a3.5 3.5 0 1 0-7 0Z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold leading-tight">{t('calendar.legend.pill_logged')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-neutral-marker calendar-guide-sex-protected-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                      <SexMarkerIcon type="protected" className="w-[16px] h-[16px] text-purple-500" />
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.protected_sex')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-neutral-marker calendar-guide-sex-unprotected-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                      <SexMarkerIcon type="unprotected" className="w-[16px] h-[16px] text-purple-500" />
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.unprotected_sex')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                      <svg className="w-[15px] h-[15px] text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.51a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                      </svg>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.notes')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                      <svg className="w-[14px] h-[14px] text-rose-500" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C8 8 4 12 4 16a8 8 0 1016 0c0-4-4-8-8-14z" />
+                      </svg>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.flow_logged', 'Flow Logged')}</span>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                      <div className="w-[6px] h-[6px] rounded-full bg-rose-400" />
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.spotting')}</span>
+                  </div>
+
+                  {/* CATEGORY 3: OTHER */}
+                  <div className="calendar-guide-section-other text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-200 pb-1.5 mt-2 mb-1">{t('calendar.category_other')}</div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-period-soft-marker w-9 h-9 shrink-0 rounded-full bg-rose-50/50 border border-rose-100/30 flex items-center justify-center">
+                      <span className="text-[10px] font-semibold text-rose-400/80">25</span>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold leading-tight">{t('calendar.legend.mid_flow_pause')}</span>
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -490,88 +576,7 @@ const Calendar: React.FC<CalendarProps> = ({
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
-                      <span className="text-[10px] font-semibold text-slate-400 leading-none mb-0">15</span>
-                      <div className="w-[4px] h-[4px] rounded-full bg-rose-400 translate-y-0" />
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.spotting')}</span>
-                  </div>
-
-                  {/* CATEGORY 2: FERTILITY */}
-                  {settings.showFertileWindow && (
-                    <>
-                      <div className="calendar-guide-section-fertility text-[9px] font-black uppercase tracking-[0.2em] text-teal-600/80 border-b border-teal-100 pb-1.5 mt-2 mb-1">{t('calendar.category_fertility')}</div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="calendar-guide-fertile-marker relative w-9 h-9 shrink-0 rounded-full border-2 border-[#b0f4eb] bg-transparent flex items-center justify-center">
-                          <span className="text-[10px] font-semibold text-teal-500">12</span>
-                          <div className="absolute top-0 right-0 translate-x-[15%] -translate-y-[15%] flex items-center justify-center">
-                            <div className="w-2 h-2 bg-teal-500 rounded-full border border-white shadow-sm" />
-                          </div>
-                        </div>
-                        <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.fertile_window')}</span>
-                      </div>
-                    </>
-                  )}
-
-                  {/* CATEGORY 3: LOGS */}
-                  <div className="calendar-guide-section-logs text-[9px] font-black uppercase tracking-[0.2em] text-indigo-400/80 border-b border-indigo-100 pb-1.5 mt-2 mb-1">{t('calendar.category_logs')}</div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-transparent border border-slate-200 shadow-sm flex items-center justify-center">
-                      <span className="text-[10px] font-bold text-blue-400">26</span>
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.pms')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
-                      <span className="text-[10px] font-semibold text-slate-400 leading-none mb-0">16</span>
-                      <svg className="w-[8px] h-[8px] text-amber-500 translate-y-0" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                      </svg>
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.symptoms')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
-                      <span className="text-[10px] font-semibold text-slate-400 leading-none mb-0">18</span>
-                      <svg className="w-[10px] h-[10px] text-cyan-500 translate-y-0" viewBox="0 0 24 24" fill="currentColor">
-                        <path fillRule="evenodd" d="M19.5 6.5a3.5 3.5 0 0 0-7 0v11a3.5 3.5 0 1 0 7 0v-11ZM16 2a5.5 5.5 0 0 0-5.5 5.5v11a5.5 5.5 0 1 0 11 0v-11A5.5 5.5 0 0 0 16 2Zm-3.5 5.5v4.25h7V7.5a3.5 3.5 0 1 0-7 0Z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.pill_logged')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-neutral-marker calendar-guide-sex-protected-marker relative w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
-                      <SexMarkerIcon type="protected" className="absolute left-[4px] top-1/2 -translate-y-1/2 w-[10px] h-[10px] text-purple-500" />
-                      <span className="text-[10px] font-semibold text-slate-400 leading-none">8</span>
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.protected_sex')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-neutral-marker calendar-guide-sex-unprotected-marker relative w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
-                      <SexMarkerIcon type="unprotected" className="absolute left-[4px] top-1/2 -translate-y-1/2 w-[10px] h-[10px] text-purple-500" />
-                      <span className="text-[10px] font-semibold text-slate-400 leading-none">8</span>
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.unprotected_sex')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center overflow-hidden">
-                      <span className="text-[10px] font-semibold text-slate-400 leading-none mb-0">10</span>
-                      <svg className="w-[9px] h-[9px] text-slate-400 translate-y-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.51a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-                      </svg>
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.notes')}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-today-marker w-9 h-9 shrink-0 rounded-full bg-white ring-2 ring-accent ring-offset-2 flex items-center justify-center shadow-sm">
+                    <div className="calendar-guide-today-marker w-9 h-9 shrink-0 rounded-full bg-white ring-2 ring-accent ring-offset-2 flex items-center justify-center">
                       <span className="text-[10px] font-bold text-slate-400">30</span>
                     </div>
                     <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.today')}</span>

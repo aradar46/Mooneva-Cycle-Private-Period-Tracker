@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DailyLog, Cycle, SymptomConfig, PeriodRecord, AppSettings, MOOD_OPTIONS } from '../types';
-import { toLocalISOString } from '../utils/dateUtils';
+import { toLocalISOString, getTimestamp, diffInDays } from '../utils/dateUtils';
+import { isCycleEligibleForAverage } from '../services/logic/cycle';
 
 // Inlined useTrendStats Hook
 interface TrendStatsProps {
@@ -43,7 +44,7 @@ const useTrendStats = ({
       }
       if (selectedMoods.length > 0) {
         if (!log.mood) return;
-        const logMoods = Array.isArray(log.mood) ? log.mood : [log.mood];
+        const logMoods = log.mood;
         const hasMatchingMood = logMoods.some(m => selectedMoods.includes(m));
         if (!hasMatchingMood) return;
       }
@@ -67,15 +68,11 @@ const useTrendStats = ({
     cutoffDate.setDate(cutoffDate.getDate() - range);
     const cutoffStr = toLocalISOString(cutoffDate);
 
-    const getUtcTimestamp = (dateStr: string) => {
-      const [y, m, d] = dateStr.split('-').map(Number);
-      return Date.UTC(y, m - 1, d);
-    };
     const DAY_MS = 86400000;
 
     const filteredLogTimestamps = new Set<number>();
     Object.keys(filteredLogs).forEach(dateStr => {
-      filteredLogTimestamps.add(getUtcTimestamp(dateStr));
+      filteredLogTimestamps.add(getTimestamp(dateStr));
     });
 
     return cycles.filter(c => {
@@ -86,7 +83,7 @@ const useTrendStats = ({
         return true;
       }
 
-      const cycleStartUtc = getUtcTimestamp(c.startDate);
+      const cycleStartUtc = getTimestamp(c.startDate);
       const cycleLen = c.length || 28;
 
       for (let i = 0; i < cycleLen; i++) {
@@ -103,7 +100,7 @@ const useTrendStats = ({
     const defaultCycle = settings.cycleLength ?? 28;
     const defaultPeriod = settings.periodLength ?? 5;
 
-    const filterOutliers = (list: Cycle[]) => list.filter(c => (c.length || 0) >= 21 && (c.length || 0) <= 45);
+    const filterOutliers = (list: Cycle[]) => list.filter(c => isCycleEligibleForAverage(c.length || 0));
     const validRelevant = filterOutliers(filteredCycles);
 
     if (validRelevant.length === 0) {
@@ -148,8 +145,7 @@ const useTrendStats = ({
       spotting: {}
     };
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const todayStr = toLocalISOString(new Date());
 
     filteredCycles.forEach((cycle) => {
       const [y, m, d_val] = cycle.startDate.split('-').map(Number);
@@ -157,7 +153,7 @@ const useTrendStats = ({
       // Use actual cycle length, or days-elapsed for unfinished cycle
       const maxDay = cycle.length
         ? cycle.length
-        : Math.max(1, Math.floor((today.getTime() - cycleStart.getTime()) / 86400000) + 1);
+        : Math.max(1, diffInDays(todayStr, cycle.startDate) + 1);
       for (let day = 1; day <= maxDay; day++) {
         const d = new Date(cycleStart);
         d.setDate(d.getDate() + (day - 1));
@@ -189,15 +185,14 @@ const useTrendStats = ({
     const data: Record<string, Record<number, number>> = {};
     MOOD_OPTIONS.forEach(opt => { data[opt.id] = {}; });
 
-    const todayMood = new Date();
-    todayMood.setHours(0, 0, 0, 0);
+    const todayMoodStr = toLocalISOString(new Date());
 
     filteredCycles.forEach((cycle) => {
       const [y, m, d_val] = cycle.startDate.split('-').map(Number);
       const cycleStart = new Date(y, m - 1, d_val);
       const maxDay = cycle.length
         ? cycle.length
-        : Math.max(1, Math.floor((todayMood.getTime() - cycleStart.getTime()) / 86400000) + 1);
+        : Math.max(1, diffInDays(todayMoodStr, cycle.startDate) + 1);
       for (let day = 1; day <= maxDay; day++) {
         const d = new Date(cycleStart);
         d.setDate(d.getDate() + (day - 1));
@@ -205,7 +200,7 @@ const useTrendStats = ({
 
         const log = filteredLogs[dStr];
         if (log && log.mood) {
-          const logMoods = Array.isArray(log.mood) ? log.mood : [log.mood];
+          const logMoods = log.mood;
           const cycleDay = Math.min(day, 31);
           logMoods.forEach(mood => {
             if (data[mood]) {
@@ -236,15 +231,14 @@ const useTrendStats = ({
     const data: Record<string, Record<number, number>> = {};
     topSymptomNames.forEach(name => { data[name] = {}; });
 
-    const todaySymptom = new Date();
-    todaySymptom.setHours(0, 0, 0, 0);
+    const todaySymptomStr = toLocalISOString(new Date());
 
     filteredCycles.forEach((cycle) => {
       const [y, m, d_val] = cycle.startDate.split('-').map(Number);
       const cycleStart = new Date(y, m - 1, d_val);
       const maxDay = cycle.length
         ? cycle.length
-        : Math.max(1, Math.floor((todaySymptom.getTime() - cycleStart.getTime()) / 86400000) + 1);
+        : Math.max(1, diffInDays(todaySymptomStr, cycle.startDate) + 1);
       for (let day = 1; day <= maxDay; day++) {
         const d = new Date(cycleStart);
         d.setDate(d.getDate() + (day - 1));
@@ -280,15 +274,14 @@ const useTrendStats = ({
   const pillHeatmap = useMemo(() => {
     const data: Record<number, number> = {};
 
-    const todayPill = new Date();
-    todayPill.setHours(0, 0, 0, 0);
+    const todayPillStr = toLocalISOString(new Date());
 
     filteredCycles.forEach((cycle) => {
       const [y, m, d_val] = cycle.startDate.split('-').map(Number);
       const cycleStart = new Date(y, m - 1, d_val);
       const maxDay = cycle.length
         ? cycle.length
-        : Math.max(1, Math.floor((todayPill.getTime() - cycleStart.getTime()) / 86400000) + 1);
+        : Math.max(1, diffInDays(todayPillStr, cycle.startDate) + 1);
       for (let day = 1; day <= maxDay; day++) {
         const d = new Date(cycleStart);
         d.setDate(d.getDate() + (day - 1));
@@ -297,6 +290,35 @@ const useTrendStats = ({
         if (filteredLogs[dStr]?.pillTakenAt) {
           const cycleDay = Math.min(day, 31);
           data[cycleDay] = (data[cycleDay] || 0) + 1;
+        }
+      }
+    });
+
+    return data;
+  }, [filteredLogs, filteredCycles]);
+
+  // Medications vs Day of Cycle: one row per medication, built only from the selected
+  // range, so old one-off medications simply have no data here and never show up.
+  const medsHeatmap = useMemo(() => {
+    const data: Record<string, Record<number, number>> = {};
+
+    const todayMedsStr = toLocalISOString(new Date());
+
+    filteredCycles.forEach((cycle) => {
+      const [y, m, d_val] = cycle.startDate.split('-').map(Number);
+      const cycleStart = new Date(y, m - 1, d_val);
+      const maxDay = cycle.length
+        ? cycle.length
+        : Math.max(1, diffInDays(todayMedsStr, cycle.startDate) + 1);
+      for (let day = 1; day <= maxDay; day++) {
+        const d = new Date(cycleStart);
+        d.setDate(d.getDate() + (day - 1));
+        const dStr = toLocalISOString(d);
+
+        for (const name of filteredLogs[dStr]?.meds || []) {
+          const cycleDay = Math.min(day, 31);
+          if (!data[name]) data[name] = {};
+          data[name][cycleDay] = (data[name][cycleDay] || 0) + 1;
         }
       }
     });
@@ -316,7 +338,8 @@ const useTrendStats = ({
     symptomHeatmap,
     maxSymptomFreq,
     topSymptomNames,
-    pillHeatmap
+    pillHeatmap,
+    medsHeatmap
   };
 };
 
@@ -359,6 +382,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
     maxSymptomFreq,
     topSymptomNames,
     pillHeatmap,
+    medsHeatmap,
     filteredCycles
   } = useTrendStats({
     logs,
@@ -448,9 +472,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
                           </svg>
                         </div>
                         <p className="text-[12px] font-bold text-slate-600 leading-relaxed pr-2">
-                          {remaining === 1
-                            ? t('trends.adaptive_learning_remaining_one', { count: remaining })
-                            : t('trends.adaptive_learning_remaining_other', { count: remaining })}
+                          {t('trends.adaptive_learning_remaining', { count: remaining })}
                         </p>
                       </div>
                     </div>
@@ -461,6 +483,9 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
             </div>
           )}
 
+          <p className="px-2 pb-1 text-center text-[11px] leading-relaxed text-slate-500">
+            {t('trends.completed_cycles_note')}
+          </p>
           <TrendStatCards rangeAverages={rangeAverages} defaultCycleLength={settings.cycleLength} defaultPeriodLength={settings.periodLength} />
         </div>
 
@@ -534,8 +559,10 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
           />
         )}
 
-        {/* Pill Adherence (Cycle Days) — intensity = fraction of cycles where the pill was taken that day */}
-        {Object.keys(pillHeatmap).length > 0 && (
+        {/* Pill Adherence (Cycle Days) — intensity = fraction of cycles where it was taken that day.
+            Other medications share this section: one extra row each, only for medications
+            actually taken inside the selected range. */}
+        {(Object.keys(pillHeatmap).length > 0 || Object.keys(medsHeatmap).length > 0) && (
           <HeatmapSection
             title={t('trends.pill_timeline')}
             gradientFrom="teal-100"
@@ -544,17 +571,30 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
             maxValue={Math.max(filteredCycles.length, 1)}
             lowLabel={t('trends.pill_low')}
             highLabel={t('trends.pill_high')}
-            rows={[{
-              id: 'pill',
-              label: `💊 ${t('trends.pill_taken')}`,
-              data: pillHeatmap,
-              config: {
-                color: 'rgb(45, 212, 191)',
-                secondary: 'rgb(13, 148, 136)',
-                wash: 'rgba(45, 212, 191, 0.1)',
-                blob: 'blob-1'
-              }
-            }]}
+            rows={[
+              ...(Object.keys(pillHeatmap).length > 0 ? [{
+                id: 'pill',
+                label: `💊 ${t('trends.pill_taken')}`,
+                data: pillHeatmap,
+                config: {
+                  color: 'rgb(45, 212, 191)',
+                  secondary: 'rgb(13, 148, 136)',
+                  wash: 'rgba(45, 212, 191, 0.1)',
+                  blob: 'blob-1'
+                }
+              }] : []),
+              ...Object.keys(medsHeatmap).map((name, idx) => ({
+                id: name.toLowerCase(),
+                label: name,
+                data: medsHeatmap[name],
+                config: {
+                  color: 'rgb(45, 212, 191)',
+                  secondary: 'rgb(13, 148, 136)',
+                  wash: 'rgba(45, 212, 191, 0.1)',
+                  blob: `blob-${(idx % 5) + 1}`
+                }
+              }))
+            ]}
           />
         )}
       </div>

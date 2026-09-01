@@ -23,8 +23,8 @@ La plupart des applications de suivi des règles envoient vos données de cycle 
 <li>Thème sombre</li>
 </ul>
 
-<b>Disponible en 12 langues</b>
-Anglais, allemand, espagnol, suédois, chinois, persan, français, ukrainien, italien, hongrois, russe et portugais.
+<b>Disponible en 14 langues</b>
+Anglais, allemand, espagnol, suédois, chinois, persan, arabe, turc, français, ukrainien, italien, hongrois, russe et portugais.
 
 <b>Confidentialité</b>
 Aucun compte. Aucun cloud. Aucune analyse, aucun rapport de plantage, aucun SDK publicitaire, aucun service tiers d'aucune sorte. Mooneva ne peut pas voir vos données, car elle ne les reçoit jamais.

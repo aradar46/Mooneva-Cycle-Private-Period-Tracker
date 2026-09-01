@@ -37,11 +37,17 @@
         "free": "Grátis",
         "private": "Privado",
         "forever": "Para sempre",
-        "share_app": "Compartilhar app"
+        "share_app": "Compartilhar app",
+        "reload": "Recarregar",
+        "copy": "Copiar",
+        "copied": "Copiado!",
+        "shop": "Loja",
+        "navigation": "Navegação"
     },
     "whats_new": {
         "title": "Novidades",
-        "intro": "Desde a última versão:"
+        "intro": "Desde a última versão:",
+        "tip": "O Mooneva parece minimalista, mas as <b>Configurações</b> estão cheias de ferramentas poderosas. Falta alguma função? Dê uma olhada por lá: atualizamos com frequência e adicionamos as mais pedidas."
     },
     "share_message": {
         "text": "Conheça o Mooneva. Um app de ciclo privado e offline, da Suécia. Sem anúncios, sem rastreamento."
@@ -109,7 +115,7 @@
         "contraception_time": "Horário do lembrete",
         "contraception_warning_days": "Dias de aviso prévio (opcional)",
         "contraception_standard_schedule": "Os lembretes seguem o esquema padrão deste método.",
-        "contraception_schedule_patch": "4 semanas: trocar por semana ×3, depois remover.",
+        "contraception_schedule_patch": "4 semanas: trocar a cada semana durante 3 semanas, depois remover.",
         "contraception_schedule_ring": "4 semanas: 3 semanas com, 1 semana sem.",
         "contraception_schedule_due": "Lembrete na data prevista; aviso prévio opcional.",
         "contraception_date_required": "Informe uma data antes de ativar este lembrete.",
@@ -120,7 +126,9 @@
         "contraception_warning_invalid": "Informe os dias de aviso como um número inteiro de 0 a 365.",
         "remind_at": "Lembrar às",
         "next_period_days": "Próxima menstruação – faltam {{count}} dias",
-        "next_period_unknown": "Previsão da próxima menstruação"
+        "next_period_unknown": "Previsão da próxima menstruação",
+        "permission_denied_message": "As notificações estão desativadas. Ative-as nas configurações do dispositivo para receber lembretes.",
+        "exact_alarm_message": "Os lembretes podem chegar atrasados ou não chegar. Permite alarmes e lembretes nas definições do dispositivo para receberes a horas."
     },
     "nav": {
         "history": "Histórico"
@@ -134,10 +142,17 @@
         "free_private_forever": "Grátis. Privado. Para sempre.",
         "passion_not_ads": "Seus dados ficam no seu dispositivo. Vivemos de paixão, não de anúncios.",
         "story_title": "Nossa história",
-        "story_body": "O Mooneva é uma startup sueca de femtech que está reimaginando o cuidado menstrual. Estamos construindo um ecossistema sustentável, gentil com seu corpo, seu bolso e o planeta."
+        "story_body": "O Mooneva é uma startup sueca de femtech que está reimaginando o cuidado menstrual. Estamos construindo um ecossistema sustentável, gentil com seu corpo, seu bolso e o planeta.",
+        "gift_modal_title": "Cuidado menstrual sustentável",
+        "gift_modal_badge": "Cupom de 25% para a comunidade do app",
+        "voucher_button": "Cupom de 25%",
+        "gift_modal_desc": "Do acompanhamento do seu ritmo ao cuidado do seu corpo. Conheça os produtos de cuidado menstrual sustentáveis e suaves da Mooneva com um presente exclusivo de 25% para a comunidade do nosso app.",
+        "visit_store": "Explorar a loja Mooneva",
+        "eu_shipping_only": "Produtos físicos • Envio somente para a UE"
     },
     "dashboard": {
         "cycle_day": "Dia {{day}}",
+        "cycle_day_progress": "Dia {{day}}/<hl>{{total}}</hl>",
         "period_day": "Dia {{day}} da menstruação",
         "period_late": "Menstruação atrasada",
         "period_soon": "Menstruação em breve",
@@ -175,7 +190,9 @@
         "adaptive_mode": "Modo adaptativo",
         "learning_mode": "Modo de aprendizado",
         "cycle_count_one": "{{count}} ciclo",
-        "cycle_count_other": "{{count}} ciclos"
+        "cycle_count_other": "{{count}} ciclos",
+        "no_recent_data": "Sem dados recentes",
+        "log_to_resume": "Registre uma menstruação para retomar as previsões"
     },
     "discrete": {
         "title": "Minhas tarefas",
@@ -208,7 +225,8 @@
         },
         "guide": {
             "show": "Mostrar guia",
-            "hide": "Ocultar guia"
+            "hide": "Ocultar guia",
+            "label": "Guia"
         },
         "period_question": "Menstruou?",
         "edit_period": "Editar menstruação",
@@ -225,8 +243,7 @@
         "how_to_log_period_tip": "Para <strong>adicionar uma menstruação passada</strong>, deslize primeiro para um mês anterior.",
         "how_to_log_daily_title": "Registre sintomas diários",
         "how_to_log_daily_body": "<strong>Toque</strong> (para adicionar) ou <strong>toque duas vezes</strong> (para editar) em qualquer dia do calendário.",
-        "category_flow": "Fluxo e sangramento",
-        "category_fertility": "Fertilidade",
+        "category_flow": "Ciclo",
         "category_logs": "Detalhes do registro",
         "legend": {
             "show": "Mostrar legenda",
@@ -243,7 +260,7 @@
             "pms": "Dias de TPM",
             "spotting": "Escape",
             "symptoms": "Sintomas",
-            "pill_logged": "Pílula registrada",
+            "pill_logged": "Pílula (ciano) / outro medicamento (violeta)",
             "protected_sex": "Sexo com proteção",
             "unprotected_sex": "Sexo sem proteção",
             "notes": "Notas do dia",
@@ -251,7 +268,8 @@
             "selected": "Dia selecionado",
             "orphan_flow": "Fluxo (sem menstruação)",
             "withdrawal_bleed": "Sangramento de privação (pela pílula)"
-        }
+        },
+        "category_other": "Outro"
     },
     "log": {
         "daily_log": "Registro diário",
@@ -271,12 +289,16 @@
         "flow": "Intensidade do fluxo",
         "flow_tab": "Fluxo",
         "vitals_tab": "Corpo",
-        "pill_tab": "Pílula",
+        "pill_tab": "Remédios",
         "pill_taken": "Tomei a pílula",
+        "pill_taken_hint": "Sua pílula anticoncepcional",
         "pill_time": "Horário da pílula",
         "pill_badge": "Pílula",
         "pill_taken_at": "Pílula tomada às {{time}}",
         "pill_report_label": "Pílula",
+        "meds_add": "Adicionar medicamento ou suplemento",
+        "meds_hint": "Analgésicos, outros medicamentos ou suplementos",
+        "meds_report_label": "Remédios",
         "intensity_spotting": "Escape",
         "intensity_light": "Leve",
         "intensity_medium": "Méd.",
@@ -330,7 +352,8 @@
         "withdrawal_bleed_label": "Sangramento de privação",
         "excluded_label": "Excluído",
         "day_x_of_y": "Dia {{day}} de {{total}}",
-        "no_period_advanced": "Esta data não faz parte de uma menstruação. Inicie ou selecione um dia de menstruação para acessar as opções avançadas."
+        "no_period_advanced": "Esta data não faz parte de uma menstruação. Inicie ou selecione um dia de menstruação para acessar as opções avançadas.",
+        "daily_log_tabs": "Abas do registro diário"
     },
     "settings": {
         "language": "Idioma",
@@ -398,7 +421,7 @@
         "set_backup_pwd": "Definir senha do backup",
         "enter_import_pwd": "Digite a senha para importar",
         "export_doctor_title": "Exportar para o médico",
-        "export_doctor_desc": "Relatório em PDF (sinais vitais e histórico)",
+        "export_doctor_desc": "Relatório em PDF (sintomas e histórico do ciclo)",
         "nuclear_option": "Opção nuclear: apagar todos os dados",
         "archive_confirm": "Isso vai redefinir suas previsões, ignorando todo o histórico anterior a hoje. Seus dados antigos continuarão visíveis no calendário, mas o algoritmo começará do zero. Continuar?",
         "import_confirm": "Isso vai sobrescrever seus dados atuais com o backup. Tem certeza de que deseja continuar?",
@@ -418,8 +441,8 @@
         "pins_dont_match": "Os PINs não coincidem.",
         "wipe_confirm": "Tem certeza?",
         "feedback_title": "Ajude-nos a criar algo que você ame",
-        "feedback_desc": "Conte para nós em 30 segundos.",
-        "feedback_button": "Enviar e-mail",
+        "feedback_desc": "Encontrou um erro, tem uma ideia de recurso ou viu uma tradução incorreta? Conte para nós em 30 segundos.",
+        "feedback_button": "Enviar feedback",
         "data_management_title": "Gerenciamento de dados",
         "create_backup": "Criar backup",
         "save_to_file": "Salve seus dados em um arquivo",
@@ -502,10 +525,9 @@
         "report_footer_new": "Mooneva Cycle: registro de ciclo privado",
         "birth_control_sub_desc": "Ocultar fertilidade, marcar sangramentos como privação",
         "birth_control_pill_hint": "Ideal para quem usa pílula combinada, anel ou adesivo.",
-        "pause_predictions_full_desc": "Pause todas as previsões (gravidez, irregularidade etc.) — por exemplo, em caso de gravidez ou quando você preferir não ver estimativas.",
+        "pause_predictions_full_desc": "Pause todas as previsões (gravidez, irregularidade etc.), por exemplo, em caso de gravidez ou quando você preferir não ver estimativas.",
         "adaptive_prediction_label": "Previsão adaptativa",
         "adaptive_prediction_desc_long": "Calcula a média dos 3 últimos ciclos para prever a duração do ciclo",
-        "fixed_prediction_hint": "As previsões seguem a duração de ciclo que você definiu",
         "cycle_length_label": "Duração do ciclo",
         "cycle_length_desc": "Dias entre menstruações",
         "period_length_label": "Duração da menstruação",
@@ -517,7 +539,20 @@
         "cycle_config_section": "Configuração do ciclo",
         "on_bc_disabled": "Desativado durante o uso de contracepção",
         "bc_protected_msg": "🛡️ Modo protegido ativo. Acompanhamento de fertilidade desativado.",
-        "unarchive": "Desarquivar"
+        "unarchive": "Desarquivar",
+        "community_care": "Comunidade e cuidado",
+        "member_gift_title": "Presente para a comunidade do app",
+        "member_gift_desc": "Cupom exclusivo de 25% em cuidado menstrual Mooneva",
+        "pin_locked_out": "Muitas tentativas incorretas. Tente novamente em {{seconds}}s.",
+        "plaintext_backup_warning": "Aviso: este arquivo de backup NÃO será protegido por senha. Qualquer pessoa que receba este arquivo pode ler todo o seu histórico de saúde em texto simples.",
+        "cycle_ongoing": "Em andamento",
+        "tracking_gap": "Intervalo sem registro",
+        "cycle_day_n": "Dia {{count}}",
+        "report_range": "Intervalo de datas",
+        "report_range_from": "Data inicial",
+        "report_range_to": "Data final",
+        "report_range_max": "Máx. 12 meses",
+        "report_share_failed": "Falha ao compartilhar o PDF. Tente um intervalo de datas menor."
     },
     "trends": {
         "header": "Insights",
@@ -534,6 +569,7 @@
         "90d": "3 meses",
         "180d": "6 meses",
         "year": "1 ano",
+        "completed_cycles_note": "Esta página mostra apenas dados de ciclos concluídos. O seu ciclo atual entra quando a próxima menstruação começar.",
         "cycle_regularity": "Regularidade do ciclo",
         "average_label": "Média: {{count}} dias",
         "regular": "Regular",
@@ -571,7 +607,7 @@
         "need_data_chart": "Registre pelo menos 2 ciclos para ver este gráfico.",
         "need_data_flow": "Registre mais dados de fluxo menstrual para ver padrões.",
         "need_data_mood": "Registre seu humor ao longo do ciclo para ver padrões emocionais.",
-        "pill_timeline": "Linha do tempo da pílula",
+        "pill_timeline": "Linha do tempo dos medicamentos",
         "pill_taken": "Pílula tomada",
         "pill_low": "Esquecida",
         "pill_high": "Tomada"
@@ -651,10 +687,10 @@
         "get_started": {
             "title": "Veja como começar",
             "period_card_title": "Registre sua menstruação",
-            "period_card_body": "Toque no botão abaixo e depois toque nos dias para adicionar ou remover dias de menstruação. Toque em Concluído ao terminar.",
-            "period_card_tip": "Deslize até um mês anterior para registrar menstruações passadas.",
+            "period_card_body": "Toque em \"Menstruou?\" → toque nos dias para adicionar ou remover → toque em Concluído.",
+            "period_card_tip": "Para adicionar uma menstruação passada, deslize primeiro até um mês anterior.",
             "daily_card_title": "Registre sintomas diários",
-            "daily_card_body": "Toque em qualquer dia do calendário para registrar humor, sintomas ou notas.",
+            "daily_card_body": "Toque num dia para pré-visualizá-lo. Toque novamente para editá-lo.",
             "cta": "Vamos lá"
         }
     },
@@ -662,7 +698,10 @@
         "backup_password": "Defina uma senha para proteger seu backup.",
         "backup_error": "Tivemos um problema ao criar seu backup seguro. Tente novamente.",
         "import_password": "Digite a senha que você usou para criptografar este arquivo.",
-        "decryption_failed": "Senha incorreta ou arquivo danificado. Verifique sua senha e tente novamente."
+        "decryption_failed": "Senha incorreta ou arquivo danificado. Verifique sua senha e tente novamente.",
+        "load_failed_title": "Não foi possível desbloquear seus dados",
+        "load_failed_desc": "Seus dados continuam neste dispositivo e não foram alterados. Reiniciar o app normalmente resolve isso.",
+        "import_too_large": "Esse arquivo é grande demais para importar (máx. 50 MB)."
     },
     "months": {
         "jan": "Jan",
@@ -687,7 +726,7 @@
         "acne": "Acne",
         "backache": "Dor nas costas",
         "nausea": "Náusea",
-        "digestion": "Digestão",
+        "digestion": "Problemas digestivos",
         "insomnia": "Insônia",
         "cravings": "Desejos por comida",
         "joint pain": "Dor nas articulações",

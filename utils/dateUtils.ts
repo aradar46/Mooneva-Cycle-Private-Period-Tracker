@@ -29,3 +29,27 @@ export const getTodayStr = (): string => {
     today.setHours(12, 0, 0, 0);
     return toLocalISOString(today);
 };
+
+export const parseLocalDate = (dateStr: string): Date => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d);
+};
+
+/**
+ * Strictly validates a YYYY-MM-DD string: exact format, and a real calendar
+ * date (rejects e.g. 2026-02-30, which the Date constructor would otherwise
+ * silently roll over into March 2).
+ */
+export const parseStrictLocalDate = (value: string): Date | undefined => {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (!match) return undefined;
+
+    const [, yearText, monthText, dayText] = match;
+    const year = Number(yearText);
+    const month = Number(monthText);
+    const day = Number(dayText);
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
+        ? date
+        : undefined;
+};

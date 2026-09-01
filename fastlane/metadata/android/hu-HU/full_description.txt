@@ -23,8 +23,8 @@ A legtöbb menstruációkövető alkalmazás feltölti a ciklusadataidat cégek 
 <li>Sötét téma</li>
 </ul>
 
-<b>12 nyelven elérhető</b>
-Angol, német, spanyol, svéd, kínai, perzsa, francia, ukrán, olasz, magyar, orosz és portugál.
+<b>14 nyelven elérhető</b>
+Angol, német, spanyol, svéd, kínai, perzsa, arab, török, francia, ukrán, olasz, magyar, orosz és portugál.
 
 <b>Adatvédelem</b>
 Nincs fiók. Nincs felhő. Nincs elemzés, nincs összeomlás-jelentés, nincs hirdetési SDK, semmilyen külső szolgáltatás. A Mooneva nem látja az adataidat, mert soha nem kapja meg azokat.

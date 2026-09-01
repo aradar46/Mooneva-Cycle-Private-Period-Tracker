@@ -2,7 +2,6 @@ export type FlowIntensity = 'light' | 'medium' | 'heavy' | 'spotting' | null;
 export type FirstDayOfWeek = 'monday' | 'sunday' | 'saturday';
 
 // Big 5 Menstrual Moods - covers 95% of cycle-related mood shifts
-export type MoodType = 'energetic' | 'calm' | 'sad' | 'anxious' | 'irritable' | 'mood_swings' | 'sensitive' | null;
 
 export interface MoodOptionConfig {
   id: string;
@@ -38,35 +37,22 @@ export interface DailyLog {
   flow: FlowIntensity;
   symptoms: string[];
   notes: string;
-  mood?: MoodType | string[];
+  mood?: string[]; // MOOD_OPTIONS ids; legacy single-string logs are migrated on load
   discharge?: DischargeType;
   sexDrive?: SexDriveType;
   sexType?: SexType;
   pillTakenAt?: string; // Local HH:mm time when birth control pill was taken
+  meds?: string[]; // Free-form names of other medications/supplements taken this day
   // --- Medical Flags ---
-  isWithdrawalBleeding?: boolean; // Tagged if on birth control during log
   ignoreForAverages?: boolean;   // Manual override for outliers (miscarriage, stress, etc)
 
 }
-
-// Replica Logic Types
-export interface Period {
-  mensesStart: string; // YYYY-MM-DD
-  mensesLength: number; // days (can be negative for unknown/default)
-  periodLength: number; // cycle length in days
-  isPregnancy: boolean;
-  uid?: string;
-  // Computed helpers for ease of use
-  effectiveBleedingDays: number;
-}
-
 
 // Explicit Cycle Management
 export interface PeriodRecord {
   id: string; // UUID v4 or ISO date of start
   startDate: string; // YYYY-MM-DD
   days: number; // Stored duration
-  cycleLength?: number; // Stored cycle length (optional for migration)
   activeDays?: number[]; // indices relative to startDate that actually have bleeding
   isWithdrawalBleed?: boolean; // Tagged if created while on birth control
   ignoreForAverages?: boolean; // Manual override for outlier cycles (miscarriage, stress, etc)
@@ -78,7 +64,7 @@ export interface Cycle {
   length?: number;
   periodLength?: number; // Count of actual bleeding days (activeDays.length)
   spanDays?: number;     // Full span from start to end (includes skip days)
-  /** True if 21 <= length <= 60 (used for averages and fertile display) */
+  /** True if 18 <= length <= 45 (used for averages and fertile display) */
   isValid?: boolean;
   /** True if length > 60 (tracking gap; exclude from averages, hide fertile in UI) */
   isOutlier?: boolean;
@@ -211,6 +197,9 @@ export interface PredictionResults {
   };
   nextPeriodStart: string | null;
   nextPeriodEnd: string | null;
+  /** Last logged period is older than the outlier threshold, so the forecast is a guess
+   *  off stale data - show "no recent data" rather than an overdue day count. */
+  isStale?: boolean;
   fertileWindow: {
     start: string;
     end: string;
@@ -220,7 +209,6 @@ export interface PredictionResults {
     start: string;
     end: string;
   } | null;
-  healthStatus: string;
   currentEventDays?: number;
   futurePredictions?: {
     startDate: string;
@@ -246,10 +234,13 @@ export interface DayMeta {
   isValidMonth: boolean; // Computed by Calendar, but meta can know it if provided month context
   // Status
   isPeriod: boolean; // Inside the period span
-  isBleeding: boolean; // Actually had bleeding (respects activeDays)
+  isBleeding: boolean; // Actually had bleeding (respects activeDays) - excludes trailing spotting
+  isPeriodSpan: boolean; // Part of the period's visual span, including trailing spotting
   isCycleStart?: boolean; // New cycle start
   isSpotting: boolean;
   dayOfPeriod?: number;
+  /** Day number within the current cycle - what the calendar badge shows. */
+  dayOfCycle?: number;
   periodId?: string;
   isForecastPeriod: boolean; // Predicted
   isFertile: boolean;
@@ -261,17 +252,4 @@ export interface DayMeta {
   intensity?: FlowIntensity;
   symptoms?: string[];
   mood?: string[];
-  /** Header (Dashboard state for the day, typically consumed for Today) */
-  header?: {
-    title: string;
-    subtitle: string;
-    statusVariant?: 'neutral' | 'warning' | 'primary' | 'success' | 'info' | 'secondary';
-    chance?: string;
-    chanceVariant?: 'low' | 'medium' | 'high' | 'peak';
-    // Metadata for the header specifically
-    dayOfCycle?: number;
-    cycleLength?: number;
-    dayOfPeriod?: number;
-    periodLength?: number;
-  };
 }

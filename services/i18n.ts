@@ -64,7 +64,9 @@ export const i18nReady = i18n
 
 const applyLocaleSettings = (lng: string) => {
     document.documentElement.lang = lng;
-    document.dir = lng === 'fa' ? 'rtl' : 'ltr';
+    // i18next knows which scripts are RTL (ar, fa, he, ur, ...), so new RTL locales
+    // work without another hand-maintained list here.
+    document.dir = i18n.dir(lng);
 };
 
 i18n.on('languageChanged', (lng) => {

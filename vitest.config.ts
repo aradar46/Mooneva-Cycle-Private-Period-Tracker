@@ -11,7 +11,7 @@ export default defineConfig({
                 url: 'http://localhost/',
             },
         },
-        setupFiles: [],
+        setupFiles: ['./tests/setup.ts'],
         include: ['tests/**/*.test.{ts,tsx}'],
     },
     resolve: {

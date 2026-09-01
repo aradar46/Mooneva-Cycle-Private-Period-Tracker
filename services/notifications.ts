@@ -7,7 +7,7 @@ import { Capacitor } from '@capacitor/core';
 import type { LocalNotificationSchema } from '@capacitor/local-notifications';
 import type { AppSettings, ContraceptionReminder, PredictionResults } from '../types';
 import Logger from './logger';
-import { addDays } from '../utils/dateUtils';
+import { addDays, parseStrictLocalDate } from '../utils/dateUtils';
 
 import i18n from './i18n';
 
@@ -78,20 +78,6 @@ function parseTimeHHmm(value: string | undefined, fallback = DEFAULT_TIME): { ho
   const str = value || fallback;
   const [h, m] = str.split(':').map(Number);
   return { hour: isNaN(h) ? 9 : h, minute: isNaN(m) ? 0 : m };
-}
-
-function parseStrictLocalDate(value: string): Date | undefined {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!match) return undefined;
-
-  const [, yearText, monthText, dayText] = match;
-  const year = Number(yearText);
-  const month = Number(monthText);
-  const day = Number(dayText);
-  const date = new Date(year, month - 1, day);
-  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
-    ? date
-    : undefined;
 }
 
 function parseStrictTime(value: string): { hour: number; minute: number } | undefined {
@@ -290,6 +276,30 @@ export async function requestNotificationPermission(): Promise<boolean> {
     return result.display === 'granted';
   } catch {
     return false;
+  }
+}
+
+export async function canScheduleExactAlarms(): Promise<boolean> {
+  if (Capacitor.getPlatform() !== 'android') return true;
+  try {
+    const { registerPlugin } = await import('@capacitor/core');
+    const ExactAlarm = registerPlugin<{ canSchedule(): Promise<{ granted: boolean }> }>('ExactAlarm');
+    const { granted } = await ExactAlarm.canSchedule();
+    return granted;
+  } catch (e) {
+    Logger.warn('canScheduleExactAlarms failed', e);
+    return true;
+  }
+}
+
+export async function openExactAlarmSettings(): Promise<void> {
+  if (Capacitor.getPlatform() !== 'android') return;
+  try {
+    const { registerPlugin } = await import('@capacitor/core');
+    const ExactAlarm = registerPlugin<{ openSettings(): Promise<void> }>('ExactAlarm');
+    await ExactAlarm.openSettings();
+  } catch (e) {
+    Logger.warn('openExactAlarmSettings failed', e);
   }
 }
 
@@ -500,12 +510,16 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
             }
           });
         } else {
-          // Catch-up logic
+          // Catch-up: the PMS slot for today already passed, so aim at the next one.
+          // Anchoring to a fixed time (rather than now + 10min) means the repeated syncs
+          // triggered by every settings change converge on the same instant instead of
+          // pushing the notification further out each time.
           const oneDayBefore = parseLocalDate(predictions.nextPeriodStart);
           oneDayBefore.setDate(oneDayBefore.getDate() - 1);
           if (now.getTime() < oneDayBefore.getTime()) {
-            const catchUpTime = new Date();
-            catchUpTime.setMinutes(catchUpTime.getMinutes() + 10);
+            const catchUpTime = new Date(now);
+            catchUpTime.setDate(catchUpTime.getDate() + 1);
+            catchUpTime.setHours(hour, minute, 0, 0);
             const content = getNotifContent('reminderPMS', discrete);
             notifications.push({
               id: REMINDER_IDS.reminderPMS,

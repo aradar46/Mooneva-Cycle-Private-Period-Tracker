@@ -9,6 +9,7 @@ import { hasPin } from '../utils/pin';
 import OnboardingWizard from './OnboardingWizard';
 import PinLock from './PinLock';
 import { WhatsNewModal } from './WhatsNewModal';
+import LoadErrorScreen from './LoadErrorScreen';
 
 import { CalendarScreen } from './screens/CalendarScreen';
 import { TrendsScreen } from './screens/TrendsScreen';
@@ -16,13 +17,14 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { NotificationManagerScreen } from './screens/NotificationManagerScreen';
 
 type PendingPinAction = 'exitDiscreteMode' | null;
-const WHATS_NEW_VERSION = '2.2.1';
+const WHATS_NEW_VERSION = '2.3.0';
 const WHATS_NEW_STORAGE_KEY = `mooneva_whats_new_seen_${WHATS_NEW_VERSION}`;
 
 export const AppRouter = () => {
     const {
         settings,
         isLoading: loading,
+        loadError,
         logs,
         actions
     } = useMooneva();
@@ -100,6 +102,8 @@ export const AppRouter = () => {
             />
         );
     }
+
+    if (loadError) return <LoadErrorScreen />;
 
     if (showOnboarding) return <OnboardingWizard onComplete={completeOnboarding} />;
 

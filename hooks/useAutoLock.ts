@@ -9,6 +9,9 @@ interface UseAutoLockParams {
     loading: boolean;
 }
 
+export const PICKER_SESSION_KEY = 'mooneva_picking_file';
+export const PICKER_GRACE_PERIOD_MS = 20000;
+
 export const useAutoLock = ({ settings, loading }: UseAutoLockParams) => {
     const isPinConfigured = hasPin(settings);
     const [isLocked, setIsLocked] = useState(true);
@@ -28,9 +31,9 @@ export const useAutoLock = ({ settings, loading }: UseAutoLockParams) => {
                     clearDeliveredNotifications();
 
                     // Check if returning from a system file picker
-                    const pickerTime = Number(sessionStorage.getItem('mooneva_picking_file') || 0);
-                    if (pickerTime && Date.now() - pickerTime < 60000) {
-                        sessionStorage.removeItem('mooneva_picking_file');
+                    const pickerTime = Number(sessionStorage.getItem(PICKER_SESSION_KEY) || 0);
+                    if (pickerTime && Date.now() - pickerTime < PICKER_GRACE_PERIOD_MS) {
+                        sessionStorage.removeItem(PICKER_SESSION_KEY);
                         setIsLocked(false);
                         backgroundedAt.current = null;
                         return;
@@ -49,9 +52,9 @@ export const useAutoLock = ({ settings, loading }: UseAutoLockParams) => {
                 } else {
                     if (isPinConfigured) {
                         backgroundedAt.current = Date.now();
-                        const pickerTime = Number(sessionStorage.getItem('mooneva_picking_file') || 0);
+                        const pickerTime = Number(sessionStorage.getItem(PICKER_SESSION_KEY) || 0);
                         // Do not lock out if user is explicitly picking a file
-                        if (!(pickerTime && Date.now() - pickerTime < 60000)) {
+                        if (!(pickerTime && Date.now() - pickerTime < PICKER_GRACE_PERIOD_MS)) {
                             setIsLocked(true);
                         }
                     }

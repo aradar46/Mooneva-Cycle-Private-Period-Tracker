@@ -14,14 +14,8 @@ export interface WidgetSyncResult {
     widgetsUpdated: number;
 }
 
-export interface WidgetStatusResult {
-    widgetCount: number;
-    hasWidgets: boolean;
-}
-
 export interface WidgetSyncPlugin {
     updateWidgetData(data: WidgetSyncData): Promise<WidgetSyncResult>;
-    getWidgetStatus(): Promise<WidgetStatusResult>;
 }
 
 const WidgetSync = registerPlugin<WidgetSyncPlugin>('WidgetSync');

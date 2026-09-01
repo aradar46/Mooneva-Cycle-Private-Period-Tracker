@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DailyLog, FlowIntensity, MoodOptionConfig, MOOD_OPTIONS, PeriodRecord, SYMPTOM_GROUPS, DischargeType, SexDriveType, SexType } from '../types';
 import { findNearbyPeriod } from '../services/logic';
@@ -49,27 +49,79 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
     // Internal state
     const [showPeriodEdit, setShowPeriodEdit] = useState(false);
     const [mergePrompt, setMergePrompt] = useState<{ show: boolean; nearbyPeriod: PeriodRecord } | null>(null);
-    const [flow, setFlow] = useState<FlowIntensity>(log?.flow || null);
-    const [symptoms, setSymptoms] = useState<string[]>(log?.symptoms || []);
-    const [notes, setNotes] = useState(log?.notes || '');
-    const [mood, setMood] = useState<string[]>(Array.isArray(log?.mood) ? log.mood : (log?.mood ? [log.mood] : []));
-    const [discharge, setDischarge] = useState<DischargeType>(log?.discharge || null);
-    const [sexDrive, setSexDrive] = useState<SexDriveType>(log?.sexDrive || null);
-    const [sexType, setSexType] = useState<SexType>(log?.sexType || null);
-    const [pillTakenAt, setPillTakenAt] = useState<string | undefined>(log?.pillTakenAt);
+    const [flow, setFlow] = useState<FlowIntensity>(() => logs[date]?.flow || null);
+    const [symptoms, setSymptoms] = useState<string[]>(() => logs[date]?.symptoms || []);
+    const [notes, setNotes] = useState<string>(() => logs[date]?.notes || '');
+    const [mood, setMood] = useState<string[]>(() => {
+        const m = logs[date]?.mood;
+        return Array.isArray(m) ? m : (m ? [m] : []);
+    });
+    const [discharge, setDischarge] = useState<DischargeType>(() => logs[date]?.discharge || null);
+    const [sexDrive, setSexDrive] = useState<SexDriveType>(() => logs[date]?.sexDrive || null);
+    const [sexType, setSexType] = useState<SexType>(() => logs[date]?.sexType || null);
+    const [pillTakenAt, setPillTakenAt] = useState<string | undefined>(() => logs[date]?.pillTakenAt);
+    const [meds, setMeds] = useState<string[]>(() => logs[date]?.meds || []);
+    const [medInput, setMedInput] = useState('');
 
-    // Sync state when date/logs change
+    // Keep references to current state and handlers to safely flush across date changes and unmounts
+    const prevDateRef = useRef(date);
+    const updateLogRef = useRef(updateLog);
+    updateLogRef.current = updateLog;
+    const currentStateRef = useRef({ flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds });
+    currentStateRef.current = { flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds };
+    const isDirtyRef = useRef(false);
+    const logsRef = useRef(logs);
+    logsRef.current = logs;
+
+    // Track user edits
+    const isInitialMount = useRef(true);
     useEffect(() => {
-        const activeLog = logs[date];
-        setFlow(activeLog?.flow || null);
-        setSymptoms(activeLog?.symptoms || []);
-        setNotes(activeLog?.notes || '');
-        setMood(Array.isArray(activeLog?.mood) ? activeLog.mood : (activeLog?.mood ? [activeLog.mood] : []));
-        setDischarge(activeLog?.discharge || null);
-        setSexDrive(activeLog?.sexDrive || null);
-        setSexType(activeLog?.sexType || null);
-        setPillTakenAt(activeLog?.pillTakenAt);
-    }, [date, logs]);
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+        isDirtyRef.current = true;
+    }, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds]);
+
+    // Sync state when date changes, flushing any pending unsaved changes for the previous date
+    useEffect(() => {
+        if (prevDateRef.current !== date) {
+            if (isDirtyRef.current) {
+                updateLogRef.current(prevDateRef.current, {
+                    date: prevDateRef.current,
+                    ...currentStateRef.current
+                });
+                isDirtyRef.current = false;
+            }
+            prevDateRef.current = date;
+
+            const activeLog = logsRef.current[date];
+            setFlow(activeLog?.flow || null);
+            setSymptoms(activeLog?.symptoms || []);
+            setNotes(activeLog?.notes || '');
+            setMood(activeLog?.mood ?? []);
+            setDischarge(activeLog?.discharge || null);
+            setSexDrive(activeLog?.sexDrive || null);
+            setSexType(activeLog?.sexType || null);
+            setPillTakenAt(activeLog?.pillTakenAt);
+            setMeds(activeLog?.meds || []);
+            setMedInput('');
+            isDirtyRef.current = false;
+        }
+    }, [date]);
+
+    // On unmount: flush if dirty
+    useEffect(() => {
+        return () => {
+            if (isDirtyRef.current) {
+                updateLogRef.current(prevDateRef.current, {
+                    date: prevDateRef.current,
+                    ...currentStateRef.current
+                });
+                isDirtyRef.current = false;
+            }
+        };
+    }, []);
 
     // Check if there is an existing period overlapping this date
     const activePeriod = useMemo(() => {
@@ -83,21 +135,25 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
     const meta = getDayMeta(date);
 
     const saveToLog = useCallback(() => {
-        updateLog(date, {
-            date,
-            flow,
-            symptoms,
-            notes,
-            mood,
-            discharge,
-            sexDrive,
-            sexType,
-            pillTakenAt
-        });
+        if (isDirtyRef.current) {
+            updateLog(date, {
+                date,
+                flow,
+                symptoms,
+                notes,
+                mood,
+                discharge,
+                sexDrive,
+                sexType,
+                pillTakenAt,
+                meds
+            });
+            isDirtyRef.current = false;
+        }
         // Note: Auto-period creation removed. Periods are managed via calendar toggle only.
-    }, [date, flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, updateLog]);
+    }, [date, flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, updateLog]);
 
-    useAutoSave(saveToLog, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, saveToLog]);
+    useAutoSave(saveToLog, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, saveToLog]);
 
     const handleMerge = () => {
         if (!mergePrompt?.nearbyPeriod) return;
@@ -155,6 +211,54 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                 setMood([...mood, m]);
             }
         }
+    };
+
+    // Medication suggestions: names logged in the last 60 days, newest first. Older names
+    // stay in history and come back by typing, so a year of one-off meds never piles up.
+    const recentMeds = useMemo(() => {
+        const cutoff = addDays(toLocalISOString(new Date()), -60);
+        const seen = new Map<string, string>();
+        for (const d of Object.keys(logs).sort((a, b) => b.localeCompare(a))) {
+            if (d < cutoff) break;
+            for (const name of logs[d].meds || []) {
+                if (!seen.has(name.toLowerCase())) seen.set(name.toLowerCase(), name);
+            }
+        }
+        return [...seen.values()];
+    }, [logs]);
+
+    // Anything selected on this date stays visible even if it was last taken long ago.
+    const medOptions = useMemo(() => {
+        const out = [...meds];
+        recentMeds.forEach(name => {
+            if (!out.some(m => m.toLowerCase() === name.toLowerCase())) out.push(name);
+        });
+        return out;
+    }, [meds, recentMeds]);
+
+    const medQuery = medInput.trim();
+    const visibleMeds = medQuery
+        ? medOptions.filter(m => m.toLowerCase().includes(medQuery.toLowerCase()))
+        : medOptions;
+    const canAddMedQuery = medQuery.length > 0
+        && !medOptions.some(m => m.toLowerCase() === medQuery.toLowerCase());
+
+    const toggleMed = (name: string) => {
+        const key = name.toLowerCase();
+        setMeds(prev => prev.some(m => m.toLowerCase() === key)
+            ? prev.filter(m => m.toLowerCase() !== key)
+            : [...prev, name]);
+    };
+
+    const addMed = () => {
+        const name = medQuery;
+        if (!name) return;
+        // Reuse the stored spelling so "iron" and "Iron" stay one medication.
+        const canonical = medOptions.find(m => m.toLowerCase() === name.toLowerCase()) || name;
+        if (!meds.some(m => m.toLowerCase() === canonical.toLowerCase())) {
+            setMeds([...meds, canonical]);
+        }
+        setMedInput('');
     };
 
     const renderAdvancedContent = () => {
@@ -572,6 +676,9 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                         <span className="text-[11px] font-bold text-slate-700 select-none block">
                                             {t('log.pill_taken', 'Took pill')}
                                         </span>
+                                        <p className="text-[9px] text-slate-400 mt-0.5">
+                                            {t('log.pill_taken_hint', 'Your contraceptive pill')}
+                                        </p>
                                     </div>
                                     <input
                                         type="checkbox"
@@ -608,6 +715,55 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                         />
                                     </label>
                                 )}
+
+                                <div className="daily-log-meds flex flex-col gap-2">
+                                    <p className="text-[9px] text-slate-400 px-1">
+                                        {t('log.meds_hint', 'Painkillers, other medication or supplements')}
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {canAddMedQuery && (
+                                            <button
+                                                type="button"
+                                                onClick={addMed}
+                                                className="daily-log-med-chip daily-log-med-chip-new px-3 py-2 rounded-xl text-[11px] font-bold bg-cyan-500 text-white transition-all active:scale-[0.97]"
+                                            >
+                                                + {medQuery}
+                                            </button>
+                                        )}
+                                        {visibleMeds.map(name => {
+                                            const isTaken = meds.some(m => m.toLowerCase() === name.toLowerCase());
+                                            return (
+                                                <button
+                                                    key={name.toLowerCase()}
+                                                    type="button"
+                                                    aria-pressed={isTaken}
+                                                    onClick={() => toggleMed(name)}
+                                                    className={`daily-log-med-chip px-3 py-2 rounded-xl text-[11px] font-bold transition-all active:scale-[0.97] border-2
+                                                    ${isTaken
+                                                            ? 'daily-log-med-chip-on bg-cyan-50 border-cyan-400 text-cyan-700'
+                                                            : 'daily-log-med-chip-off bg-white border-transparent text-slate-500 shadow-[1px_1px_2px_rgba(163,177,198,0.4)]'}`}
+                                                >
+                                                    {name}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={medInput}
+                                        maxLength={40}
+                                        onChange={(event) => setMedInput(event.target.value)}
+                                        onKeyDown={(event) => {
+                                            if (event.key === 'Enter') {
+                                                event.preventDefault();
+                                                addMed();
+                                            }
+                                        }}
+                                        placeholder={t('log.meds_add', 'Add medication or supplement')}
+                                        aria-label={t('log.meds_add', 'Add medication or supplement')}
+                                        className="daily-log-med-input w-full p-3 text-xs font-medium text-slate-700 placeholder-slate-400 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-0 focus:border-slate-300 transition-all"
+                                    />
+                                </div>
                             </section>
                         )}
                     </>

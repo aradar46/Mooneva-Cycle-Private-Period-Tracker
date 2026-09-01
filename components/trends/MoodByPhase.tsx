@@ -73,7 +73,7 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles }) => {
                         }
                     }
 
-                    const logMoods = Array.isArray(log.mood) ? log.mood : [log.mood];
+                    const logMoods = log.mood;
                     logMoods.forEach(m => {
                         if (phaseMoodCounts[phaseKey] && phaseMoodCounts[phaseKey][m] !== undefined) {
                             phaseMoodCounts[phaseKey][m]++;

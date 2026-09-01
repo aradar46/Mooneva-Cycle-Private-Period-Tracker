@@ -23,8 +23,8 @@ La mayoría de las apps de seguimiento de regla suben tus datos de ciclo a servi
 <li>Tema oscuro</li>
 </ul>
 
-<b>Disponible en 12 idiomas</b>
-Inglés, alemán, español, sueco, chino, persa, francés, ucraniano, italiano, húngaro, ruso y portugués.
+<b>Disponible en 14 idiomas</b>
+Inglés, alemán, español, sueco, chino, persa, árabe, turco, francés, ucraniano, italiano, húngaro, ruso y portugués.
 
 <b>Privacidad</b>
 Sin cuentas. Sin nube. Sin analítica, sin informes de fallos, sin SDK de publicidad, sin servicios de terceros de ningún tipo. Mooneva no puede ver tus datos porque nunca los recibe.

@@ -23,8 +23,8 @@ De flesta mensappar laddar upp din cykeldata till företagsservrar, där den kan
 <li>Mörkt tema</li>
 </ul>
 
-<b>Finns på 12 språk</b>
-Engelska, tyska, spanska, svenska, kinesiska, persiska, franska, ukrainska, italienska, ungerska, ryska och portugisiska.
+<b>Finns på 14 språk</b>
+Engelska, tyska, spanska, svenska, kinesiska, persiska, arabiska, turkiska, franska, ukrainska, italienska, ungerska, ryska och portugisiska.
 
 <b>Integritet</b>
 Inga konton. Inget moln. Ingen analys, inga kraschrapporter, inga annons-SDK:er, inga tredjepartstjänster av något slag. Mooneva kan inte se din data, eftersom den aldrig tar emot den.

@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 import { AppSettings, PredictionResults, DayMeta } from '../../types';
+import { addDays, diffInDays, toLocalISOString } from '../../utils/dateUtils';
 
 export interface CycleStatusData {
     title: string;
@@ -9,6 +10,9 @@ export interface CycleStatusData {
     statusVariant?: 'neutral' | 'warning' | 'primary' | 'success' | 'info' | 'secondary';
     dayOfCycle?: number;
     cycleLength?: number;
+    /** True when `title` is the "Day N" headline, so the view can render N/total
+     *  through one translated template instead of gluing "/total" on the end. */
+    titleIsCycleDay?: boolean;
     dayOfPeriod?: number;
     periodLength?: number;
 }
@@ -24,6 +28,27 @@ export interface CycleStatusData {
  * - Secondary (Purple): Normal cycle days
  * - Neutral (Gray): No data or paused
  */
+/**
+ * Which day of the cycle `dateStr` is, or undefined when there is no usable anchor.
+ * Shared so the calendar badge and the header agree by construction - the badge needs
+ * only this number, not the full status, and paying for the whole status (i18n lookups,
+ * fertility bands, phase labels) on all 42 cells of a month was the reason it was split.
+ */
+export const computeDayOfCycle = (
+    dateStr: string,
+    anchorStart: string | null | undefined,
+    cycleLength: number,
+    today: string
+): number | undefined => {
+    if (!anchorStart) return undefined;
+    const raw = diffInDays(dateStr, anchorStart) + 1;
+    if (raw < 1) return undefined;
+    const len = cycleLength || 28;
+    // Wrap only for future dates past one cycle: a genuinely long past cycle should
+    // show its real day count, not a wrapped one.
+    return dateStr > today && raw > len ? ((raw - 1) % len) + 1 : raw;
+};
+
 export const calculateCycleStatus = (
     meta: DayMeta,
     predictions: PredictionResults,
@@ -69,31 +94,17 @@ export const calculateCycleStatus = (
     // --- REFACTORED PRIORITY ALGORITHM (Steps A-E) ---
     // Inputs
     const todayStr = meta.date;
-    const [lsY, lsM, lsD] = effectiveStartStr.split('-').map(Number);
-    const lastStart = new Date(lsY, lsM - 1, lsD);
-    const [ty, tm, td] = todayStr.split('-').map(Number);
-    const dayDate = new Date(ty, tm - 1, td);
-    dayDate.setHours(0, 0, 0, 0);
-
-    const rawDayOfCycle = Math.floor((dayDate.getTime() - lastStart.getTime()) / (1000 * 3600 * 24)) + 1;
+    const rawDayOfCycle = diffInDays(todayStr, effectiveStartStr) + 1;
     const cycleLen = predictions.cycleLengthUsed || predictions.effective?.cycleLength || 28;
 
-    // Wrap dayOfCycle ONLY for FUTURE predictions (days beyond today AND beyond cycle length)
-    // Past cycles (even if 60+ days long) should show the actual day count
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const isFutureDate = dayDate.getTime() > today.getTime();
-
-    let dayOfCycle = rawDayOfCycle;
-    if (isFutureDate && rawDayOfCycle > cycleLen) {
-        // Wrap to show what day of the predicted cycle this would be
-        dayOfCycle = ((rawDayOfCycle - 1) % cycleLen) + 1;
-    }
+    const dayOfCycle = computeDayOfCycle(
+        todayStr, effectiveStartStr, cycleLen, toLocalISOString(new Date())
+    ) ?? rawDayOfCycle;
 
     // FIX: Handle cases where we are viewing a date BEFORE the effective period start.
     // This happens if the user is viewing a date before their first logged period (future period is the anchor).
     if (rawDayOfCycle < 1) {
-        const daysUntil = Math.ceil((lastStart.getTime() - dayDate.getTime()) / (1000 * 3600 * 24));
+        const daysUntil = diffInDays(effectiveStartStr, todayStr);
         return {
             title: t('dashboard.period_in', { count: daysUntil }),
             subtitle: t('timeline.upcoming', 'Upcoming'),
@@ -111,10 +122,7 @@ export const calculateCycleStatus = (
     let overdueDays = 0;
 
     if (predictions.nextPeriodStart) {
-        const nextDay = new Date(predictions.nextPeriodStart);
-        nextDay.setHours(0, 0, 0, 0);
-        const diffTime = nextDay.getTime() - dayDate.getTime();
-        const rawDays = Math.round(diffTime / (1000 * 3600 * 24));
+        const rawDays = diffInDays(predictions.nextPeriodStart, todayStr);
 
         if (rawDays < 0) {
             overdueDays = Math.abs(rawDays);
@@ -123,45 +131,52 @@ export const calculateCycleStatus = (
         }
     }
 
+    // Days from predicted ovulation (negative = before, 0 = ovulation day).
+    // Ovulation is anchored to the next period minus the luteal length: the luteal
+    // phase is the stable part of the cycle, the follicular phase absorbs variation.
+    //
+    // For a date past nextPeriodStart, anchor to the future cycle that actually
+    // contains it. Measuring everything against the single next period leaves
+    // ovulationDiff positive forever, so every far-out day reads "luteal" while
+    // dayOfCycle has already wrapped - the card contradicts itself.
+    let ovulationDiff: number | null = null;
+    const anchorPeriodStart = (() => {
+        if (!predictions.nextPeriodStart) return null;
+        if (todayStr <= predictions.nextPeriodStart) return predictions.nextPeriodStart;
+        const upcoming = predictions.futurePredictions?.find(p => todayStr <= p.startDate);
+        return upcoming?.startDate ?? predictions.nextPeriodStart;
+    })();
+    if (anchorPeriodStart) {
+        const ovulationDateStr = addDays(anchorPeriodStart, -(settings.lutealPhaseLength || 14));
+        ovulationDiff = diffInDays(todayStr, ovulationDateStr);
+    }
+
     // Determine Fertility Band
     type FertilityBand = 'none' | 'fertile' | 'peak';
     let fertilityBand: FertilityBand = 'none';
 
-    if (settings.showFertileWindow && !settings.isOnBirthControl && predictions.nextPeriodStart) {
-        const nextDay = new Date(predictions.nextPeriodStart);
-        nextDay.setHours(0, 0, 0, 0);
-        const ovulationDate = new Date(nextDay);
-        ovulationDate.setDate(ovulationDate.getDate() - (settings.lutealPhaseLength || 14));
-        const diffToOvulation = Math.round((dayDate.getTime() - ovulationDate.getTime()) / (1000 * 3600 * 24));
-
-        // Peak: -2, -1 (24-48h before ovulation)
-        if (diffToOvulation >= -2 && diffToOvulation <= -1) {
-            fertilityBand = 'peak';
-        }
-        // Fertile: -5 to 0 (excluding peak band overlaps if we treat them strictly, but logic says peak is a subset of fertile window)
-        // Let's stick to the requested definition: "fertile means in fertile window but not peak day"
-        else if ((diffToOvulation >= -5 && diffToOvulation <= 0) || diffToOvulation === 1) { // +1 is often low but sometimes included
-            // Actually, standardized window usually ends on ovulation day (0). +1 is often irrelevant.
-            // Following previous logic: -5 to -3 and 0 were 'High'. -2,-1 were 'Peak'.
-            fertilityBand = 'fertile';
-        }
+    // Fertile window: 5 days before ovulation through ovulation day. Sperm survive ~5
+    // days, the oocyte ~12-24h, so the window closes at ovulation. Peak = the two days
+    // before ovulation plus ovulation day (highest conception probability).
+    if (settings.showFertileWindow && !settings.isOnBirthControl
+        && ovulationDiff !== null && ovulationDiff >= -5 && ovulationDiff <= 0) {
+        fertilityBand = ovulationDiff >= -2 ? 'peak' : 'fertile';
     }
 
     const fertilityEnabled = settings.showFertileWindow && !settings.isOnBirthControl;
 
-    // --- Step A: System Gates ---
-    // 1. No Data
-    if (!predictions.lastPeriodStart) {
+    // --- Step B: Hard Override (Late) ---
+    // A forecast built on a months-old record isn't a late period, it's missing data.
+    // Say so instead of printing an overdue count nobody should act on.
+    if (predictions.isStale) {
         return {
-            title: t('dashboard.hello', 'Hello'),
-            subtitle: t('dashboard.log_to_start', 'Log period to start'),
+            title: t('dashboard.no_recent_data', 'No recent data'),
+            subtitle: t('dashboard.log_to_resume', 'Log a period to resume predictions'),
             statusVariant: 'neutral',
-            chance: undefined,
-            chanceVariant: undefined
+            dayOfCycle: undefined
         };
     }
 
-    // --- Step B: Hard Override (Late) ---
     // 2. Late
     if (overdueDays > 0) {
         // Late overrides basic card AND hides fertility
@@ -181,8 +196,22 @@ export const calculateCycleStatus = (
     }
 
     // --- Step C: Determine Base Period Timing Card ---
+    // Cycle phase in order: follicular -> ovulation -> luteal -> PMS. PMS is the tail
+    // of the luteal phase, not a phase of its own, so it is checked after ovulation and
+    // bounded by the same pmsWindow/showPMS the calendar uses. Menstrual days show the
+    // period-progress row instead of a phase name.
+    const phaseLabel = (): string => {
+        // Ovulation is only named when fertility is shown at all (hidden on birth control).
+        if (fertilityEnabled && ovulationDiff === 0) return t('dashboard.ovulation_day');
+        if (settings.showPMS && dueInDays !== null
+            && dueInDays >= 1 && dueInDays <= (settings.pmsLength ?? 3)) return t('dashboard.pms_phase');
+        if (ovulationDiff !== null && ovulationDiff >= 0) return t('dashboard.luteal_phase');
+        return t('dashboard.follicular_phase');
+    };
+
     let baseTitle = t('dashboard.cycle_day', { day: dayOfCycle });
-    let baseSubtitle = t('dashboard.follicular_phase');
+    let baseTitleIsCycleDay = true;
+    let baseSubtitle = phaseLabel();
     let baseVariant: CycleStatusData['statusVariant'] = 'secondary';
     let baseDayOfPeriod: number | undefined = undefined;
     let basePeriodLength: number | undefined = undefined;
@@ -193,53 +222,36 @@ export const calculateCycleStatus = (
         baseSubtitle = t('dashboard.flow_logged');
         baseVariant = 'primary';
         baseDayOfPeriod = meta.dayOfPeriod;
-        basePeriodLength = settings.periodLength || 5;
+        basePeriodLength = predictions.periodLength || settings.periodLength || 5;
     } else if (dueInDays === 0) {
         // 5. Due Today
         baseTitle = t('dashboard.period_due', 'Period Due');
+        baseTitleIsCycleDay = false;
         baseSubtitle = t('dashboard.expected_today', 'Expected Today');
         baseVariant = 'warning';
     } else if (dueInDays === 1) {
         // 6. Due Tomorrow
         baseTitle = t('dashboard.period_soon');
+        baseTitleIsCycleDay = false;
         baseSubtitle = t('dashboard.expected_tomorrow');
         baseVariant = 'info';
     } else if (dueInDays !== null && dueInDays >= 2 && dueInDays <= 3) {
         // 7. Due in 2-3 Days
         baseTitle = t('dashboard.period_in', { count: dueInDays });
-        baseSubtitle = t('dashboard.luteal_phase');
+        baseTitleIsCycleDay = false;
+        baseSubtitle = phaseLabel();
         baseVariant = 'secondary';
     } else {
-        // 8. Normal Phase — determine actual phase from cycle position
+        // 8. Normal Phase
         baseTitle = t('dashboard.cycle_day', { day: dayOfCycle });
-
-        if (predictions.nextPeriodStart) {
-            const nextDay = new Date(predictions.nextPeriodStart);
-            nextDay.setHours(0, 0, 0, 0);
-            const daysUntilNext = Math.round((nextDay.getTime() - dayDate.getTime()) / (1000 * 3600 * 24));
-            const ovDay = new Date(nextDay);
-            ovDay.setDate(ovDay.getDate() - (settings.lutealPhaseLength || 14));
-            const isPastOvulation = dayDate.getTime() >= ovDay.getTime();
-
-            if (dueInDays !== null && dueInDays >= 4 && dueInDays <= 7) {
-                baseSubtitle = t('dashboard.pms_phase');
-                baseVariant = 'secondary';
-            } else if (isPastOvulation) {
-                baseSubtitle = t('dashboard.luteal_phase');
-                baseVariant = 'secondary';
-            } else {
-                baseSubtitle = t('dashboard.follicular_phase');
-                baseVariant = 'secondary';
-            }
-        } else {
-            baseSubtitle = t('dashboard.follicular_phase');
-            baseVariant = 'secondary';
-        }
+        baseSubtitle = phaseLabel();
+        baseVariant = 'secondary';
     }
 
     // --- Step D: Fertility Overlay Rules ---
     const hasFertility = fertilityEnabled && (fertilityBand === 'fertile' || fertilityBand === 'peak');
     let finalTitle = baseTitle;
+    let finalTitleIsCycleDay = baseTitleIsCycleDay;
     let finalSubtitle = baseSubtitle;
     let finalVariant: CycleStatusData['statusVariant'] = baseVariant;
 
@@ -253,12 +265,10 @@ export const calculateCycleStatus = (
 
     if (hasFertility) {
         finalTitle = t('dashboard.cycle_day', { day: dayOfCycle });
-        finalSubtitle = t('dashboard.fertile_window');
+        finalTitleIsCycleDay = true;
+        // Append rather than replace: the phase stays the headline, fertility qualifies it.
+        finalSubtitle = `${baseSubtitle} (${t('dashboard.fertile_window')})`;
         finalVariant = 'success';
-
-        // Remove period specific metadata from the card face if replaced?
-        // Logic says "Replace card copy". So we show "Day X" / "Fertile Window".
-        // We might lose 'Flow logged' subtitle but that seems intentional per "fertility wins visible messaging".
     }
 
 
@@ -287,13 +297,14 @@ export const calculateCycleStatus = (
 
     return {
         title: finalTitle,
+        titleIsCycleDay: finalTitleIsCycleDay,
         subtitle: finalSubtitle,
         chance: fertilityLabel,
         chanceVariant: fertilityLabelVariant,
         statusVariant: finalVariant,
         dayOfCycle,
         cycleLength: predictions.cycleLengthUsed || 28,
-        dayOfPeriod: hasFertility ? undefined : baseDayOfPeriod, // hide period dots when fertility copy wins
-        periodLength: hasFertility ? undefined : basePeriodLength
+        dayOfPeriod: baseDayOfPeriod,
+        periodLength: basePeriodLength
     };
 };

@@ -18,9 +18,13 @@ export function normalizeFirstDayOfWeek(value: unknown): FirstDayOfWeek | undefi
         : undefined;
 }
 
+// Persian and Arabic calendars conventionally start the week on Saturday. This is only
+// the default - the user can always override it in Settings.
+const SATURDAY_START_LANGUAGES = new Set(['fa', 'ar']);
+
 export function getLanguageDefaultFirstDayOfWeek(language: unknown): FirstDayOfWeek {
     const languageCode = typeof language === 'string' ? language.split('-')[0].toLowerCase() : '';
-    return languageCode === 'fa' ? 'saturday' : 'monday';
+    return SATURDAY_START_LANGUAGES.has(languageCode) ? 'saturday' : 'monday';
 }
 
 export function resolveFirstDayOfWeek(language: unknown, override: unknown): FirstDayOfWeek {

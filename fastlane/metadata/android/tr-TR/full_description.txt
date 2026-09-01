@@ -1,0 +1,33 @@
+Mooneva Cycle, tamamen çevrimdışı çalışan gizli bir regl takipçisi ve adet döngüsü takvimidir. Regl günlerini takip et, bir sonraki döngünü tahmin et, doğurgan pencereni ve yumurtlamanı izle, günlük belirti ve ruh halini kaydet — hesap açmadan ve telefonundan tek bir bayt bile çıkmadan.
+
+<b>Çevrimdışı olmak neden önemli</b>
+Çoğu regl takip uygulaması döngü verilerini şirket sunucularına yükler; oradan reklamverenlere satılabilir, bir veri sızıntısında açığa çıkabilir ya da kolluk kuvvetlerince talep edilebilir. Mooneva'nın hiç sunucusu yok. Verilerin cihazında PBKDF2 ve AES-GCM ile şifrelenir ve uygulama internet iznini bile istemez — iletilecek bir şey yok, teslim edilecek bir şey de yok.
+
+<b>Özellikler</b>
+<ul>
+<li>Uyarlanabilir tahminlerle regl ve adet döngüsü takibi</li>
+<li>Doğurgan pencere ve yumurtlama tahminleri</li>
+<li>PMS dönemi uyarıları</li>
+<li>Günlük kayıt: ruh hali, belirtiler, kanama yoğunluğu, akıntı, cinsellik ve libido</li>
+<li>Hap ve doğum kontrolü hatırlatıcıları — hap, bant, halka, iğne, spiral, implant</li>
+<li>Eğilimler, döngü geçmişi ve döngü gününe göre belirti ısı haritaları</li>
+<li>Doktorunla paylaşabileceğin klinik PDF raporu</li>
+<li>Doğum kontrolü modu — doğurganlığı gizler, çekilme kanamalarını etiketler</li>
+<li>Gebelik modu — tahminleri ve bildirimleri duraklatır</li>
+<li>Gizli mod — uygulamayı simgesi ve adıyla birlikte görev listesi gibi gösterir</li>
+<li>Ayarlanabilir zaman aşımıyla PIN kilidi</li>
+<li>Şifreli yedekleme ve geri yükleme</li>
+<li>Geçmişini drip, Flo ve Clue'dan içe aktarma</li>
+<li>Farsça (Celali) takvim ve tam sağdan sola desteği</li>
+<li>Haftanın ilk gününü seçebilme</li>
+<li>Koyu tema</li>
+</ul>
+
+<b>14 dilde mevcut</b>
+İngilizce, Almanca, İspanyolca, İsveççe, Çince, Farsça, Arapça, Türkçe, Fransızca, Ukraynaca, İtalyanca, Macarca, Rusça ve Portekizce.
+
+<b>Gizlilik</b>
+Hesap yok. Bulut yok. Analitik yok, çökme raporlayıcı yok, reklam SDK'sı yok, hiçbir türde üçüncü taraf hizmeti yok. Mooneva verilerini göremez, çünkü onları hiç almaz.
+
+<b>Açık Kaynak</b>
+GPL-3.0-or-later lisanslıdır. Tüm kaynak kodu GitHub'da mevcuttur.

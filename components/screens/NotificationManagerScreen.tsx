@@ -5,7 +5,9 @@ import { useMooneva } from '../../contexts/MoonevaContext';
 import { SettingRow, Toggle } from '../settings/SettingsUI';
 import type { ViewType } from '../../hooks/useAppNavigation';
 import {
+  canScheduleExactAlarms,
   isContraceptionReminderSchedulable,
+  openExactAlarmSettings,
   openNotificationSettings,
   REMINDER_DEFAULT_TIMES,
   requestNotificationPermission,
@@ -94,6 +96,15 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
       ? '4 weeks: in for 3 weeks, out for 1.'
       : 'Due date reminder; early warning optional.';
 
+  const promptExactAlarmIfNeeded = async () => {
+    if (await canScheduleExactAlarms()) return;
+    const msg = t(
+      'notifications.exact_alarm_message',
+      'Reminders may arrive late or not at all. Allow alarms & reminders in device settings for on-time delivery.',
+    );
+    if (confirm(msg)) await openExactAlarmSettings();
+  };
+
   const handleToggle = async (key: keyof AppSettings, currentValue: boolean) => {
     const nextState = !currentValue;
     if (nextState) {
@@ -105,6 +116,7 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
         }
         return;
       }
+      await promptExactAlarmIfNeeded();
     }
     updateSettings({ ...settings, [key]: nextState });
   };
@@ -126,6 +138,7 @@ export const NotificationManagerScreen: React.FC<NotificationManagerScreenProps>
       if (confirm(msg)) openNotificationSettings();
       return;
     }
+    await promptExactAlarmIfNeeded();
     const latestSettings = settingsRef.current;
     const latestReminder = latestSettings.contraceptionReminder ?? {
       enabled: false,

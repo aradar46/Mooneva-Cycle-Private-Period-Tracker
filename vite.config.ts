@@ -11,7 +11,11 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [react()],
       build: {
-        target: ['chrome67', 'safari12'],
+        // Must cover the oldest API actually used at runtime (esbuild only
+        // transpiles syntax, it doesn't polyfill APIs): crypto.randomUUID()
+        // needs Chrome 92 / Safari 15.4, Object.hasOwn needs Chrome 93 /
+        // Safari 15.4. Capacitor 8's supported WebView floor is newer still.
+        target: ['chrome93', 'safari15'],
       },
       resolve: {
         alias: {

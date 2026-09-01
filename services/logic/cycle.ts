@@ -5,13 +5,10 @@ const MIN_CYCLE_LENGTH = 18;
 const MAX_CYCLE_LENGTH = 45;
 /** Cycles longer than this are treated as tracking gaps (e.g. 153 days); excluded from averages, fertile hidden in UI */
 const OUTLIER_THRESHOLD_DAYS = 60;
-/** Max cycle length included in averages and eligible for prediction (long-normal 36–60 days) */
-const MAX_ELIGIBLE_CYCLE_DAYS = 60;
 export const MIN_GAP_DAYS = 3;
-export const CYCLE_GAP_THRESHOLD_DAYS = 2;
 
 // --- Date Utils ---
-import { addDays, diffInDays } from '../../utils/dateUtils';
+import { addDays, diffInDays, getTodayStr } from '../../utils/dateUtils';
 
 
 // --- Predicates ---
@@ -66,7 +63,7 @@ const clampAndRound = (value: number, min: number, max: number): number => {
 };
 
 /**
- * Normalizes and clamps cycle length to medically typical ranges (21-45 days).
+ * Normalizes and clamps cycle length to medically typical ranges (18-45 days).
  */
 const normalizeCycleLength = (length: number): number => clampAndRound(length, MIN_CYCLE_LENGTH, MAX_CYCLE_LENGTH);
 
@@ -84,10 +81,12 @@ const isCycleOutlier = (length: number): boolean =>
     length > OUTLIER_THRESHOLD_DAYS;
 
 /**
- * True if cycle is eligible for averages and fertile display (21–60 days: normal, short, long-normal).
+ * True if cycle is eligible for averages and fertile display (18–45 days). Matches
+ * normalizeCycleLength's clamp exactly - a longer cycle that made it here would
+ * otherwise be silently truncated to 45 rather than excluded.
  */
-const isCycleEligibleForAverage = (length: number): boolean =>
-    length >= MIN_CYCLE_LENGTH && length <= MAX_ELIGIBLE_CYCLE_DAYS;
+export const isCycleEligibleForAverage = (length: number): boolean =>
+    length >= MIN_CYCLE_LENGTH && length <= MAX_CYCLE_LENGTH;
 
 
 
@@ -117,8 +116,7 @@ export const getPastCycles = (
         const current = filtered[i];
         const next = filtered[i + 1];
 
-        // Use stored cycleLength if available, otherwise compute from gap
-        const cycleLength = current.cycleLength ?? diffInDays(next.startDate, current.startDate);
+        const cycleLength = diffInDays(next.startDate, current.startDate);
 
         // Use active bleeding days count for periodLength, keep full span for display
         const periodDuration = current.activeDays
@@ -144,7 +142,7 @@ export const getPastCycles = (
             // Ovulation = Next Period Start - Luteal
             ovulationDate = addDays(next.startDate, -lutealPhaseLength);
             fertileStart = addDays(ovulationDate, -5);
-            fertileEnd = addDays(ovulationDate, 1);
+            fertileEnd = ovulationDate; // window closes at ovulation
         }
 
         cycles.push({
@@ -170,7 +168,7 @@ export const getPastCycles = (
 
 /**
  * Filters past cycles to find "eligible" ones for adaptive prediction.
- * Criteria: length between 21 and 60 days (excludes gap cycles > 60).
+ * Criteria: length between 18 and 45 days (also excludes gap cycles > 60, via isOutlier).
  * Also excludes cycles marked as withdrawal bleeds (birth control).
  */
 export const getEligibleCycles = (cycles: Cycle[]): Cycle[] => {
@@ -185,10 +183,9 @@ export const getEligibleCycles = (cycles: Cycle[]): Cycle[] => {
 
 /**
  * Computes adaptive cycle and period lengths dynamically from history.
- * Logic:
- * - Use last N (9, 6, 3) eligible cycles.
- * - Trimmed mean if N >= 6.
- * - Simple mean if N = 3.
+ * Logic: requires at least MIN_ADAPTIVE_CYCLES (3) eligible cycles, then takes
+ * a plain (untrimmed) mean of the last 3 eligible cycles - regardless of how
+ * many more eligible cycles exist beyond that.
  */
 export const computeAdaptiveLengths = (eligibleCycles: Cycle[]) => {
     // We need at least 3 cycles to be safe
@@ -253,9 +250,9 @@ export const getCyclePredictions = (
             fertileWindow: null,
             pmsWindow: null,
             ovulationDate: null,
+            isStale: false,
             periodLength: settings.periodLength || 5, // Placeholder for strict mode
             cycleLengthUsed: settings.cycleLength || 28, // Placeholder for strict mode
-            healthStatus: 'paused',
             futurePredictions: [],
             ...emptyMeta
         };
@@ -268,10 +265,9 @@ export const getCyclePredictions = (
     if (sortedPeriods.length === 0) {
         return {
             lastPeriodStart: null, nextPeriodStart: null, nextPeriodEnd: null,
-            fertileWindow: null, pmsWindow: null, ovulationDate: null,
+            fertileWindow: null, pmsWindow: null, ovulationDate: null, isStale: false,
             periodLength: settings.periodLength || 5,
             cycleLengthUsed: settings.cycleLength || 28,
-            healthStatus: 'empty',
             futurePredictions: [],
             ...emptyMeta
         };
@@ -279,6 +275,7 @@ export const getCyclePredictions = (
 
     // 2. Forecast Next Cycle
     const lastPeriod = sortedPeriods[0]; // Newest
+    const todayStr = getTodayStr();
 
     // --- Adaptive Logic ---
     let forecastedCycleLength = settings.cycleLength;
@@ -301,11 +298,36 @@ export const getCyclePredictions = (
     const effectiveCycleLength = forecastedCycleLength;
     const effectivePeriodLength = forecastedPeriodLength;
 
+    // Ovulation is nextPeriodStart - lutealPhaseLength with no natural relationship
+    // to periodLength/cycleLength otherwise - an unclamped long luteal phase on a
+    // short cycle can put ovulation before the current period even ends. Clamp so
+    // ovulation never lands earlier than the period's last day.
+    const effectiveLutealPhaseLength = Math.min(
+        settings.lutealPhaseLength,
+        Math.max(1, effectiveCycleLength - effectivePeriodLength)
+    );
+
     // Note: Adaptive or Settings 
     // Predictions now rely on either strictly user settings or strictly adaptive history.
 
     // 3. Construct Prediction Results
-    const nextPeriodStart = addDays(lastPeriod.startDate, effectiveCycleLength);
+    //
+    // How stale the underlying record is, so the UI can say "no recent data" instead of
+    // counting an overdue figure nobody should act on.
+    const daysSinceLastPeriod = diffInDays(todayStr, lastPeriod.startDate);
+    const isStale = daysSinceLastPeriod > OUTLIER_THRESHOLD_DAYS;
+
+    // Only roll the forecast forward by whole cycles once the record is genuinely
+    // stale (isStale). Otherwise a merely-overdue period (a few days late) would
+    // vanish from its expected spot and jump a full cycle ahead - the forecast
+    // should stay put and simply read as overdue until it's actually stale.
+    const cyclesElapsed = isStale
+        ? Math.max(0, Math.floor(daysSinceLastPeriod / effectiveCycleLength))
+        : 0;
+    const nextPeriodStart = addDays(
+        lastPeriod.startDate,
+        effectiveCycleLength * (cyclesElapsed + 1)
+    );
     // Use effectiveLength
     const nextPeriodEnd = addDays(nextPeriodStart, effectivePeriodLength - 1);
 
@@ -314,9 +336,7 @@ export const getCyclePredictions = (
     // However, if we want the calendar cells to match, we might need to update replica.ts too 
     // or just trust that `cycleLengthUsed` returned here overrides UI display.
 
-    const ovulationDateStr = addDays(nextPeriodStart, -settings.lutealPhaseLength);
-
-    const healthStatus = 'standard'; // simplified for now
+    const ovulationDateStr = addDays(nextPeriodStart, -effectiveLutealPhaseLength);
 
     // Future Chain
     const futurePredictions = [];
@@ -331,14 +351,14 @@ export const getCyclePredictions = (
             // Just ensure we don't project indefinitely if something is broken.
 
             const pEnd = addDays(pStart, effectivePeriodLength - 1);
-            const ov = addDays(pStart, -settings.lutealPhaseLength);
+            const ov = addDays(pStart, -effectiveLutealPhaseLength);
 
             futurePredictions.push({
                 startDate: pStart,
                 endDate: pEnd,
                 ovulationDate: ov,
                 fertileStart: addDays(ov, -5),
-                fertileEnd: addDays(ov, 1),
+                fertileEnd: ov,
                 pmsStart: addDays(pStart, -settings.pmsLength),
                 pmsEnd: addDays(pStart, -1)
             });
@@ -361,16 +381,16 @@ export const getCyclePredictions = (
         },
         nextPeriodStart,
         nextPeriodEnd,
+        isStale,
         fertileWindow: (settings.isOnBirthControl || !settings.showFertileWindow) ? null : {
             start: addDays(ovulationDateStr, -5),
-            end: addDays(ovulationDateStr, 1)
+            end: ovulationDateStr
         },
         ovulationDate: (settings.isOnBirthControl || !settings.showFertileWindow) ? null : ovulationDateStr,
         pmsWindow: {
             start: addDays(nextPeriodStart, -settings.pmsLength),
             end: addDays(nextPeriodStart, -1)
         },
-        healthStatus,
         futurePredictions: (settings.isOnBirthControl || !settings.showFertileWindow)
             ? futurePredictions.map(p => ({ ...p, ovulationDate: null, fertileStart: null, fertileEnd: null }))
             : futurePredictions

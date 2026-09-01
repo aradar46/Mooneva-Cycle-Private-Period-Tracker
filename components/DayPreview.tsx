@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMooneva } from '../contexts/MoonevaContext';
 import { MOOD_OPTIONS } from '../types';
-import { toLocalISOString } from '../utils/dateUtils';
+import { toLocalISOString, addDays, diffInDays } from '../utils/dateUtils';
 import { hasDailyLogContent } from '../utils/dailyLogContent';
 
 interface DayPreviewProps {
@@ -13,18 +13,15 @@ interface DayPreviewProps {
 
 export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit }) => {
     const { t, i18n } = useTranslation();
-    const isRtl = i18n.language === 'fa';
+    const isRtl = i18n.dir?.() === 'rtl';
     const { logs, periods, model } = useMooneva();
     const { getDayMeta } = model;
 
     const log = logs[date];
     const meta = getDayMeta(date);
     const activePeriod = periods.find(p => {
-        const start = new Date(p.startDate);
-        const end = new Date(start);
-        end.setDate(end.getDate() + p.days - 1);
-        const current = new Date(date);
-        return current >= start && current <= end;
+        const end = addDays(p.startDate, p.days - 1);
+        return date >= p.startDate && date <= end;
     });
 
     const hasContent = hasDailyLogContent(log);
@@ -50,7 +47,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                     boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)'
                                 }}
                             >
-                                {t('log.day_x_of_y', { day: Math.floor((new Date(date).getTime() - new Date(activePeriod.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1, total: activePeriod.days })}
+                                {t('log.day_x_of_y', { day: diffInDays(date, activePeriod.startDate) + 1, total: activePeriod.days })}
                             </span>
                         )}
                         {log?.flow && (
@@ -72,7 +69,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                     </div>
                     {log?.mood && (
                         <div className="flex flex-wrap gap-2">
-                            {(Array.isArray(log.mood) ? log.mood : [log.mood]).map(m => {
+                            {log.mood.map(m => {
                                 const config = MOOD_OPTIONS.find(opt => opt.id === m);
                                 if (!config) return null;
                                 return (
@@ -107,7 +104,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
             {/* Content Body */}
             <div className="space-y-2 px-1">
                 {/* Symptoms & Vitals */}
-                {(log?.symptoms?.length > 0 || log?.discharge || log?.sexDrive || log?.sexType || log?.pillTakenAt || activePeriod?.isWithdrawalBleed || activePeriod?.ignoreForAverages) && (
+                {(log?.symptoms?.length > 0 || log?.discharge || log?.sexDrive || log?.sexType || log?.pillTakenAt || (log?.meds?.length ?? 0) > 0 || activePeriod?.isWithdrawalBleed || activePeriod?.ignoreForAverages) && (
                     <div className="flex flex-wrap items-center gap-1.5">
                         {log?.symptoms?.map((s) => (
                             <span key={s} className="day-preview-tag day-preview-tag-neutral text-[10px] font-bold text-slate-500 bg-white/50 px-2 py-0.5 rounded-full">
@@ -148,6 +145,11 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                 </span>
                             </span>
                         )}
+                        {log?.meds?.map((name) => (
+                            <span key={name.toLowerCase()} className="day-preview-tag day-preview-tag-med text-[10px] font-bold text-cyan-700 bg-cyan-50/60 px-2 py-0.5 rounded-full">
+                                {name}
+                            </span>
+                        ))}
                         {activePeriod?.isWithdrawalBleed && (
                             <span className="day-preview-tag day-preview-tag-pill text-[10px] font-bold text-indigo-600 bg-indigo-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter flex items-center gap-1">
                                 💊 {t('log.withdrawal_bleed_label')}
@@ -165,7 +167,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                 {log?.notes && (
                     <div className="relative group">
                         <div className="day-preview-note-rail absolute left-0 top-0 bottom-0 w-0.5 bg-slate-200 rounded-full" />
-                        <p className="day-preview-note-text text-[12px] text-slate-600 font-medium pl-3 py-0.5 leading-relaxed max-h-[80px] overflow-y-auto scrollbar-hide">
+                        <p className="day-preview-note-text text-[12px] text-slate-600 font-medium pl-3 py-0.5 leading-relaxed max-h-[140px] overflow-y-auto break-words whitespace-pre-wrap">
                             {log.notes}
                         </p>
                     </div>

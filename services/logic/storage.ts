@@ -16,26 +16,20 @@ import Logger from '../logger';
 import { SecureStoragePlugin } from 'capacitor-secure-storage-plugin';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { diffInDays } from '../../utils/dateUtils';
-import {
-    isAnyFlowDay,
-    isFullFlowDay,
-    CYCLE_GAP_THRESHOLD_DAYS
-} from './cycle';
 import { normalizeFirstDayOfWeek } from '../../utils/weekStart';
 
 // --- Constants ---
 const STORAGE_KEY_ENCRYPTED = 'mooneva_data_enc';
 const STORAGE_KEY_PERIODS = 'mooneva_periods_enc';
 const STORAGE_KEY_LEGACY = 'mooneva_data';
-const SETTINGS_KEY = 'mooneva_settings';
+const SETTINGS_KEY = 'mooneva_settings'; // legacy plaintext, migrated on load
+const SETTINGS_KEY_ENCRYPTED = 'mooneva_settings_enc';
 const PBKDF2_ITERATIONS_DEVICE = 100000;
 const PBKDF2_ITERATIONS_BACKUP_V1 = 100000;
 // OWASP-recommended minimum for PBKDF2-HMAC-SHA256. Backups are the only
 // password-derived keys in the app, so the iteration count actually matters here.
 const PBKDF2_ITERATIONS_BACKUP_V2 = 600000;
 const BACKUP_VERSION = 2;
-const DEVICE_LOCAL_SALT = "mooneva_local_salt_v1";
 const DEVICE_SECRET_KEY = 'mooneva_device_secret';
 
 const isPlainRecord = (value: unknown): value is Record<string, unknown> => {
@@ -97,6 +91,21 @@ const bytesToBase64 = (bytes: Uint8Array): string => {
     return btoa(chunks.join(''));
 };
 
+/**
+ * Older logs stored `mood` as a single string; it has been an array of MOOD_OPTIONS
+ * ids for a long time. Normalising here means every reader can assume string[] rather
+ * than repeating an Array.isArray dance, and the declared type can finally be honest.
+ */
+const migrateMoodToArray = (logs: Record<string, DailyLog>): Record<string, DailyLog> => {
+    for (const log of Object.values(logs)) {
+        const raw: unknown = (log as { mood?: unknown })?.mood;
+        if (raw !== undefined && !Array.isArray(raw)) {
+            (log as { mood?: string[] }).mood = raw ? [String(raw)] : [];
+        }
+    }
+    return logs;
+};
+
 export const loadData = async (): Promise<Record<string, DailyLog>> => {
     const encryptedBase64 = localStorage.getItem(STORAGE_KEY_ENCRYPTED);
 
@@ -105,7 +114,7 @@ export const loadData = async (): Promise<Record<string, DailyLog>> => {
         const legacyData = localStorage.getItem(STORAGE_KEY_LEGACY);
         if (legacyData) {
             try {
-                const parsed = JSON.parse(legacyData);
+                const parsed = migrateMoodToArray(JSON.parse(legacyData));
                 await saveData(parsed); // Migrate to encrypted
                 localStorage.removeItem(STORAGE_KEY_LEGACY);
                 return parsed;
@@ -129,13 +138,13 @@ export const loadData = async (): Promise<Record<string, DailyLog>> => {
         );
 
         const decoder = new TextDecoder();
-        const parsed = JSON.parse(decoder.decode(decrypted));
+        const parsed = migrateMoodToArray(JSON.parse(decoder.decode(decrypted)));
 
         // In a future update, we can handle DATA_SCHEMA_VERSION migrations here
         return parsed;
     } catch (e) {
         Logger.error("Failed to decrypt local data:", e);
-        return {};
+        throw e;
     }
 };
 
@@ -168,25 +177,45 @@ export const saveData = async (data: Record<string, DailyLog>) => {
     }
 };
 
-export const loadSettings = (): AppSettings => {
-    const settings = localStorage.getItem(SETTINGS_KEY);
-    const defaults: AppSettings = {
-        discreteMode: false,
-        darkNeumorphism: false,
-        userName: 'User',
-        onboardingCompleted: false,
-        symptoms: INITIAL_SYMPTOMS,
-        predictionsPaused: false,
-        isOnBirthControl: false,
-        // Prediction Settings
-        cycleLength: 28,
-        periodLength: 5,
-        lutealPhaseLength: 14,
-        pmsLength: 3,
-        showFertileWindow: true,
-        showPMS: true, // #20
-        adaptivePrediction: false
-    };
+export const DEFAULT_SETTINGS: AppSettings = {
+    discreteMode: false,
+    darkNeumorphism: false,
+    userName: 'User',
+    onboardingCompleted: false,
+    symptoms: INITIAL_SYMPTOMS,
+    predictionsPaused: false,
+    isOnBirthControl: false,
+    // Prediction Settings
+    cycleLength: 28,
+    periodLength: 5,
+    lutealPhaseLength: 14,
+    pmsLength: 3,
+    showFertileWindow: true,
+    showPMS: true, // #20
+    adaptivePrediction: false
+};
+
+export const loadSettings = async (): Promise<AppSettings> => {
+    const defaults = DEFAULT_SETTINGS;
+
+    const encryptedBase64 = localStorage.getItem(SETTINGS_KEY_ENCRYPTED);
+    let settings: string | null = null;
+
+    if (encryptedBase64) {
+        try {
+            const masterKey = await getDeviceMasterKey();
+            const combined = Uint8Array.from(atob(encryptedBase64), c => c.charCodeAt(0));
+            const iv = combined.slice(0, 12);
+            const data = combined.slice(12);
+            const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, masterKey, data);
+            settings = new TextDecoder().decode(decrypted);
+        } catch (e) {
+            Logger.error("Failed to decrypt settings:", e);
+            throw e;
+        }
+    } else {
+        settings = localStorage.getItem(SETTINGS_KEY);
+    }
 
     if (settings) {
         try {
@@ -244,6 +273,12 @@ export const loadSettings = (): AppSettings => {
                 };
             }
 
+            if (!encryptedBase64) {
+                // First read of a legacy plaintext blob: persist encrypted, drop the plaintext copy.
+                await saveSettings(normalizedSettings);
+                localStorage.removeItem(SETTINGS_KEY);
+            }
+
             return normalizedSettings;
         } catch (e) {
             Logger.error("Failed to load settings:", e);
@@ -253,23 +288,45 @@ export const loadSettings = (): AppSettings => {
     return defaults;
 };
 
-export const saveSettings = (settings: AppSettings) => {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+export const saveSettings = async (settings: AppSettings): Promise<void> => {
+    try {
+        const masterKey = await getDeviceMasterKey();
+        const encoder = new TextEncoder();
+        const encodedData = encoder.encode(JSON.stringify(settings));
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+
+        const encrypted = await crypto.subtle.encrypt(
+            { name: "AES-GCM", iv },
+            masterKey,
+            encodedData
+        );
+
+        const combined = new Uint8Array(iv.length + encrypted.byteLength);
+        combined.set(iv);
+        combined.set(new Uint8Array(encrypted), iv.length);
+
+        localStorage.setItem(SETTINGS_KEY_ENCRYPTED, bytesToBase64(combined));
+    } catch (e) {
+        Logger.error("Failed to save encrypted settings:", e);
+        throw e;
+    }
 };
 
-export const wipeAllData = () => {
+export const wipeAllData = async () => {
     localStorage.removeItem(STORAGE_KEY_ENCRYPTED);
     localStorage.removeItem(SETTINGS_KEY);
+    localStorage.removeItem(SETTINGS_KEY_ENCRYPTED);
     localStorage.removeItem(STORAGE_KEY_PERIODS);
     // Clear device secret keys for a full wipe
     localStorage.removeItem(DEVICE_SECRET_KEY);
     localStorage.removeItem(`${DEVICE_SECRET_KEY}_salt`);
     try {
-        SecureStoragePlugin.remove({ key: DEVICE_SECRET_KEY });
-        SecureStoragePlugin.remove({ key: `${DEVICE_SECRET_KEY}_salt` });
+        await SecureStoragePlugin.remove({ key: DEVICE_SECRET_KEY });
+        await SecureStoragePlugin.remove({ key: `${DEVICE_SECRET_KEY}_salt` });
     } catch (e) {
         // SecureStorage may not be available on web
     }
+    cachedMasterKeyPromise = null;
     window.location.reload();
 };
 
@@ -294,7 +351,7 @@ export const loadPeriods = async (): Promise<PeriodRecord[]> => {
         return JSON.parse(decoder.decode(decrypted));
     } catch (e) {
         Logger.error("Failed to decrypt periods:", e);
-        return [];
+        throw e;
     }
 };
 
@@ -326,39 +383,52 @@ export const savePeriods = async (periods: PeriodRecord[]) => {
 
 // --- Crypto & Security (Merged) ---
 
-const getDeviceMasterKey = async (): Promise<CryptoKey> => {
-    let secret: string | null = null;
-    let saltStr: string | null = null;
+const isKeyNotFoundError = (e: unknown): boolean => {
+    const message = typeof e === 'string' ? e : e instanceof Error ? e.message : '';
+    return message.toLowerCase().includes('does not exist');
+};
 
+/**
+ * Reads one device-secret part: secure storage first, the localStorage fallback
+ * second (the same place writeDeviceSecretPart falls back to when set() fails).
+ * Throws on an ambiguous secure-storage error with no local fallback, rather than
+ * letting the caller treat it as "absent" and mint (and overwrite) a new secret.
+ */
+const readDeviceSecretPart = async (key: string): Promise<string | null> => {
     try {
-        const result = await SecureStoragePlugin.get({ key: DEVICE_SECRET_KEY });
-        secret = result.value;
-        const saltResult = await SecureStoragePlugin.get({ key: `${DEVICE_SECRET_KEY}_salt` });
-        saltStr = saltResult.value;
+        const result = await SecureStoragePlugin.get({ key });
+        return result.value;
     } catch (e) {
-        // Falls back
+        const local = localStorage.getItem(key);
+        if (local) return local;
+        if (isKeyNotFoundError(e)) return null;
+        Logger.warn(`Ambiguous secure-storage read failure for ${key}`, e);
+        throw new Error(`Unable to read ${key}: secure storage error and no local fallback`);
     }
+};
 
+const writeDeviceSecretPart = async (key: string, value: string): Promise<void> => {
+    try {
+        await SecureStoragePlugin.set({ key, value });
+    } catch (e) {
+        Logger.warn(`Secure storage unavailable, falling back to localStorage for ${key}`);
+        localStorage.setItem(key, value);
+    }
+};
+
+const deriveDeviceMasterKey = async (): Promise<CryptoKey> => {
+    let secret = await readDeviceSecretPart(DEVICE_SECRET_KEY);
     if (!secret) {
         secret = Array.from(crypto.getRandomValues(new Uint8Array(32)))
             .map(b => b.toString(16).padStart(2, '0')).join('');
-        try {
-            await SecureStoragePlugin.set({ key: DEVICE_SECRET_KEY, value: secret });
-        } catch (e) {
-            Logger.warn('Secure storage unavailable, falling back to localStorage for device secret');
-            localStorage.setItem(DEVICE_SECRET_KEY, secret);
-        }
+        await writeDeviceSecretPart(DEVICE_SECRET_KEY, secret);
     }
 
+    let saltStr = await readDeviceSecretPart(`${DEVICE_SECRET_KEY}_salt`);
     if (!saltStr) {
         saltStr = Array.from(crypto.getRandomValues(new Uint8Array(16)))
             .map(b => b.toString(16).padStart(2, '0')).join('');
-        try {
-            await SecureStoragePlugin.set({ key: `${DEVICE_SECRET_KEY}_salt`, value: saltStr });
-        } catch (e) {
-            Logger.warn('Secure storage unavailable, falling back to localStorage for device salt');
-            localStorage.setItem(`${DEVICE_SECRET_KEY}_salt`, saltStr);
-        }
+        await writeDeviceSecretPart(`${DEVICE_SECRET_KEY}_salt`, saltStr);
     }
 
     const encoder = new TextEncoder();
@@ -373,7 +443,7 @@ const getDeviceMasterKey = async (): Promise<CryptoKey> => {
     return await crypto.subtle.deriveKey(
         {
             name: "PBKDF2",
-            salt: encoder.encode(saltStr || DEVICE_LOCAL_SALT),
+            salt: encoder.encode(saltStr),
             iterations: PBKDF2_ITERATIONS_DEVICE,
             hash: "SHA-256"
         },
@@ -382,6 +452,30 @@ const getDeviceMasterKey = async (): Promise<CryptoKey> => {
         false,
         ["encrypt", "decrypt"]
     );
+};
+
+// The device secret + salt never change once written, so the derived key is
+// always identical - deriving it fresh on every save/load is pure wasted CPU
+// (100k PBKDF2 rounds each time). Cache the promise, not just the resolved
+// key, so concurrent calls before the first derivation resolves share one
+// derivation instead of racing to start their own.
+let cachedMasterKeyPromise: Promise<CryptoKey> | null = null;
+
+const getDeviceMasterKey = async (): Promise<CryptoKey> => {
+    if (!cachedMasterKeyPromise) {
+        cachedMasterKeyPromise = deriveDeviceMasterKey().catch((e) => {
+            // Don't let a transient failure (e.g. secure storage glitch) wedge
+            // every future save/load for the rest of the session.
+            cachedMasterKeyPromise = null;
+            throw e;
+        });
+    }
+    return cachedMasterKeyPromise;
+};
+
+/** Test-only: clears the cached key so each test can start from a fresh derivation. */
+export const __resetDeviceMasterKeyCacheForTests = (): void => {
+    cachedMasterKeyPromise = null;
 };
 
 export const generateEncryptedBackup = async (data: BackupData, password: string): Promise<Blob> => {
@@ -423,14 +517,11 @@ export const decryptBackup = async (file: File, password: string): Promise<Backu
     const buffer = await file.arrayBuffer();
     const view = new Uint8Array(buffer);
 
-    let offset = 0;
     const version = view[0];
-    if (version === 1 || version === 2) {
-        offset = 1;
-    } else if (version > 2) {
+    if (version !== 1 && version !== 2) {
         throw new Error(`Unsupported backup version (v${version}). Please update the app to import this backup.`);
     }
-    // version 0 (legacy, no version byte): offset stays 0
+    const offset = 1;
 
     // v2 raised the iteration count; older backups must still decrypt with theirs.
     const iterations = version === 2
@@ -491,17 +582,39 @@ const readBlobAsText = (blob: Blob): Promise<string> => {
     });
 };
 
+// Generous cap for years of daily logs as JSON/encrypted text; guards against
+// an oversized file hanging the device on decrypt/parse. Shared with the
+// other-app import path, which reads whole files the same way.
+export const MAX_IMPORT_FILE_SIZE_BYTES = 50 * 1024 * 1024;
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const isValidBackupShape = (value: unknown): value is BackupData =>
+    isPlainObject(value) && isPlainObject(value.data) && isPlainObject(value.settings);
+
 export const restoreBackup = async (file: File, password?: string): Promise<BackupData> => {
-    if (password) {
-        return decryptBackup(file, password);
+    if (file.size > MAX_IMPORT_FILE_SIZE_BYTES) {
+        throw new Error("Backup file is too large (max 50MB).");
     }
-    // Plain JSON parsing
-    try {
-        const text = await readBlobAsText(file);
-        return JSON.parse(text);
-    } catch (e) {
+
+    let restored: unknown;
+    if (password) {
+        restored = await decryptBackup(file, password);
+    } else {
+        // Plain JSON parsing
+        try {
+            const text = await readBlobAsText(file);
+            restored = JSON.parse(text);
+        } catch (e) {
+            throw new Error("Invalid file format. Please ensure you uploaded a valid JSON backup, or check the box to decrypt if it is encrypted.");
+        }
+    }
+
+    if (!isValidBackupShape(restored)) {
         throw new Error("Invalid file format. Please ensure you uploaded a valid JSON backup, or check the box to decrypt if it is encrypted.");
     }
+    return restored;
 };
 
 // --- Backup Sharing (Merged) ---
@@ -511,7 +624,10 @@ export const shareOrDownloadBackup = async (blob: Blob, filename = 'mooneva-back
         // Convert Blob to Base64 for Capacitor
         const reader = new FileReader();
         reader.readAsDataURL(blob);
-        await new Promise((resolve) => (reader.onload = resolve));
+        await new Promise<void>((resolve, reject) => {
+            reader.onload = () => resolve();
+            reader.onerror = () => reject(reader.error ?? new Error('Failed to read backup file'));
+        });
         const base64Data = (reader.result as string).split(',')[1];
 
         // Write file to Cache Directory
@@ -560,7 +676,7 @@ export const cleanupStaleBackupFiles = async () => {
             directory: Directory.Cache,
         });
         for (const file of files.files) {
-            if (file.name.startsWith('mooneva-backup') || file.name.endsWith('.enc')) {
+            if (file.name.startsWith('mooneva-backup')) {
                 try {
                     await Filesystem.deleteFile({
                         path: file.name,

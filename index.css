@@ -152,7 +152,9 @@ body,
   --accent-soft: #7598a0;
   --shadow-raised: 8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8);
   --shadow-raised-sm: 4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8);
+  --shadow-raised-xs: 2px 2px 4px rgba(163, 177, 198, 0.35), -2px -2px 4px rgba(255, 255, 255, 0.7);
   --shadow-inset: inset 3px 3px 6px rgba(163, 177, 198, 0.4), inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+  --shadow-inset-xs: inset 1.5px 1.5px 3px rgba(163, 177, 198, 0.35), inset -1.5px -1.5px 3px rgba(255, 255, 255, 0.7);
 }
 
 body[data-theme="dark-neumorphism"] {
@@ -172,7 +174,9 @@ body[data-theme="dark-neumorphism"] {
   --cycle-spotting: #ff6b6b;
   --shadow-raised: 8px 8px 16px rgba(6, 9, 12, 0.7), -8px -8px 16px rgba(61, 71, 80, 0.5);
   --shadow-raised-sm: 4px 4px 8px rgba(6, 9, 12, 0.68), -4px -4px 8px rgba(61, 71, 80, 0.46);
+  --shadow-raised-xs: 2px 2px 4px rgba(6, 9, 12, 0.6), -2px -2px 4px rgba(61, 71, 80, 0.4);
   --shadow-inset: inset 4px 4px 8px rgba(6, 9, 12, 0.72), inset -4px -4px 8px rgba(61, 71, 80, 0.42);
+  --shadow-inset-xs: inset 1.5px 1.5px 3px rgba(6, 9, 12, 0.65), inset -1.5px -1.5px 3px rgba(61, 71, 80, 0.38);
   background-color: var(--app-bg);
   color: var(--text-primary);
 }
@@ -200,7 +204,8 @@ body[data-theme="dark-neumorphism"] [class~="bg-slate-50/80"],
 body[data-theme="dark-neumorphism"] [class~="bg-slate-50/50"],
 body[data-theme="dark-neumorphism"] [class~="bg-white/50"],
 body[data-theme="dark-neumorphism"] [class~="bg-gray-100"],
-body[data-theme="dark-neumorphism"] [class~="bg-gray-50/50"] {
+body[data-theme="dark-neumorphism"] [class~="bg-gray-50/50"],
+body[data-theme="dark-neumorphism"] [class*="bg-[#F0F4F6]"] {
   background-color: var(--surface-alt) !important;
 }
 
@@ -338,11 +343,6 @@ body[data-theme="dark-neumorphism"] .calendar-guide-section-flow {
   border-color: rgba(255, 138, 160, 0.42) !important;
 }
 
-body[data-theme="dark-neumorphism"] .calendar-guide-section-fertility {
-  color: #5eead4 !important;
-  border-color: rgba(94, 234, 212, 0.42) !important;
-}
-
 body[data-theme="dark-neumorphism"] .calendar-guide-section-logs {
   color: #a5b4fc !important;
   border-color: rgba(165, 180, 252, 0.42) !important;
@@ -451,19 +451,19 @@ body[data-theme="dark-neumorphism"] .timeline-cycle-length {
 
 /* Sex marker sits centered in the gap between the cell border and the centered
    date number. A 2-digit date at 15px is ~18px wide (half = 9px), so the icon's
-   right edge must stay left of calc(50% - 9px). Centering an 11px icon in that
-   gap gives left = (50% - 9px - 11px) / 2 = 25% - 10px, clamped to the border. */
+   right edge must stay left of calc(50% - 9px). Centering a 14px icon in that
+   gap gives left = (50% - 9px - 14px) / 2 = 25% - 11.5px, clamped to the border. */
 .calendar-sex-marker-edge {
-  width: 11px;
-  height: 11px;
-  left: max(0px, calc(25% - 10px));
+  width: 14px;
+  height: 14px;
+  left: max(0px, calc(25% - 11.5px));
 }
 
 @media (max-width: 379px) {
   .calendar-sex-marker-edge {
-    width: 8px;
-    height: 8px;
-    left: max(0px, calc(25% - 8.5px));
+    width: 10px;
+    height: 10px;
+    left: max(0px, calc(25% - 9.5px));
   }
 }
 
@@ -794,7 +794,8 @@ body[data-theme="dark-neumorphism"] [class*="!text-white"] {
   color: #ffffff !important;
 }
 
-body[data-theme="dark-neumorphism"] .text-blue-600 {
+body[data-theme="dark-neumorphism"] .text-blue-600,
+body[data-theme="dark-neumorphism"] .text-blue-800 {
   color: #7fb6ff !important;
 }
 
@@ -893,30 +894,6 @@ body[data-theme="dark-neumorphism"] #report-content [class*="border-slate-"] {
 
   100% {
     transform: scale(1);
-  }
-}
-
-@keyframes calendar-guide-pulse {
-  0%, 100% {
-    opacity: 0.72;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.04);
-  }
-}
-
-.calendar-guide-trigger-pulse {
-  display: inline-block;
-  transform-origin: left center;
-  animation: calendar-guide-pulse 2.8s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .calendar-guide-trigger-pulse {
-    animation: none;
   }
 }
 
@@ -1089,4 +1066,62 @@ body[data-theme="dark-neumorphism"] #report-content [class*="border-slate-"] {
 .animate-period-button {
   animation: period-button-pulse 7.5s ease-in-out infinite;
   will-change: transform, color;
+}
+
+@keyframes guide-button-color {
+  0%   { color: #f472b6; }
+  16%  { color: #fb923c; }
+  33%  { color: #facc15; }
+  50%  { color: #4ade80; }
+  66%  { color: #60a5fa; }
+  83%  { color: #c084fc; }
+  100% { color: #f472b6; }
+}
+
+.animate-guide-button {
+  animation: guide-button-color 7.5s ease-in-out infinite;
+  will-change: color;
+}
+
+/* --- Clinical report: PDF rasterisation --- */
+
+/* html2pdf slices one tall canvas into page-height strips, so a row straddling a
+   boundary gets drawn twice and overlaps itself. Keeping rows whole is enough;
+   the cycle blocks must stay breakable or a block taller than a page can never
+   be placed and html2pdf emits a blank page instead. */
+#report-content tr,
+#report-content thead {
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+#report-content .report-cycle {
+    break-inside: auto;
+    page-break-inside: auto;
+}
+
+/* The cycle header is two lines and always fits, so keep it whole - split across a
+   boundary it gets drawn on both pages. break-after keeps it with its table rather
+   than stranded alone at the foot of a page. */
+#report-content .report-cycle-head {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    break-after: avoid;
+    page-break-after: avoid;
+}
+
+/* Arabic and Persian letters join. letter-spacing severs the joins, and
+   html2canvas bakes that into the image - which is why the Persian headers came
+   out as detached glyphs. Tailwind's tracking-* utilities are all over this
+   report, so clear them wholesale for RTL rather than per element. */
+#report-content.report-rtl,
+#report-content.report-rtl * {
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+}
+
+/* Uppercasing does nothing for Persian but does defeat the shaper on some
+   fallback fonts. */
+#report-content.report-rtl * {
+    text-transform: none !important;
 }

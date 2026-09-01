@@ -35,7 +35,7 @@ export const DayCell: React.FC<DayCellProps> = ({
     idx,
     label
 }) => {
-    const hasFlow = meta.isBleeding;
+    const hasFlow = meta.isPeriodSpan;
     const isInsideSpan = meta.isPeriod;
     const isStart = meta.isCycleStart;
 
@@ -46,8 +46,8 @@ export const DayCell: React.FC<DayCellProps> = ({
     const isPredPeriod = isEditMode ? false : meta.isForecastPeriod;
     const isPredFertile = isEditMode ? false : meta.isFertile;
     const isOvulation = isEditMode ? false : meta.isOvulation;
-    // const isPMS = isEditMode ? false : meta.isPMS; // DEPRECATED
-    const isPMS = isEditMode ? false : (settings.showPMS && meta.isPMS);
+    // meta.isPMS already accounts for settings.showPMS (see useMoonevaModel.getDayMeta)
+    const isPMS = isEditMode ? false : meta.isPMS;
     const isToday = meta.isToday;
 
     const hasSymptoms = (meta.symptoms?.length || 0) > 0;
@@ -130,9 +130,9 @@ export const DayCell: React.FC<DayCellProps> = ({
         >
             <div className="relative w-full h-full flex items-center justify-center">
                 {/* Cycle Day Badge - top of the cell */}
-                {meta.header?.dayOfCycle && meta.header.dayOfCycle > 0 && !isEditMode && (
+                {meta.dayOfCycle && meta.dayOfCycle > 0 && !isEditMode && (
                     <span className="calendar-cycle-badge absolute top-[3px] left-1/2 -translate-x-1/2 text-[8px] font-extrabold text-slate-500/95 tracking-tight">
-                        {formatNumber(meta.header.dayOfCycle)}
+                        {formatNumber(meta.dayOfCycle)}
                     </span>
                 )}
                 {sexType && (
@@ -166,9 +166,9 @@ export const DayCell: React.FC<DayCellProps> = ({
                             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                         </svg>
                     )}
-                    {/* Pill taken - cyan capsule */}
-                    {log?.pillTakenAt && (
-                        <svg aria-label="Pill taken" role="img" className="w-[10px] h-[10px] text-cyan-500" viewBox="0 0 24 24" fill="currentColor">
+                    {/* Contraceptive pill taken - cyan capsule; other meds/supplements - violet capsule */}
+                    {(log?.pillTakenAt || (log?.meds?.length ?? 0) > 0) && (
+                        <svg aria-label={log?.pillTakenAt ? "Pill taken" : "Medication logged"} role="img" className={`w-[10px] h-[10px] ${log?.pillTakenAt ? 'text-cyan-500' : 'text-violet-400'}`} viewBox="0 0 24 24" fill="currentColor">
                             <path fillRule="evenodd" d="M19.5 6.5a3.5 3.5 0 0 0-7 0v11a3.5 3.5 0 1 0 7 0v-11ZM16 2a5.5 5.5 0 0 0-5.5 5.5v11a5.5 5.5 0 1 0 11 0v-11A5.5 5.5 0 0 0 16 2Zm-3.5 5.5v4.25h7V7.5a3.5 3.5 0 1 0-7 0Z" clipRule="evenodd" />
                         </svg>
                     )}

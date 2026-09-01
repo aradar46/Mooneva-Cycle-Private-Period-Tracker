@@ -7,6 +7,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
         registerPlugin(AppIconPlugin.class);
+        registerPlugin(ExactAlarmPlugin.class);
         registerPlugin(WidgetSyncPlugin.class);
         super.onCreate(savedInstanceState);
     }

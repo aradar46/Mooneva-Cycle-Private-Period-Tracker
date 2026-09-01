@@ -23,8 +23,8 @@ Die meisten Perioden-Apps laden deine Zyklusdaten auf Firmenserver hoch, wo sie 
 <li>Dunkles Design</li>
 </ul>
 
-<b>Verfügbar in 12 Sprachen</b>
-Englisch, Deutsch, Spanisch, Schwedisch, Chinesisch, Persisch, Französisch, Ukrainisch, Italienisch, Ungarisch, Russisch und Portugiesisch.
+<b>Verfügbar in 14 Sprachen</b>
+Englisch, Deutsch, Spanisch, Schwedisch, Chinesisch, Persisch, Arabisch, Türkisch, Französisch, Ukrainisch, Italienisch, Ungarisch, Russisch und Portugiesisch.
 
 <b>Datenschutz</b>
 Keine Konten. Keine Cloud. Keine Analyse-Tools, keine Absturzberichte, keine Werbe-SDKs, keine Dienste von Drittanbietern jeglicher Art. Mooneva kann deine Daten nicht einsehen, weil sie nie bei uns ankommen.

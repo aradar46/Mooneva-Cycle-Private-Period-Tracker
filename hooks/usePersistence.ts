@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DailyLog, AppSettings, INITIAL_SYMPTOMS, PeriodRecord } from '../types';
-import { loadData, saveData, loadSettings, saveSettings, loadPeriods, savePeriods, findNearbyPeriod, MIN_GAP_DAYS, cleanupStaleBackupFiles } from '../services/logic';
+import { loadData, saveData, loadSettings, saveSettings, loadPeriods, savePeriods, findNearbyPeriod, MIN_GAP_DAYS, cleanupStaleBackupFiles, DEFAULT_SETTINGS } from '../services/logic';
 import { addDays, diffInDays } from '../utils/dateUtils';
 import { hasDailyLogContent } from '../utils/dailyLogContent';
 import { hashPin } from '../utils/pin';
 import Logger from '../services/logger';
+import { App } from '@capacitor/app';
 
 // Simple helper to sort periods by start date
 const sortPeriods = (periods: PeriodRecord[]): PeriodRecord[] =>
@@ -15,13 +16,14 @@ interface UsePersistenceResult {
     periods: PeriodRecord[];
     settings: AppSettings;
     loading: boolean;
+    loadError: boolean;
     updateLog: (date: string, data: DailyLog) => Promise<void>;
     bulkUpdateLogs: (updates: Record<string, DailyLog>) => Promise<void>;
     deleteLog: (date: string) => Promise<void>;
     updateSettings: (newSettings: AppSettings) => void;
 
     // Onboarding logic moved to Context
-    startPeriod: (startDate: string, days?: number) => Promise<void>;
+    startPeriod: (startDate: string, days?: number, isWithdrawalBleed?: boolean) => Promise<void>;
     editPeriod: (id: string, days: number) => Promise<void>;
     deletePeriod: (id: string) => Promise<void>;
     toggleBleedingDay: (date: string, effectivePeriodLength?: number) => Promise<void>;
@@ -33,35 +35,84 @@ interface UsePersistenceResult {
 export const usePersistence = (): UsePersistenceResult => {
     const [logs, setLogs] = useState<Record<string, DailyLog>>({});
     const [periods, setPeriods] = useState<PeriodRecord[]>([]);
-    const [settings, setSettings] = useState<AppSettings>({
-        discreteMode: false,
-        darkNeumorphism: false,
-        userName: 'User',
-        onboardingCompleted: false,
-        symptoms: INITIAL_SYMPTOMS,
-        predictionsPaused: false,
-        isOnBirthControl: false,
-        // Prediction Settings
-        cycleLength: 28,
-        periodLength: 5,
-        lutealPhaseLength: 14,
-        pmsLength: 3,
-        showFertileWindow: true,
-        showPMS: true,
-    });
+    const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
     const [loading, setLoading] = useState(true);
 
     // Ref to always access latest logs without stale closures
     const logsRef = useRef(logs);
     useEffect(() => { logsRef.current = logs; }, [logs]);
 
+    const periodsRef = useRef(periods);
+    useEffect(() => { periodsRef.current = periods; }, [periods]);
+
+    // Clearing flow logs is a second state update, not part of deriving the next
+    // periods array - running it inside a setPeriods updater makes that updater
+    // impure, so StrictMode's double-invoke (and any discarded concurrent render)
+    // replays it. Callers decide which dates to clear, then call this as a sibling.
+    const clearFlowOnDates = useCallback((dates: string[]) => {
+        if (dates.length === 0) return;
+        setLogs(curr => {
+            let changed = false;
+            const next = { ...curr };
+            for (const d of dates) {
+                if (next[d]?.flow) {
+                    next[d] = { ...next[d], flow: null };
+                    changed = true;
+                }
+            }
+            return changed ? next : curr;
+        });
+    }, []);
+
+    const periodFlowDates = (p: PeriodRecord): string[] =>
+        Array.from({ length: p.days }, (_, i) => addDays(p.startDate, i));
+
+    const [loadError, setLoadError] = useState(false);
+    const logsLoadFailedRef = useRef(false);
+    const periodsLoadFailedRef = useRef(false);
+    const settingsLoadFailedRef = useRef(false);
+
+    const persistLogs = useCallback((data: Record<string, DailyLog>) => {
+        if (logsLoadFailedRef.current) {
+            Logger.warn('Skipping log save: initial load failed, refusing to overwrite possibly-undecrypted data');
+            return Promise.resolve();
+        }
+        return saveData(data);
+    }, []);
+
+    const persistPeriods = useCallback((data: PeriodRecord[]) => {
+        if (periodsLoadFailedRef.current) {
+            Logger.warn('Skipping period save: initial load failed, refusing to overwrite possibly-undecrypted data');
+            return Promise.resolve();
+        }
+        return savePeriods(data);
+    }, []);
+
+    const persistSettings = useCallback((data: AppSettings) => {
+        if (settingsLoadFailedRef.current) {
+            Logger.warn('Skipping settings save: initial load failed, refusing to overwrite possibly-undecrypted data');
+            return Promise.resolve();
+        }
+        return saveSettings(data);
+    }, []);
+
     // Initial Load
     useEffect(() => {
         const init = async () => {
+            let logsLoadFailed = false;
+            let periodsLoadFailed = false;
+            let settingsLoadFailed = false;
+
             try {
                 const loadedLogs = await loadData();
                 setLogs(loadedLogs);
-                const loadedSettings = loadSettings();
+            } catch (error) {
+                Logger.error("CRITICAL: Failed to load logs; refusing to overwrite on-disk data", error);
+                logsLoadFailed = true;
+            }
+
+            try {
+                const loadedSettings = await loadSettings();
 
                 // Repair symptoms: ensure all INITIAL_SYMPTOMS are present and remove "Others"
                 if (loadedSettings && loadedSettings.symptoms) {
@@ -74,7 +125,7 @@ export const usePersistence = (): UsePersistenceResult => {
 
                     if (missing.length > 0 || cleaned.length !== loadedSettings.symptoms.length) {
                         loadedSettings.symptoms = [...cleaned, ...missing];
-                        saveSettings(loadedSettings);
+                        await persistSettings(loadedSettings);
                     }
                 }
 
@@ -85,15 +136,19 @@ export const usePersistence = (): UsePersistenceResult => {
                         loadedSettings.pinHash = hash;
                         loadedSettings.pinSalt = salt;
                         delete loadedSettings.pin;
-                        saveSettings(loadedSettings);
+                        await persistSettings(loadedSettings);
                     } catch (e) {
                         Logger.error("Failed to migrate legacy PIN to salted hash:", e);
                     }
                 }
 
                 setSettings(loadedSettings);
+            } catch (error) {
+                Logger.error("Failed to load settings", error);
+                settingsLoadFailed = true;
+            }
 
-                // Load periods and normalize to ensure all have the new fields
+            try {
                 const loadedPeriods = await loadPeriods();
                 const normalized = loadedPeriods.map(p => ({
                     ...p,
@@ -102,33 +157,88 @@ export const usePersistence = (): UsePersistenceResult => {
                 }));
                 setPeriods(sortPeriods(normalized));
 
-                // Save normalized version if changed
                 if (JSON.stringify(normalized) !== JSON.stringify(loadedPeriods)) {
-                    savePeriods(normalized);
+                    persistPeriods(normalized);
                 }
-
-                // Clean up any stale backup export files from cache
-                cleanupStaleBackupFiles().catch(() => {});
-
             } catch (error) {
-                Logger.error("CRITICAL: Failed to load app data", error);
-            } finally {
-                setLoading(false);
+                Logger.error("CRITICAL: Failed to load periods; refusing to overwrite on-disk data", error);
+                periodsLoadFailed = true;
             }
+
+            logsLoadFailedRef.current = logsLoadFailed;
+            periodsLoadFailedRef.current = periodsLoadFailed;
+            settingsLoadFailedRef.current = settingsLoadFailed;
+            setLoadError(logsLoadFailed || periodsLoadFailed || settingsLoadFailed);
+
+            cleanupStaleBackupFiles().catch(() => {});
+            setLoading(false);
         };
         init();
     }, []);
 
     // --- Debounced Logic ---
+    // The debounce is what makes an edit losable: swipe the app away inside the window
+    // and the write never happens. flushPending below is the escape hatch, so the timer
+    // and the data it would have written are kept where the flush can reach them.
+    const pendingLogsSave = useRef<{ timer: ReturnType<typeof setTimeout>; data: Record<string, DailyLog> } | null>(null);
+    const pendingPeriodsSave = useRef<{ timer: ReturnType<typeof setTimeout>; data: PeriodRecord[] } | null>(null);
+
     useEffect(() => {
         if (loading) return;
 
         const timer = setTimeout(() => {
-            saveData(logs);
+            pendingLogsSave.current = null;
+            persistLogs(logs);
         }, 1000); // Debounce 1s
+        pendingLogsSave.current = { timer, data: logs };
 
         return () => clearTimeout(timer);
-    }, [logs, loading]);
+    }, [logs, loading, persistLogs]);
+
+    useEffect(() => {
+        if (loading) return;
+
+        const timer = setTimeout(() => {
+            pendingPeriodsSave.current = null;
+            persistPeriods(periods);
+        }, 1000); // Debounce 1s
+        pendingPeriodsSave.current = { timer, data: periods };
+
+        return () => clearTimeout(timer);
+    }, [periods, loading, persistPeriods]);
+
+    /** Write anything still sitting in the debounce window, right now. */
+    const flushPending = useCallback(async () => {
+        const logsSave = pendingLogsSave.current;
+        const periodsSave = pendingPeriodsSave.current;
+        pendingLogsSave.current = null;
+        pendingPeriodsSave.current = null;
+
+        const writes: Promise<unknown>[] = [];
+        if (logsSave) {
+            clearTimeout(logsSave.timer);
+            writes.push(persistLogs(logsSave.data));
+        }
+        if (periodsSave) {
+            clearTimeout(periodsSave.timer);
+            writes.push(persistPeriods(periodsSave.data));
+        }
+        await Promise.allSettled(writes);
+    }, [persistLogs, persistPeriods]);
+
+    // Android can kill a backgrounded WebView without further warning, so the pause
+    // event is the last reliable moment to get an edit onto disk.
+    useEffect(() => {
+        if (loading) return;
+
+        const listener = App.addListener('appStateChange', ({ isActive }) => {
+            if (!isActive) {
+                flushPending().catch(err => Logger.error('Failed to flush on background:', err));
+            }
+        });
+
+        return () => { listener.then(l => l.remove()).catch(() => {}); };
+    }, [loading, flushPending]);
 
     const updateLog = useCallback(async (date: string, data: DailyLog) => {
         setLogs(prev => {
@@ -223,13 +333,12 @@ export const usePersistence = (): UsePersistenceResult => {
                 }
 
                 if (changed) {
-                    savePeriods(updated);
                     return updated;
                 }
                 return prev;
             });
         }
-    }, [logs]);
+    }, [logs, settings.periodLength, settings.isOnBirthControl]);
 
     const bulkUpdateLogs = useCallback(async (updates: Record<string, DailyLog>) => {
         setLogs(prev => {
@@ -250,13 +359,13 @@ export const usePersistence = (): UsePersistenceResult => {
 
     const updateSettingsWrapper = useCallback((newSettings: AppSettings) => {
         setSettings(newSettings);
-        saveSettings(newSettings); // Settings are rare, instant save is fine/better
-    }, []);
+        persistSettings(newSettings).catch(err => Logger.error('Failed to persist settings:', err));
+    }, [persistSettings]);
 
 
 
     // --- Period CRUD ---
-    const startPeriod = useCallback(async (startDate: string, days?: number) => {
+    const startPeriod = useCallback(async (startDate: string, days?: number, isWithdrawalBleed?: boolean) => {
         setPeriods(prev => {
             const periodLen = days ?? settings.periodLength ?? 5;
             const newPeriod: PeriodRecord = {
@@ -264,13 +373,12 @@ export const usePersistence = (): UsePersistenceResult => {
                 startDate,
                 days: periodLen,
                 activeDays: Array.from({ length: periodLen }, (_, i) => i),
-                isWithdrawalBleed: settings.isOnBirthControl || false,
+                isWithdrawalBleed: isWithdrawalBleed ?? settings.isOnBirthControl ?? false,
                 ignoreForAverages: false
             };
             // Replace any existing period on this exact date (e.g. auto-created by updateLog)
             const filtered = prev.filter(p => p.startDate !== startDate);
             const updated = sortPeriods([...filtered, newPeriod]);
-            savePeriods(updated);
             return updated;
         });
     }, [settings.periodLength, settings.isOnBirthControl]);
@@ -279,7 +387,6 @@ export const usePersistence = (): UsePersistenceResult => {
         setPeriods(prev => {
             const updated = prev.map(p => p.id === id ? { ...p, days } : p);
             const resolved = sortPeriods(updated);
-            savePeriods(resolved);
             return resolved;
         });
     }, []);
@@ -287,7 +394,6 @@ export const usePersistence = (): UsePersistenceResult => {
     const updatePeriodWithdrawalBleed = useCallback(async (id: string, isWithdrawalBleed: boolean) => {
         setPeriods(prev => {
             const updated = prev.map(p => p.id === id ? { ...p, isWithdrawalBleed } : p);
-            savePeriods(updated);
             return updated;
         });
     }, []);
@@ -297,36 +403,31 @@ export const usePersistence = (): UsePersistenceResult => {
         setPeriods(prev => {
             const updated = prev.map(p => p.id === id ? { ...p, ignoreForAverages } : p);
             Logger.debug('Updated periods:', updated);
-            savePeriods(updated);
             return updated;
         });
     }, []);
 
     const deletePeriod = useCallback(async (id: string) => {
-        setPeriods(prev => {
-            const p = prev.find(item => item.id === id);
-            if (p) {
-                setLogs(curr => {
-                    const nextLogs = { ...curr };
-                    let changed = false;
-                    for (let i = 0; i < p.days; i++) {
-                        const d = addDays(p.startDate, i);
-                        if (nextLogs[d]?.flow) {
-                            nextLogs[d] = { ...nextLogs[d], flow: null };
-                            changed = true;
-                        }
-                    }
-                    return changed ? nextLogs : curr;
-                });
-            }
-
-            const updated = prev.filter(item => item.id !== id);
-            savePeriods(updated);
-            return updated;
-        });
-    }, []);
+        const target = periodsRef.current.find(item => item.id === id);
+        if (target) clearFlowOnDates(periodFlowDates(target));
+        setPeriods(prev => prev.filter(item => item.id !== id));
+    }, [clearFlowOnDates]);
 
     const toggleBleedingDay = useCallback(async (date: string, effectivePeriodLength?: number) => {
+        // Same lookup the updater does below, run against the current periods so the
+        // log clearing can happen outside it. Both read the same array, so they agree.
+        const containing = periodsRef.current.find(p =>
+            date >= p.startDate && date <= addDays(p.startDate, p.days - 1));
+        if (containing) {
+            const dayIdx = diffInDays(date, containing.startDate);
+            const activeDays = containing.activeDays
+                ?? Array.from({ length: containing.days }, (_, i) => i);
+            if (activeDays.includes(dayIdx)) {
+                // Removing day 0 removes the whole period, so its days clear too.
+                clearFlowOnDates(dayIdx === 0 ? periodFlowDates(containing) : [date]);
+            }
+        }
+
         setPeriods(prev => {
             let updated = [...prev];
 
@@ -341,36 +442,13 @@ export const usePersistence = (): UsePersistenceResult => {
                 let activeDays = p.activeDays ? [...p.activeDays] : Array.from({ length: p.days }, (_, i) => i);
 
                 if (activeDays.includes(dayIdx)) {
-                    // Removing a day
-
-                    // User Request (New): Clear flow log for this day if it exists
-                    setLogs(curr => {
-                        if (curr[date]?.flow) {
-                            return { ...curr, [date]: { ...curr[date], flow: null } };
-                        }
-                        return curr;
-                    });
+                    // Removing a day. The matching flow logs were already cleared above.
 
                     // User Request: If removing the START date (day 0), remove the entire period.
                     // This handles the "oops, wrong start date" case by clearing the auto-filled future days
                     // so the user can click the correct start date and get a fresh auto-fill.
                     if (dayIdx === 0) {
-                        // Clean up logs for the entire period being removed
-                        setLogs(curr => {
-                            const nextLogs = { ...curr };
-                            let changed = false;
-                            for (let i = 0; i < p.days; i++) {
-                                const d = addDays(p.startDate, i);
-                                if (nextLogs[d]?.flow) {
-                                    nextLogs[d] = { ...nextLogs[d], flow: null };
-                                    changed = true;
-                                }
-                            }
-                            return changed ? nextLogs : curr;
-                        });
-
                         updated.splice(pIdx, 1);
-                        savePeriods(sortPeriods(updated));
                         return updated;
                     }
 
@@ -471,7 +549,6 @@ export const usePersistence = (): UsePersistenceResult => {
             }
 
             const resolved = sortPeriods(updated);
-            savePeriods(resolved);
 
             // Note: We no longer auto-set flow in logs when editing period span.
             // The period record (activeDays) is the source of truth for "period span".
@@ -483,7 +560,6 @@ export const usePersistence = (): UsePersistenceResult => {
 
     const restorePeriods = useCallback((snapshot: PeriodRecord[]) => {
         setPeriods(snapshot);
-        savePeriods(snapshot);
     }, []);
 
 
@@ -491,6 +567,7 @@ export const usePersistence = (): UsePersistenceResult => {
         logs,
         settings,
         loading,
+        loadError,
         updateLog,
         bulkUpdateLogs,
         deleteLog,

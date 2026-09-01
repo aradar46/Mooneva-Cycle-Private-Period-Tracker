@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { formatNumber } from '../services/i18n';
 import { Cycle } from '../types';
 import { useCalendarSystem } from '../hooks/useCalendarSystem';
-import { getTodayStr } from '../utils/dateUtils';
+import { addDays, diffInDays, getTodayStr, parseLocalDate } from '../utils/dateUtils';
 
 interface TimelineViewProps {
   cycles: Cycle[];
@@ -18,33 +18,15 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
 
   // Format dates: "Jan 30 - Feb 2" or "Bahman 10 - 15"
   const formatPeriodRange = (startDateStr: string, length: number) => {
-    // 1. Get Gregorian Start Date
-    const start = new Date(startDateStr);
+    const start = parseLocalDate(startDateStr);
+    const end = parseLocalDate(addDays(startDateStr, length - 1));
 
-    // 2. Get Gregorian End Date
-    const end = new Date(startDateStr);
-    end.setDate(end.getDate() + length - 1);
-
-    // 3. Convert both to Target Calendar System
+    // Convert both to Target Calendar System
     const startParts = calendarSystem.toCalendarDate(start);
     const endParts = calendarSystem.toCalendarDate(end);
 
-    // 4. Format Month Names
-    // We can't use standard toLocaleDateString easily for Jalali month names unless we have the Polyfill, 
-    // but our hook provides `formatMonthYear`. We just need the Month Name.
-    // Let's extract month name from the hook's logic or add a helper. 
-    // Since formatMonthYear returns "Month Year", we can split it or just add a helper to hook.
-    // actually, let's just use the month index from startParts to get name if it's Jalali.
-
-    // Helper to get month name
-    const getMonthName = (year: number, month: number) => {
-      // This is a bit hacky, relying on the formatMonthYear implementation
-      const full = calendarSystem.formatMonthYear(year, month);
-      return full.split(' ')[0]; // "Bahman 1403" -> "Bahman"
-    };
-
-    const startMonth = getMonthName(startParts.year, startParts.month);
-    const endMonth = getMonthName(endParts.year, endParts.month);
+    const startMonth = calendarSystem.formatMonth(startParts.year, startParts.month);
+    const endMonth = calendarSystem.formatMonth(endParts.year, endParts.month);
 
     if (startParts.month === endParts.month) {
       return `${startMonth} ${formatNumber(startParts.day)} – ${formatNumber(endParts.day)}`;
@@ -93,13 +75,20 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
                   // Calculate percentages for bar segments using span for width
                   const periodWidth = Math.min(100, (spanLen / cycleLenForCalc) * 100);
 
-                  // Fertile Window (hidden for gap/short cycles – tracking gap, not used for predictions)
-                  const fertileStartDay = Math.max(0, cycleLenForCalc - 19);
-                  const fertileEndDay = Math.max(0, cycleLenForCalc - 13);
+                  // Fertile Window (hidden for gap/short cycles – tracking gap, not used for predictions).
+                  // Offsets come from the cycle's own fertileStart/fertileEnd, which getPastCycles
+                  // already derived from settings.lutealPhaseLength. Never re-derive them here.
+                  const fertileStartDay = cycle.fertileStart
+                    ? Math.max(0, diffInDays(cycle.fertileStart, cycle.startDate))
+                    : 0;
+                  const fertileEndDay = cycle.fertileEnd
+                    ? Math.min(cycleLenForCalc, diffInDays(cycle.fertileEnd, cycle.startDate) + 1)
+                    : 0;
                   const fertileDuration = Math.max(0, fertileEndDay - fertileStartDay);
                   const fertileLeft = (fertileStartDay / cycleLenForCalc) * 100;
                   const fertileWidth = (fertileDuration / cycleLenForCalc) * 100;
-                  const showFertile = !isInvalid && fertileWidth > 0;
+                  // fertileWindow is null on birth control / fertility hidden, matching the calendar.
+                  const showFertile = !isInvalid && fertileWidth > 0 && predictions.fertileWindow !== null;
 
                   return (
                     <div key={`${cycle.startDate}-${idx}`} className="flex flex-col">
@@ -143,6 +132,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
                         {/* Fertile Segment – hidden for gap cycles */}
                         {showFertile && (
                           <div
+                            data-testid="fertile-band"
                             className="absolute top-0 h-full bg-teal-400/30 flex items-center justify-center z-10"
                             style={{ left: `${fertileLeft}%`, width: `${fertileWidth}%` }}
                           >

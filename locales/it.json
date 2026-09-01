@@ -37,11 +37,17 @@
         "free": "Gratuita",
         "private": "Privata",
         "forever": "Per sempre",
-        "share_app": "Condividi l'app"
+        "share_app": "Condividi l'app",
+        "reload": "Ricarica",
+        "copy": "Copia",
+        "copied": "Copiato!",
+        "shop": "Negozio",
+        "navigation": "Navigazione"
     },
     "whats_new": {
         "title": "Novità",
-        "intro": "Dall’ultima versione:"
+        "intro": "Dall’ultima versione:",
+        "tip": "Mooneva sembra minimalista, ma le <b>Impostazioni</b> sono piene di strumenti potenti. Ti manca una funzione? Dacci un'occhiata: aggiorniamo spesso e aggiungiamo quelle richieste."
     },
     "share_message": {
         "text": "Scopri Mooneva. Un tracker del ciclo privato e offline dalla Svezia. Niente pubblicità, nessun tracciamento."
@@ -109,7 +115,7 @@
         "contraception_time": "Ora del promemoria",
         "contraception_warning_days": "Giorni di preavviso (facoltativo)",
         "contraception_standard_schedule": "I promemoria seguono il programma standard per questo metodo.",
-        "contraception_schedule_patch": "4 settimane: cambia 3 volte ogni settimana, poi rimuovi.",
+        "contraception_schedule_patch": "4 settimane: cambia ogni settimana per 3 settimane, poi rimuovi.",
         "contraception_schedule_ring": "4 settimane: inserito per 3, rimosso per 1.",
         "contraception_schedule_due": "Promemoria alla scadenza; preavviso opzionale.",
         "contraception_date_required": "Inserisci una data prima di attivare questo promemoria.",
@@ -120,7 +126,9 @@
         "contraception_warning_invalid": "Inserisci un numero intero di giorni di avviso da 0 a 365.",
         "remind_at": "Ricorda alle",
         "next_period_days": "Prossime mestruazioni – mancano {{count}} giorni",
-        "next_period_unknown": "Previsione delle prossime mestruazioni"
+        "next_period_unknown": "Previsione delle prossime mestruazioni",
+        "permission_denied_message": "Le notifiche sono disattivate. Attivale nelle impostazioni del dispositivo per ricevere i promemoria.",
+        "exact_alarm_message": "I promemoria potrebbero arrivare in ritardo o non arrivare affatto. Consenti sveglie e promemoria nelle impostazioni del dispositivo per riceverli in orario."
     },
     "nav": {
         "history": "Cronologia"
@@ -134,10 +142,17 @@
         "free_private_forever": "Gratuita. Privata. Per sempre.",
         "passion_not_ads": "I tuoi dati restano sul tuo dispositivo. Andiamo avanti con la passione, non con la pubblicità.",
         "story_title": "La nostra storia",
-        "story_body": "Mooneva è una startup femtech svedese che reinventa la cura del ciclo. Stiamo costruendo un ecosistema sostenibile, rispettoso del tuo corpo, del tuo portafoglio e del pianeta."
+        "story_body": "Mooneva è una startup femtech svedese che reinventa la cura del ciclo. Stiamo costruendo un ecosistema sostenibile, rispettoso del tuo corpo, del tuo portafoglio e del pianeta.",
+        "gift_modal_title": "Cura mestruale sostenibile",
+        "gift_modal_badge": "Buono del 25% per la community dell'app",
+        "voucher_button": "Buono del 25%",
+        "gift_modal_desc": "Dal monitoraggio del tuo ritmo alla cura del tuo corpo. Scopri i prodotti per la cura mestruale sostenibili e delicati di Mooneva con un regalo esclusivo del 25% per la community della nostra app.",
+        "visit_store": "Scopri il negozio Mooneva",
+        "eu_shipping_only": "Prodotti fisici • Spedizione solo nell'UE"
     },
     "dashboard": {
         "cycle_day": "Giorno {{day}}",
+        "cycle_day_progress": "Giorno {{day}}/<hl>{{total}}</hl>",
         "period_day": "Giorno {{day}} di mestruazioni",
         "period_late": "Mestruazioni in ritardo",
         "period_soon": "Mestruazioni imminenti",
@@ -175,12 +190,14 @@
         "adaptive_mode": "Modalità adattiva",
         "learning_mode": "Modalità apprendimento",
         "cycle_count_one": "{{count}} ciclo",
-        "cycle_count_other": "{{count}} cicli"
+        "cycle_count_other": "{{count}} cicli",
+        "no_recent_data": "Nessun dato recente",
+        "log_to_resume": "Registra un ciclo per riprendere le previsioni"
     },
     "discrete": {
         "title": "Le mie attività",
         "subtitle": "{{count}} elementi in scadenza oggi",
-        "backlog": "Attività del progetto",
+        "backlog": "Attività arretrate del progetto",
         "task1": "Rivedere la presentazione del progetto",
         "task2": "Aggiornare le etichette del foglio di calcolo",
         "task3": "Contattare il fornitore per la fattura"
@@ -208,7 +225,8 @@
         },
         "guide": {
             "show": "Mostra guida",
-            "hide": "Nascondi guida"
+            "hide": "Nascondi guida",
+            "label": "Guida"
         },
         "period_question": "Mestruazioni?",
         "edit_period": "Modifica mestruazioni",
@@ -225,8 +243,7 @@
         "how_to_log_period_tip": "Per <strong>aggiungere mestruazioni passate</strong>, scorri prima a un mese precedente.",
         "how_to_log_daily_title": "Registra i sintomi giornalieri",
         "how_to_log_daily_body": "<strong>Tocca</strong> (per aggiungere) o <strong>tocca due volte</strong> (per modificare) un giorno qualsiasi del calendario.",
-        "category_flow": "Flusso e sanguinamento",
-        "category_fertility": "Fertilità",
+        "category_flow": "Ciclo",
         "category_logs": "Dettagli del registro",
         "legend": {
             "show": "Mostra legenda",
@@ -243,7 +260,7 @@
             "pms": "Giorni premestruali",
             "spotting": "Spotting",
             "symptoms": "Sintomi",
-            "pill_logged": "Pillola registrata",
+            "pill_logged": "Pillola (ciano) / altri farmaci (viola)",
             "protected_sex": "Rapporto protetto",
             "unprotected_sex": "Rapporto non protetto",
             "notes": "Note del giorno",
@@ -251,7 +268,8 @@
             "selected": "Giorno selezionato",
             "orphan_flow": "Flusso (senza mestruazioni)",
             "withdrawal_bleed": "Emorragia da sospensione (da pillola)"
-        }
+        },
+        "category_other": "Altro"
     },
     "log": {
         "daily_log": "Registro giornaliero",
@@ -271,12 +289,16 @@
         "flow": "Intensità del flusso",
         "flow_tab": "Flusso",
         "vitals_tab": "Corpo",
-        "pill_tab": "Pillola",
+        "pill_tab": "Farmaci",
         "pill_taken": "Pillola presa",
+        "pill_taken_hint": "La tua pillola anticoncezionale",
         "pill_time": "Orario pillola",
         "pill_badge": "Pillola",
         "pill_taken_at": "Pillola presa alle {{time}}",
         "pill_report_label": "Pillola",
+        "meds_add": "Aggiungi farmaco o integratore",
+        "meds_hint": "Antidolorifici, altri farmaci o integratori",
+        "meds_report_label": "Farmaci",
         "intensity_spotting": "Spot",
         "intensity_light": "Leggero",
         "intensity_medium": "Medio",
@@ -292,9 +314,9 @@
         "symptoms_primary": "I 6 principali",
         "symptoms_secondary": "Corpo e intestino",
         "secretions": "Secrezioni",
-        "discharge_dry": "Assenti",
+        "discharge_dry": "Asciutte",
         "discharge_sticky_creamy": "Collose/cremose",
-        "discharge_egg_white": "Chiara d'uovo",
+        "discharge_egg_white": "A chiara d'uovo",
         "discharge_unusual": "Insolite",
         "sex_libido": "Sesso e libido",
         "libido": "Libido",
@@ -330,7 +352,8 @@
         "withdrawal_bleed_label": "Emorragia da sospensione",
         "excluded_label": "Escluso",
         "day_x_of_y": "Giorno {{day}} di {{total}}",
-        "no_period_advanced": "Questa data non fa parte di un periodo mestruale. Inizia o seleziona un giorno di mestruazioni per accedere alle opzioni avanzate."
+        "no_period_advanced": "Questa data non fa parte di un periodo mestruale. Inizia o seleziona un giorno di mestruazioni per accedere alle opzioni avanzate.",
+        "daily_log_tabs": "Schede del registro giornaliero"
     },
     "settings": {
         "language": "Lingua",
@@ -398,7 +421,7 @@
         "set_backup_pwd": "Imposta password del backup",
         "enter_import_pwd": "Inserisci la password per importare",
         "export_doctor_title": "Esporta per il medico",
-        "export_doctor_desc": "Referto PDF (parametri vitali e cronologia)",
+        "export_doctor_desc": "Referto PDF (sintomi e cronologia del ciclo)",
         "nuclear_option": "Opzione estrema: cancella tutti i dati",
         "archive_confirm": "Questa operazione azzererà le tue previsioni ignorando tutta la cronologia precedente a oggi. I dati vecchi resteranno visibili nel calendario, ma l'algoritmo ripartirà da zero. Continuare?",
         "import_confirm": "Questa operazione sovrascriverà i tuoi dati attuali con il backup. Vuoi davvero continuare?",
@@ -418,8 +441,8 @@
         "pins_dont_match": "I PIN non coincidono.",
         "wipe_confirm": "Sei sicura?",
         "feedback_title": "Aiutaci a creare qualcosa che ami",
-        "feedback_desc": "Raccontacelo in 30 secondi.",
-        "feedback_button": "Invia un'email",
+        "feedback_desc": "Hai trovato un bug, hai un'idea per una funzione o notato una traduzione sbagliata? Diccelo in 30 secondi.",
+        "feedback_button": "Invia feedback",
         "data_management_title": "Gestione dei dati",
         "create_backup": "Crea backup",
         "save_to_file": "Salva i tuoi dati in un file",
@@ -502,10 +525,9 @@
         "report_footer_new": "Mooneva Cycle: tracker del ciclo privato",
         "birth_control_sub_desc": "Nascondi la fertilità, contrassegna i sanguinamenti come emorragia da sospensione",
         "birth_control_pill_hint": "Ideale per chi usa pillola combinata, anello o cerotto.",
-        "pause_predictions_full_desc": "Sospendi tutte le previsioni (gravidanza, irregolarità, ecc.) — ad esempio in caso di gravidanza o se preferisci non vedere le stime.",
+        "pause_predictions_full_desc": "Sospendi tutte le previsioni (gravidanza, irregolarità, ecc.), ad esempio in caso di gravidanza o se preferisci non vedere le stime.",
         "adaptive_prediction_label": "Previsione adattiva",
         "adaptive_prediction_desc_long": "Calcola la media degli ultimi 3 cicli per prevedere la lunghezza del ciclo",
-        "fixed_prediction_hint": "Le previsioni seguono la lunghezza del ciclo impostata",
         "cycle_length_label": "Lunghezza del ciclo",
         "cycle_length_desc": "Giorni tra una mestruazione e l'altra",
         "period_length_label": "Durata delle mestruazioni",
@@ -517,7 +539,20 @@
         "cycle_config_section": "Configurazione del ciclo",
         "on_bc_disabled": "Disattivato durante la contraccezione",
         "bc_protected_msg": "🛡️ Modalità protetta attiva. Monitoraggio della fertilità disattivato.",
-        "unarchive": "Ripristina dall'archivio"
+        "unarchive": "Ripristina dall'archivio",
+        "community_care": "Community e cura",
+        "member_gift_title": "Regalo per la community dell'app",
+        "member_gift_desc": "Buono esclusivo del 25% sulla cura mestruale Mooneva",
+        "pin_locked_out": "Troppi tentativi falliti. Riprova tra {{seconds}} s.",
+        "plaintext_backup_warning": "Attenzione: questo file di backup NON sarà protetto da password. Chiunque riceva questo file potrà leggere in chiaro tutta la tua cronologia sanitaria.",
+        "cycle_ongoing": "In corso",
+        "tracking_gap": "Interruzione del tracciamento (non registrato)",
+        "cycle_day_n": "Giorno {{count}}",
+        "report_range": "Intervallo di date",
+        "report_range_from": "Data di inizio",
+        "report_range_to": "Data di fine",
+        "report_range_max": "Max 12 mesi",
+        "report_share_failed": "Impossibile condividere il PDF. Prova un intervallo di date più breve."
     },
     "trends": {
         "header": "Analisi",
@@ -534,6 +569,7 @@
         "90d": "3 mesi",
         "180d": "6 mesi",
         "year": "1 anno",
+        "completed_cycles_note": "Questa pagina mostra solo i dati dei cicli conclusi. Il ciclo in corso viene aggiunto quando inizia la prossima mestruazione.",
         "cycle_regularity": "Regolarità del ciclo",
         "average_label": "Media: {{count}} giorni",
         "regular": "Regolare",
@@ -571,7 +607,7 @@
         "need_data_chart": "Registra almeno 2 cicli per vedere questo grafico.",
         "need_data_flow": "Registra più dati sul flusso per vedere gli andamenti.",
         "need_data_mood": "Registra l'umore durante il ciclo per vedere gli andamenti emotivi.",
-        "pill_timeline": "Cronologia della pillola",
+        "pill_timeline": "Cronologia dei farmaci",
         "pill_taken": "Pillola presa",
         "pill_low": "Dimenticata",
         "pill_high": "Presa"
@@ -651,10 +687,10 @@
         "get_started": {
             "title": "Ecco come iniziare",
             "period_card_title": "Registra le mestruazioni",
-            "period_card_body": "Tocca il pulsante qui sotto, poi tocca i giorni per aggiungerli o rimuoverli. Tocca Fatto quando hai finito.",
-            "period_card_tip": "Scorri fino a un mese passato per registrare mestruazioni precedenti.",
+            "period_card_body": "Tocca \"Mestruazioni?\" → tocca i giorni per aggiungerli o rimuoverli → tocca Fatto.",
+            "period_card_tip": "Per aggiungere mestruazioni passate, scorri prima fino a un mese precedente.",
             "daily_card_title": "Registra i sintomi giornalieri",
-            "daily_card_body": "Tocca un giorno qualsiasi del calendario per registrare umore, sintomi o note.",
+            "daily_card_body": "Tocca un giorno per visualizzarne l'anteprima. Tocca di nuovo per modificarlo.",
             "cta": "Iniziamo"
         }
     },
@@ -662,7 +698,10 @@
         "backup_password": "Imposta una password per proteggere il tuo backup.",
         "backup_error": "Si è verificato un problema durante la creazione del backup protetto. Riprova.",
         "import_password": "Inserisci la password che hai usato per cifrare questo file.",
-        "decryption_failed": "Password errata o file danneggiato. Verifica la password e riprova."
+        "decryption_failed": "Password errata o file danneggiato. Verifica la password e riprova.",
+        "load_failed_title": "Impossibile sbloccare i tuoi dati",
+        "load_failed_desc": "I tuoi dati sono ancora su questo dispositivo e non sono stati modificati. Di solito basta riavviare l'app.",
+        "import_too_large": "Il file è troppo grande per essere importato (max 50 MB)."
     },
     "months": {
         "jan": "Gen",
@@ -687,7 +726,7 @@
         "acne": "Acne",
         "backache": "Mal di schiena",
         "nausea": "Nausea",
-        "digestion": "Digestione",
+        "digestion": "Disturbi digestivi",
         "insomnia": "Insonnia",
         "cravings": "Voglie",
         "joint pain": "Dolori articolari",

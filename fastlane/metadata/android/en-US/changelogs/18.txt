@@ -1,0 +1,5 @@
+You can now log medications and supplements alongside mood, symptoms and flow.
+
+Your entries are saved the moment you leave the app, so nothing is lost if you switch away right after typing. Coming back after a long break works properly again too: no more empty calendar and wildly overdue period, and predictions resume as soon as you log one.
+
+Also: date fixes across timezones, safer imports from Flo and Clue, settings now encrypted on your device, and 19 more strings translated.

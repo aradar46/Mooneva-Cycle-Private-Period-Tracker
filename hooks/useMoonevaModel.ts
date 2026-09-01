@@ -1,9 +1,57 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
 import { DailyLog, AppSettings, Cycle, PredictionResults, DayMeta, PeriodRecord } from '../types';
 import { getPastCycles, getCyclePredictions } from '../services/logic';
 import { toLocalISOString, addDays, diffInDays } from '../utils/dateUtils';
-import { calculateCycleStatus } from '../services/logic/status';
+import { calculateCycleStatus, computeDayOfCycle } from '../services/logic/status';
+import type { CycleStatusData } from '../services/logic/status';
 import { useTranslation } from 'react-i18next';
+
+/**
+ * Spotting logged right after a period ends extends that period. Hoisted out of
+ * getDayMeta: it captures nothing, and re-creating it per call meant one closure
+ * allocation for every calendar cell on every render.
+ */
+const findTrailingSpottingPeriod = (
+    dateStr: string,
+    logs: Record<string, DailyLog>,
+    periods: PeriodRecord[]
+): PeriodRecord | null => {
+    let checkDate = dateStr;
+    let daysBack = 0;
+    const maxSpottingChain = 7;
+
+    while (daysBack < maxSpottingChain) {
+        const prevDate = addDays(checkDate, -1);
+        const prevLog = logs[prevDate];
+
+        const periodEndingYesterday = periods.find(p =>
+            prevDate === addDays(p.startDate, p.days - 1));
+        if (periodEndingYesterday) return periodEndingYesterday;
+
+        if (prevLog?.flow === 'spotting') {
+            checkDate = prevDate;
+            daysBack++;
+        } else {
+            break;
+        }
+    }
+    return null;
+};
+
+/**
+ * Latest period starting on or before dateStr. A single pass rather than
+ * filter().sort()[0]: same answer, no sortedness assumption, and no two throwaway
+ * arrays per calendar cell.
+ */
+const findAnchorStart = (periods: PeriodRecord[], dateStr: string): string | undefined => {
+    let anchor: string | undefined;
+    for (const p of periods) {
+        if (p.startDate <= dateStr && (anchor === undefined || p.startDate > anchor)) {
+            anchor = p.startDate;
+        }
+    }
+    return anchor;
+};
 
 export interface MoonevaModel {
     // Data
@@ -12,6 +60,9 @@ export interface MoonevaModel {
 
     // Helpers
     getDayMeta: (dateStr: string) => DayMeta;
+    /** Full localized status for one day. Only the dashboard header needs this;
+     *  calendar cells read meta.dayOfCycle instead. */
+    getDayStatus: (dateStr: string) => CycleStatusData;
 
     // Exposed model properties
     lastPeriodStart: string | null;
@@ -28,6 +79,22 @@ export const useMoonevaModel = (
     settings: AppSettings
 ): MoonevaModel => {
     const { t } = useTranslation();
+
+    // getDayMeta reads new Date() fresh on every call, so isToday is always
+    // correct *when called* - but nothing re-renders the app at midnight on
+    // its own, so a screen left open overnight keeps showing yesterday's
+    // isToday until some unrelated state change happens to trigger a
+    // re-render. This state ticks once at the next local midnight (and
+    // reschedules itself) purely to force that re-render.
+    const [todayStr, setTodayStr] = useState(() => toLocalISOString(new Date()));
+    useEffect(() => {
+        const now = new Date();
+        const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+        const timer = setTimeout(() => {
+            setTodayStr(toLocalISOString(new Date()));
+        }, nextMidnight.getTime() - now.getTime());
+        return () => clearTimeout(timer);
+    }, [todayStr]);
 
     // 1. History (Past)
     const cycles = useMemo(() => {
@@ -78,40 +145,6 @@ export const useMoonevaModel = (
             }
         }
 
-        // Check for trailing spotting that should extend the period
-        // If spotting is logged immediately after a period ends, treat it as part of that period
-        const findTrailingSpottingPeriod = (
-            dateStr: string,
-            logs: Record<string, DailyLog>,
-            periods: PeriodRecord[]
-        ): PeriodRecord | null => {
-            let checkDate = dateStr;
-            let daysBack = 0;
-            const maxSpottingChain = 7;
-
-            while (daysBack < maxSpottingChain) {
-                const prevDate = addDays(checkDate, -1);
-                const prevLog = logs[prevDate];
-
-                // Check if prevDate is the end of a period
-                const periodEndingYesterday = periods.find(p => {
-                    const end = addDays(p.startDate, p.days - 1);
-                    return prevDate === end;
-                });
-
-                if (periodEndingYesterday) return periodEndingYesterday;
-
-                // If prevDate was also spotting, continue checking back
-                if (prevLog?.flow === 'spotting') {
-                    checkDate = prevDate;
-                    daysBack++;
-                } else {
-                    break;
-                }
-            }
-            return null;
-        };
-
         // ... inside getDayMeta ...
         // Check for trailing spotting that should extend the period
         // If spotting is logged immediately after a period ends, treat it as part of that period
@@ -127,7 +160,8 @@ export const useMoonevaModel = (
             isToday: dateStr === todayStr,
             isValidMonth: true,
             isPeriod: isInsidePeriod || isTrailingSpotting,
-            isBleeding: isBleeding || isTrailingSpotting,
+            isBleeding, // strict: excludes trailing spotting (isFullFlowDay excludes it too)
+            isPeriodSpan: isBleeding || isTrailingSpotting,
             isCycleStart,
             isSpotting: log?.flow === 'spotting', // Show spotting indicator even for period-extension days
             isForecastPeriod: false,
@@ -140,14 +174,13 @@ export const useMoonevaModel = (
             isWithdrawalBleed: activePeriod?.isWithdrawalBleed || trailingSpottingPeriod?.isWithdrawalBleed,
             intensity: log?.flow,
             symptoms: log?.symptoms,
-            mood: log?.mood ? (Array.isArray(log.mood) ? log.mood : [log.mood]) : []
+            mood: log?.mood ?? []
         };
 
         // Calculate Day of Period if active
         if (meta.isPeriod) {
             if (activePeriod) {
-                const diff = Math.floor((new Date(dateStr).getTime() - new Date(activePeriod.startDate).getTime()) / (86400000)) + 1;
-                meta.dayOfPeriod = diff;
+                meta.dayOfPeriod = diffInDays(dateStr, activePeriod.startDate) + 1;
             } else if (trailingSpottingPeriod) {
                 // For trailing spotting, calculate day relative to the period it extends
                 const periodActiveDays = trailingSpottingPeriod.activeDays?.length || trailingSpottingPeriod.days;
@@ -198,34 +231,39 @@ export const useMoonevaModel = (
             }
             if (predictions.ovulationDate === dateStr) meta.isOvulation = true;
 
-            if (predictions.pmsWindow) {
+            if (settings.showPMS && predictions.pmsWindow) {
                 if (dateStr >= predictions.pmsWindow.start && dateStr <= predictions.pmsWindow.end) {
                     meta.isPMS = true;
                 }
             }
         }
 
-        // Calculate Anchor Date (Correct Cycle Start) for this specific view date
-        // Instead of always using "lastPeriodStart" (which is global latest),
-        // we find the latest period that started ON or BEFORE the view date.
-        // This fixes negative cycle days when viewing dates before a future period.
-        const anchorPeriod = periods
-            .filter(p => p.startDate <= dateStr)
-            .sort((a, b) => b.startDate.localeCompare(a.startDate))[0];
-
-        const anchorDate = anchorPeriod ? anchorPeriod.startDate : undefined;
-
-        // Attach Header Status
-        meta.header = calculateCycleStatus(meta, predictions, settings, t, anchorDate);
+        // Anchor on the latest period starting on or before this date, not the global
+        // latest, so dates before a future period don't get negative cycle days.
+        // Cells only need the day number; the full status is getDayStatus below.
+        if (!settings.predictionsPaused && !predictions.isStale) {
+            meta.dayOfCycle = computeDayOfCycle(
+                dateStr,
+                findAnchorStart(periods, dateStr) ?? predictions.lastPeriodStart,
+                predictions.cycleLengthUsed || predictions.effective?.cycleLength || 28,
+                todayStr
+            );
+        }
 
         return meta;
-    }, [logs, periods, settings, cycles, predictions, t]);
+    }, [logs, periods, settings, cycles, predictions, t, todayStr]);
 
-    return {
+    const getDayStatus = useCallback((dateStr: string): CycleStatusData => {
+        const anchorDate = findAnchorStart(periods, dateStr);
+        return calculateCycleStatus(getDayMeta(dateStr), predictions, settings, t, anchorDate);
+    }, [getDayMeta, periods, predictions, settings, t]);
+
+    return useMemo(() => ({
         cycles,
         predictions,
         getDayMeta,
+        getDayStatus,
         lastPeriodStart: predictions.lastPeriodStart,
         predictionAnchorStart: predictions.lastPeriodStart
-    };
+    }), [cycles, predictions, getDayMeta, getDayStatus]);
 };

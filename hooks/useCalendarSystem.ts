@@ -16,11 +16,15 @@ export interface CalendarSystem {
     toCalendarDate: (date: Date) => CalendarDateParts;
     fromCalendarDate: (year: number, month: number, day: number) => Date;
     formatMonthYear: (year: number, month: number) => string;
+    formatMonth: (year: number, month: number) => string;
     addMonths: (dateParts: CalendarDateParts, amount: number) => CalendarDateParts;
     getFirstDayOfWeek: (year: number, month: number) => number;
     weekDayKeys: string[];
     getMonthGrid: (year: number, month: number) => { date: Date; isCurrentMonth: boolean; label: number }[];
 }
+
+const jalaaliMonthName = (month: number): string =>
+    jalaaliMonths[month]?.fa || jalaaliMonths[month]?.name;
 
 export const useCalendarSystem = (firstDayOfWeek?: FirstDayOfWeek): CalendarSystem => {
     const { i18n } = useTranslation();
@@ -54,9 +58,10 @@ export const useCalendarSystem = (firstDayOfWeek?: FirstDayOfWeek): CalendarSyst
             },
 
             formatMonthYear: (year: number, month: number) => {
-                const mName = jalaaliMonths[month]?.fa || jalaaliMonths[month]?.name;
-                return `${mName} ${year}`;
+                return `${jalaaliMonthName(month)} ${year}`;
             },
+
+            formatMonth: (year: number, month: number) => jalaaliMonthName(month),
 
             addMonths: (dateParts: CalendarDateParts, amount: number) => {
                 let { year, month, day } = dateParts;
@@ -148,6 +153,11 @@ export const useCalendarSystem = (firstDayOfWeek?: FirstDayOfWeek): CalendarSyst
         formatMonthYear: (year: number, month: number) => {
             const d = new Date(year, month, 1);
             return d.toLocaleDateString(i18n.language, { month: 'short', year: 'numeric' });
+        },
+
+        formatMonth: (year: number, month: number) => {
+            const d = new Date(year, month, 1);
+            return d.toLocaleDateString(i18n.language, { month: 'short' });
         },
 
         addMonths: (dateParts: CalendarDateParts, amount: number) => {

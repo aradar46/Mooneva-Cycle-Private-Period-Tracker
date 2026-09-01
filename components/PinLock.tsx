@@ -22,12 +22,52 @@ type PinLockProps =
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_SECONDS = 30;
 
+const PIN_LOCKOUT_KEY = 'mooneva_pin_lockout';
+
+interface PinLockoutState {
+  attempts: number;
+  lockedUntil: number;
+}
+
+const readLockoutState = (): PinLockoutState => {
+  try {
+    const raw = localStorage.getItem(PIN_LOCKOUT_KEY);
+    if (!raw) return { attempts: 0, lockedUntil: 0 };
+    const parsed = JSON.parse(raw);
+    return {
+      attempts: typeof parsed.attempts === 'number' ? parsed.attempts : 0,
+      lockedUntil: typeof parsed.lockedUntil === 'number' ? parsed.lockedUntil : 0,
+    };
+  } catch {
+    return { attempts: 0, lockedUntil: 0 };
+  }
+};
+
+const writeLockoutState = (state: PinLockoutState) => {
+  try {
+    localStorage.setItem(PIN_LOCKOUT_KEY, JSON.stringify(state));
+  } catch {
+    // best effort
+  }
+};
+
+const clearLockoutState = () => {
+  try {
+    localStorage.removeItem(PIN_LOCKOUT_KEY);
+  } catch {
+    // best effort
+  }
+};
+
 const PinLock: React.FC<PinLockProps> = (props) => {
   const { t } = useTranslation();
   const [input, setInput] = useState('');
   const [error, setError] = useState(false);
-  const [failedAttempts, setFailedAttempts] = useState(0);
-  const [lockoutRemaining, setLockoutRemaining] = useState(0);
+  const [failedAttempts, setFailedAttempts] = useState(() => readLockoutState().attempts);
+  const [lockoutRemaining, setLockoutRemaining] = useState(() => {
+    const { lockedUntil } = readLockoutState();
+    return lockedUntil > Date.now() ? Math.ceil((lockedUntil - Date.now()) / 1000) : 0;
+  });
   const [isVerifying, setIsVerifying] = useState(false);
 
   const prompt = props.purpose === 'exitDiscreteMode'
@@ -40,6 +80,7 @@ const PinLock: React.FC<PinLockProps> = (props) => {
       setLockoutRemaining((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
+          clearLockoutState();
           return 0;
         }
         return prev - 1;
@@ -56,14 +97,19 @@ const PinLock: React.FC<PinLockProps> = (props) => {
       const isValid = await verifyPin(input, props.pinHash, props.pinSalt, props.correctPin);
       if (isValid) {
         setFailedAttempts(0);
+        clearLockoutState();
         props.onUnlock();
       } else {
         const nextAttempts = failedAttempts + 1;
-        setFailedAttempts(nextAttempts);
         setError(true);
         if (nextAttempts >= MAX_FAILED_ATTEMPTS) {
-          setLockoutRemaining(LOCKOUT_DURATION_SECONDS);
+          const lockedUntil = Date.now() + LOCKOUT_DURATION_SECONDS * 1000;
           setFailedAttempts(0);
+          setLockoutRemaining(LOCKOUT_DURATION_SECONDS);
+          writeLockoutState({ attempts: 0, lockedUntil });
+        } else {
+          setFailedAttempts(nextAttempts);
+          writeLockoutState({ attempts: nextAttempts, lockedUntil: 0 });
         }
         setTimeout(() => {
           setInput('');

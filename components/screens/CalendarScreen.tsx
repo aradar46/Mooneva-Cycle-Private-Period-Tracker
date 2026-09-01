@@ -33,7 +33,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
 }) => {
     const { t } = useTranslation();
     const { logs, periods, settings, model, actions } = useMooneva();
-    const { cycles: pastCycles, predictions, getDayMeta } = model;
+    const { cycles: pastCycles, predictions, getDayMeta, getDayStatus } = model;
     const { bulkUpdateLogs } = actions;
 
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -86,7 +86,7 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
     };
 
     // --- Status for Today ---
-    const cycleStatus = getDayMeta(toLocalISOString(new Date())).header || { title: '', subtitle: '', statusVariant: 'neutral' };
+    const cycleStatus = getDayStatus(toLocalISOString(new Date()));
 
     // Handle date click - skip preview for empty days
     const handleDateClick = (dateStr: string) => {

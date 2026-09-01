@@ -9,8 +9,11 @@ export const normalizePinInput = (value: string): string =>
 export const isValidPin = (value: string): boolean =>
     /^\d{4,12}$/.test(value);
 
+// Must require exactly what verifyPin can check. A hash without its salt (partial
+// settings write, or a restored backup) would otherwise raise the lock screen on a
+// PIN that can never verify, while Settings hides the setup form as "already set".
 export const hasPin = (settings?: AppSettings | null): boolean =>
-    Boolean(settings?.pinHash || settings?.pin);
+    Boolean((settings?.pinHash && settings?.pinSalt) || settings?.pin);
 
 const bytesToHex = (bytes: Uint8Array): string =>
     Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');

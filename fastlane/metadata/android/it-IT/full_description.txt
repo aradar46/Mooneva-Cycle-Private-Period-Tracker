@@ -23,8 +23,8 @@ La maggior parte delle app di tracciamento del ciclo carica i tuoi dati sui serv
 <li>Tema scuro</li>
 </ul>
 
-<b>Disponibile in 12 lingue</b>
-Inglese, tedesco, spagnolo, svedese, cinese, persiano, francese, ucraino, italiano, ungherese, russo e portoghese.
+<b>Disponibile in 14 lingue</b>
+Inglese, tedesco, spagnolo, svedese, cinese, persiano, arabo, turco, francese, ucraino, italiano, ungherese, russo e portoghese.
 
 <b>Privacy</b>
 Nessun account. Nessun cloud. Nessuna analisi, nessun report sui crash, nessun SDK pubblicitario, nessun servizio di terze parti di alcun tipo. Mooneva non può vedere i tuoi dati, perché non li riceve mai.

@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSettings } from '../../types';
-import { generateEncryptedBackup, shareOrDownloadBackup, loadData, wipeAllData, decryptBackup, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport } from '../../services/logic';
+import { generateEncryptedBackup, shareOrDownloadBackup, loadData, wipeAllData, decryptBackup, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport, MAX_IMPORT_FILE_SIZE_BYTES } from '../../services/logic';
 import Logger from '../../services/logger';
 import { toLocalISOString } from '../../utils/dateUtils';
+import { PICKER_SESSION_KEY } from '../../hooks/useAutoLock';
 
 interface DataManagementViewProps {
     settings: AppSettings;
@@ -31,7 +32,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
     const appImportInputRef = useRef<HTMLInputElement>(null);
 
     const triggerFileInput = (ref: React.RefObject<HTMLInputElement | null>) => {
-        sessionStorage.setItem('mooneva_picking_file', String(Date.now()));
+        sessionStorage.setItem(PICKER_SESSION_KEY, String(Date.now()));
         ref.current?.click();
     };
 
@@ -54,11 +55,12 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
             setBackupPassword('');
         } catch (e) {
             alert(t('errors.backup_error'));
-            Logger.error("Import failed:", e);
+            Logger.error("Backup failed:", e);
         } finally { setIsProcessing(false); }
     };
 
     const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        sessionStorage.removeItem(PICKER_SESSION_KEY);
         const file = e.target.files?.[0];
         if (!file) return;
 
@@ -70,8 +72,9 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
             const restored = await restoreBackup(file, passwordToUse);
             if (restored.data && restored.settings && confirm(t('settings.import_confirm'))) {
                 await saveData(restored.data);
-                // Restore periods if present in backup
-                if (restored.periods && restored.periods.length > 0) {
+                // A backup always fully replaces periods (including a legitimate empty list);
+                // only a genuinely absent field (old-format backup) leaves existing periods alone.
+                if (Array.isArray(restored.periods)) {
                     await savePeriods(restored.periods);
                 }
                 onUpdate(restored.settings);
@@ -85,8 +88,17 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
     };
 
     const handleAppImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        sessionStorage.removeItem(PICKER_SESSION_KEY);
         const file = e.target.files?.[0];
         if (!file) return;
+
+        if (file.size > MAX_IMPORT_FILE_SIZE_BYTES) {
+            alert(t('errors.import_too_large', {
+                defaultValue: 'That file is too large to import (max 50MB).'
+            }));
+            if (appImportInputRef.current) appImportInputRef.current.value = '';
+            return;
+        }
 
         setIsProcessing(true);
         try {

@@ -37,11 +37,17 @@
         "free": "Gratis",
         "private": "Privat",
         "forever": "För alltid",
-        "share_app": "Dela appen"
+        "share_app": "Dela appen",
+        "reload": "Ladda om",
+        "copy": "Kopiera",
+        "copied": "Kopierat!",
+        "shop": "Butik",
+        "navigation": "Navigering"
     },
     "whats_new": {
         "title": "Nyheter",
-        "intro": "Sedan den senaste versionen:"
+        "intro": "Sedan den senaste versionen:",
+        "tip": "Mooneva ser minimalistisk ut, men <b>Inställningar</b> är fullt av kraftfulla verktyg. Saknar du något? Kika in där: vi uppdaterar ofta och lägger till det som önskas."
     },
     "share_message": {
         "text": "Kolla in Mooneva. En privat, svensk menskalender som körs helt offline. Ingen reklam, ingen spårning."
@@ -107,8 +113,8 @@
         "contraception_time": "Tid för påminnelse",
         "contraception_warning_days": "Förvarning i dagar (valfritt)",
         "contraception_standard_schedule": "Påminnelserna följer standardschemat för den här metoden.",
-        "contraception_schedule_patch": "4 veckor: byt varje vecka i 3 veckor, ta sedan bort.",
-        "contraception_schedule_ring": "4 veckor: inne i 3 veckor, ute i 1.",
+        "contraception_schedule_patch": "4 veckor: byt plåster varje vecka i 3 veckor, därefter 1 plåsterfri vecka.",
+        "contraception_schedule_ring": "4 veckor: insatt i 3 veckor, därefter 1 ringfri vecka.",
         "contraception_schedule_due": "Påminnelse på förfallodagen; förvarning valfri.",
         "contraception_date_required": "Ange ett datum innan du aktiverar påminnelsen.",
         "contraception_invalid_schedule": "Ange ett giltigt datum och en giltig tid innan du aktiverar påminnelsen.",
@@ -120,7 +126,9 @@
         "next_period_days": "Nästa mens – {{count}} dagar kvar",
         "next_period_unknown": "Nästa mensprognos",
         "section_action_needed": "Åtgärd krävs",
-        "section_cycle_updates": "Cykeluppdateringar"
+        "section_cycle_updates": "Cykeluppdateringar",
+        "permission_denied_message": "Aviseringar är avstängda. Aktivera dem i enhetens inställningar för att få påminnelser.",
+        "exact_alarm_message": "Påminnelser kan komma sent eller inte alls. Tillåt alarm och påminnelser i enhetens inställningar för leverans i tid."
     },
     "nav": {
         "history": "Historik"
@@ -134,10 +142,17 @@
         "free_private_forever": "Gratis. Privat. För alltid.",
         "passion_not_ads": "Din data stannar på din enhet. Vi drivs av passion, inte reklam.",
         "story_title": "Vår historia",
-        "story_body": "Mooneva är en svensk femtech-startup som omformar menshälsa. Vi bygger ett hållbart ekosystem som är snällt mot din kropp, din plånbok och planeten."
+        "story_body": "Mooneva är en svensk femtech-startup som omformar menshälsa. Vi bygger ett hållbart ekosystem som är snällt mot din kropp, din plånbok och planeten.",
+        "gift_modal_title": "Hållbar mensvård",
+        "gift_modal_badge": "25 % rabattkod för appens community",
+        "voucher_button": "25 % rabattkod",
+        "gift_modal_desc": "Från att följa din rytm till att ta hand om din kropp. Upptäck Moonevas hållbara och kroppsvänliga mensprodukter med en exklusiv gåva på 25 % till vår appcommunity.",
+        "visit_store": "Utforska Mooneva Store",
+        "eu_shipping_only": "Fysiska produkter • Frakt endast inom EU"
     },
     "dashboard": {
         "cycle_day": "Dag {{day}}",
+        "cycle_day_progress": "Dag {{day}}/<hl>{{total}}</hl>",
         "period_day": "Mensdag {{day}}",
         "period_late": "Mens försenad",
         "period_soon": "Mens snart",
@@ -158,14 +173,14 @@
         "no_data": "Ingen data",
         "history_instruction": "Logga din första mens",
         "cycle_active": "Cykel aktiv",
-        "flow_logged": "Mens loggad",
+        "flow_logged": "Blödning loggad",
         "expected_in": "Väntas om {{count}} dagar",
         "expected_today": "Väntas idag",
         "expected_tomorrow": "Börjar imorgon",
         "high_conception": "Hög chans till befruktning",
         "ovulation_24h": "Ägglossning trolig inom 24h",
         "chance_low": "Låg",
-        "chance_medium": "Mellan",
+        "chance_medium": "Medel",
         "chance_high": "Hög",
         "chance_peak": "Topp",
         "chance_ovulation": "Ägglossning",
@@ -175,14 +190,16 @@
         "adaptive_mode": "Adaptivt läge",
         "learning_mode": "Lärande läge",
         "cycle_count_one": "{{count}} cykel",
-        "cycle_count_other": "{{count}} cykler"
+        "cycle_count_other": "{{count}} cykler",
+        "no_recent_data": "Inga aktuella data",
+        "log_to_resume": "Logga en mens för att återuppta prognoserna"
     },
     "discrete": {
         "title": "Mina uppgifter",
-        "subtitle": "{{count}} punkter idag",
+        "subtitle": "{{count}} uppgifter att göra idag",
         "backlog": "Projektbacklog",
-        "task1": "Granska projektdäck",
-        "task2": "Uppdatera kalkylbladslabel",
+        "task1": "Granska projektpresentationen",
+        "task2": "Uppdatera etiketter i kalkylarket",
         "task3": "Kontakta leverantör angående faktura"
     },
     "alerts": {
@@ -208,7 +225,8 @@
         },
         "guide": {
             "show": "Visa guide",
-            "hide": "Dölj guide"
+            "hide": "Dölj guide",
+            "label": "Guide"
         },
         "period_question": "Mens?",
         "edit_period": "Redigera mens",
@@ -219,7 +237,7 @@
             "show": "Visa förklaring",
             "hide": "Dölj förklaring",
             "logged_period": "Loggad mens",
-            "flow_logged": "Mens loggad",
+            "flow_logged": "Blödning loggad",
             "mid_flow_pause": "Menspaus (mitt i)",
             "spotting": "Stänkblödning",
             "predicted_period": "Beräknad mens",
@@ -230,7 +248,7 @@
             "pms_phase": "PMS-fas",
             "pms": "PMS-dagar",
             "symptoms": "Symptom",
-            "pill_logged": "Piller taget",
+            "pill_logged": "Piller (cyan) / andra mediciner (lila)",
             "protected_sex": "Skyddat sex",
             "unprotected_sex": "Oskyddat sex",
             "notes": "Dagsanteckningar",
@@ -240,7 +258,7 @@
             "withdrawal_bleed": "Bortfallsblödning (P-piller)"
         },
         "period_progress": "Mens",
-        "fertility_label": "Fruktsamhet",
+        "fertility_label": "Fertilitet",
         "done": "Klar",
         "legend_title": "Teckenförklaring",
         "guide_subtitle": "Symbolguide",
@@ -249,9 +267,9 @@
         "how_to_log_period_tip": "För att <strong>lägga till en tidigare mens</strong>, svep först till en tidigare månad.",
         "how_to_log_daily_title": "Logga dagliga symtom",
         "how_to_log_daily_body": "<strong>Tryck</strong> (för att lägga till) eller <strong>dubbeltryck</strong> (för att redigera) på valfri dag i kalendern.",
-        "category_flow": "Blödning & Flöde",
-        "category_fertility": "Fruktsamhet",
-        "category_logs": "Loggdetaljer"
+        "category_flow": "Cykel",
+        "category_logs": "Loggdetaljer",
+        "category_other": "Övrigt"
     },
     "log": {
         "daily_log": "Daglig logg",
@@ -265,23 +283,27 @@
         "mood_confident": "Självsäker",
         "mood_focused": "Fokuserad",
         "mood_tired": "Trött",
-        "mood_foggy": "Dimmig",
+        "mood_foggy": "Hjärndimma",
         "mood_mood_swings": "Humörsvängningar",
         "mood_sensitive": "Känslig",
         "flow": "Blödningsintensitet",
         "flow_tab": "Blödning",
-        "pill_tab": "Piller",
+        "pill_tab": "Medicin",
         "pill_taken": "Tog piller",
+        "pill_taken_hint": "Ditt p-piller",
         "pill_time": "Pillertid",
         "pill_badge": "Piller",
         "pill_taken_at": "Piller taget kl. {{time}}",
         "pill_report_label": "Piller",
-        "intensity_spotting": "Fläck",
+        "meds_add": "Lägg till medicin eller kosttillskott",
+        "meds_hint": "Smärtstillande, annan medicin eller kosttillskott",
+        "meds_report_label": "Medicin",
+        "intensity_spotting": "Stänk",
         "intensity_light": "Lätt",
-        "intensity_medium": "Mellan",
+        "intensity_medium": "Medel",
         "intensity_heavy": "Riklig",
         "flow_light": "Lätt",
-        "flow_medium": "Mellan",
+        "flow_medium": "Medel",
         "flow_heavy": "Riklig",
         "flow_spotting": "Stänkblödning",
         "flow_hint": "Stänkblödning räknas inte som dag 1. Välj Lätt/Mellan om mensen verkligen startat.",
@@ -291,7 +313,7 @@
         "secretions": "Flytningar",
         "discharge_dry": "Torr",
         "discharge_sticky_creamy": "Klibbig/Krämig",
-        "discharge_egg_white": "Äggvite-liknande",
+        "discharge_egg_white": "Äggviteliknande",
         "discharge_unusual": "Ovanlig",
         "sex_libido": "Sex & Lust",
         "libido": "Lust",
@@ -318,7 +340,7 @@
         "yes_delete": "Ja, radera",
         "period_type": "Menstyp",
         "withdrawal_bleed_question": "Var detta en bortfallsblödning?",
-        "withdrawal_bleed_desc": "Märk om du använder hormonellt skydd (piller, ring, plaster)",
+        "withdrawal_bleed_desc": "Märk om du använder hormonellt preventivmedel (p-piller, p-ring, p-plåster)",
         "withdrawal_tagged": "Denna mens är märkt som bortfallsblödning och exkluderas från naturlig cykelstatistik.",
         "ignore_averages_question": "Exkludera från cykelsnitt?",
         "ignore_averages_desc": "För oregelbundna cykler (stress, sjukdom, etc.)",
@@ -330,7 +352,8 @@
         "withdrawal_bleed_label": "Bortfallsblödning",
         "excluded_label": "Exkluderad",
         "day_x_of_y": "Dag {{day}} av {{total}}",
-        "spotting_hint_no_period": "Logga stänkblödning eller ändra mens"
+        "spotting_hint_no_period": "Logga stänkblödning eller ändra mens",
+        "daily_log_tabs": "Flikar för dagslogg"
     },
     "settings": {
         "language": "Språk",
@@ -389,7 +412,7 @@
         "set_backup_pwd": "Sätt lösenord för backup",
         "enter_import_pwd": "Ange lösenord för fil",
         "export_doctor_title": "Exportera för läkare",
-        "export_doctor_desc": "PDF-rapport (Vitalparametrar & Historik)",
+        "export_doctor_desc": "PDF-rapport (Symtom & cykelhistorik)",
         "nuclear_option": "Totalrensning: Radera all data",
         "archive_confirm": "Detta nollställer prognoserna genom att ignorera all historik före idag. Din gamla data syns fortfarande i kalendern. Fortsätt?",
         "import_confirm": "Detta skriver över din nuvarande data med filen. Är du säker?",
@@ -406,7 +429,7 @@
         "incorrect_pin": "Fel PIN-kod.",
         "wipe_confirm": "Är du säker?",
         "feedback_title": "Hjälp oss bygga något du älskar",
-        "feedback_desc": "Berätta på 30 sekunder.",
+        "feedback_desc": "Hittat en bugg, har du en funktionsidé eller sett en översättning som skaver? Berätta på 30 sekunder.",
         "feedback_button": "Skicka feedback",
         "show_fertile_window_desc": "Visa fertilitetsfönster",
         "fertility_disclaimer_title": "Ansvarsfriskrivning:",
@@ -456,7 +479,7 @@
         "include_notes": "Inkludera anteckningar",
         "include_sex": "Inkludera sex",
         "include_libido": "Inkludera libido",
-        "include_secretion": "Inkludera sekretion",
+        "include_secretion": "Inkludera flytningar",
         "saving": "Sparar...",
         "clinical_report": "KLINISK RAPPORT",
         "patient_id": "Patient-ID",
@@ -477,11 +500,11 @@
         "cycle_history_summary": "Sammanfattning Cykelhistorik",
         "cycle_type": "Typ",
         "period_duration": "Menslängd",
-        "pill_controlled": "Pillerkontrollerad",
+        "pill_controlled": "P-pillerreglerad",
         "natural": "Naturlig",
         "natural_irregular": "Naturlig (Oregelbunden)",
         "cycle_num": "Cykel #{{count}}",
-        "pill_controlled_cycle": "Pillerkontrollerad Cykel",
+        "pill_controlled_cycle": "P-pillerreglerad cykel",
         "natural_cycle": "Naturlig Cykel",
         "flow": "Flöde",
         "symptoms_mood": "Symtom & Humör",
@@ -498,15 +521,14 @@
         "flow_short_light": "Lät",
         "flow_short_spotting": "Spot",
         "sex_libido_secretion": "Sex / Libido / Sekret",
-        "secretion": "Sekret",
+        "secretion": "Flytningar",
         "sex": "Sex",
         "report_footer_new": "Mooneva Cycle: privat mensspårare",
         "birth_control_sub_desc": "Döljer fertilitet, märker blödningar som bortfallsblödning",
         "birth_control_pill_hint": "Bäst för dig som använder kombinerade p-piller, p-ring eller p-plåster.",
-        "pause_predictions_full_desc": "Pausar alla prognoser (graviditet, oregelbunden cykel osv.) – t.ex. vid graviditet eller om du inte vill se uppskattningar.",
+        "pause_predictions_full_desc": "Pausar alla prognoser (graviditet, oregelbunden cykel osv.), t.ex. vid graviditet eller om du inte vill se uppskattningar.",
         "adaptive_prediction_label": "Adaptiv Prognos",
         "adaptive_prediction_desc_long": "Beräknar snittet av de senaste 3 cyklerna för att förutsäga cykellängd",
-        "fixed_prediction_hint": "Prognoser följer din inställda cykellängd",
         "cycle_length_label": "Cykellängd",
         "cycle_length_desc": "Dagar mellan menstruationer",
         "period_length_label": "Menslängd",
@@ -517,7 +539,20 @@
         "pms_window_section": "PMS-fönster",
         "cycle_config_section": "Cykelinställningar",
         "on_bc_disabled": "Inaktiverad vid preventivmedelsanvändning",
-        "bc_protected_msg": "🛡️ Skyddat läge aktivt. Fertilitetsspårning inaktiverad."
+        "bc_protected_msg": "🛡️ Skyddat läge aktivt. Fertilitetsspårning inaktiverad.",
+        "community_care": "Community och omtanke",
+        "member_gift_title": "Gåva till appens community",
+        "member_gift_desc": "Exklusiv 25 % rabattkod på Mooneva mensvård",
+        "pin_locked_out": "För många misslyckade försök. Försök igen om {{seconds}} s.",
+        "plaintext_backup_warning": "Varning: Den här säkerhetskopian kommer INTE att vara lösenordsskyddad. Den som får filen kan läsa hela din hälsohistorik i klartext.",
+        "cycle_ongoing": "Pågående",
+        "tracking_gap": "Lucka i loggningen (ej registrerad)",
+        "cycle_day_n": "Dag {{count}}",
+        "report_range": "Datumintervall",
+        "report_range_from": "Från datum",
+        "report_range_to": "Till datum",
+        "report_range_max": "Max 12 månader",
+        "report_share_failed": "Kunde inte dela PDF. Prova ett kortare datumintervall."
     },
     "trends": {
         "header": "Insikter",
@@ -534,6 +569,7 @@
         "90d": "3 månader",
         "180d": "6 månader",
         "year": "1 år",
+        "completed_cycles_note": "Den här sidan visar bara data från avslutade cykler. Din pågående cykel läggs till när nästa mens börjar.",
         "cycle_regularity": "Cykelregelbundenhet",
         "average_label": "Medel: {{count}} dagar",
         "regular": "Regelbunden",
@@ -571,7 +607,7 @@
         "need_data_chart": "Logga minst 2 cykler för att se detta diagram.",
         "need_data_flow": "Logga mer mensflödesdata för att se mönster.",
         "need_data_mood": "Logga humördata över din cykel för att se emotionella mönster.",
-        "pill_timeline": "Piller-tidslinje",
+        "pill_timeline": "Medicintidslinje",
         "pill_taken": "Piller taget",
         "pill_low": "Missat",
         "pill_high": "Taget"
@@ -651,10 +687,10 @@
         "get_started": {
             "title": "Så här kommer du igång",
             "period_card_title": "Logga din mens",
-            "period_card_body": "Tryck på knappen nedan, sedan på dagar för att lägga till eller ta bort mensdagar. Tryck på Klar.",
-            "period_card_tip": "Svep till en tidigare månad för att logga tidigare mensperioder.",
+            "period_card_body": "Tryck på \"Mens?\" → tryck på dagar för att lägga till eller ta bort mensdagar → tryck på Klar.",
+            "period_card_tip": "För att lägga till en tidigare mens, svep först till en tidigare månad.",
             "daily_card_title": "Logga dagliga symtom",
-            "daily_card_body": "Tryck på valfri dag i kalendern för att logga humör, symtom eller anteckningar.",
+            "daily_card_body": "Tryck på en dag för att förhandsgranska den. Tryck igen för att redigera.",
             "cta": "Kör igång"
         }
     },
@@ -662,7 +698,10 @@
         "backup_password": "Sätt ett lösenord för att skydda din backup.",
         "backup_error": "Ett fel uppstod när backupen skulle skapas. Försök igen.",
         "import_password": "Ange lösenordet du använde för att kryptera filen.",
-        "decryption_failed": "Fel lösenord eller skadad fil. Kontrollera och försök igen."
+        "decryption_failed": "Fel lösenord eller skadad fil. Kontrollera och försök igen.",
+        "load_failed_title": "Det gick inte att låsa upp dina data",
+        "load_failed_desc": "Dina data finns kvar på den här enheten och har inte ändrats. Att starta om appen brukar lösa det.",
+        "import_too_large": "Filen är för stor för att importeras (max 50 MB)."
     },
     "months": {
         "jan": "Jan",
@@ -687,7 +726,7 @@
         "acne": "Akne",
         "backache": "Ryggvärk",
         "nausea": "Illamående",
-        "digestion": "Matsmältning",
+        "digestion": "Matsmältningsbesvär",
         "insomnia": "Sömnlöshet",
         "cravings": "Sug",
         "joint pain": "Ledvärk",
@@ -697,6 +736,6 @@
         "breast pain": "Bröstspänningar",
         "hot flashes": "Vallningar",
         "crying": "Gråtmildhet",
-        "anger": "Arga känslor"
+        "anger": "Ilska"
     }
 }

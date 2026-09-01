@@ -8,18 +8,17 @@ interface HeatmapConfig {
     wash?: string;
 }
 
+// The legend bar spans the same colours the cells use: steps[1] (one hit) to the
+// last step, so the swatch never looks lighter than the grid it explains.
 const COLOR_SCALES = {
     indigo: {
-        gradient: ['#e0e7ff', '#6366f1'],
-        steps: ['#f1f5f9', '#e0e7ff', '#c7d2fe', '#a5b4fc', '#818cf8', '#6366f1', '#4f46e5', '#4338ca', '#3730a3'],
+        steps: ['#f1f5f9', '#dbe3ff', '#bcc9fe', '#94a5fc', '#6d7cf8', '#5257ef', '#4438e0', '#3a24c4', '#2f1a9c'],
     },
     orange: {
-        gradient: ['#ffedd5', '#f97316'],
-        steps: ['#f1f5f9', '#ffedd5', '#fed7aa', '#fdba74', '#fb923c', '#f97316', '#ea580c', '#c2410c', '#9a3412'],
+        steps: ['#f1f5f9', '#ffe6c7', '#ffcd99', '#ffae63', '#fd8d2e', '#f4700a', '#dd5602', '#bd3f02', '#992e05'],
     },
     teal: {
-        gradient: ['#ccfbf1', '#14b8a6'],
-        steps: ['#f1f5f9', '#ccfbf1', '#99f6e4', '#5eead4', '#2dd4bf', '#14b8a6', '#0d9488', '#0f766e', '#115e59'],
+        steps: ['#f1f5f9', '#c2fbef', '#8bf5e2', '#45e8cd', '#12d4b4', '#03b89b', '#009a82', '#00806e', '#00655a'],
     },
 };
 
@@ -78,7 +77,9 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                         >
                             <div
                                 className="h-full w-full"
-                                style={{ background: `linear-gradient(to right, ${scale.gradient[0]}, ${scale.gradient[1]})` }}
+                                style={{
+                                    background: `linear-gradient(to ${isRtl ? 'left' : 'right'}, ${scale.steps[1]}, ${scale.steps[scale.steps.length - 1]})`,
+                                }}
                             />
                         </div>
                         <span className="heatmap-scale-label text-[8px] font-extrabold uppercase text-slate-500 tracking-wider">{highLabel}</span>

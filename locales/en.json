@@ -23,6 +23,7 @@
         "items_pending": "{{count}} items pending",
         "today": "Today",
         "close": "Close",
+        "reload": "Reload",
         "notifications": "Notifications",
         "continue": "Continue",
         "support": "Support",
@@ -40,11 +41,13 @@
         "share_app": "Share App",
         "copy": "Copy",
         "copied": "Copied!",
-        "shop": "Shop"
+        "shop": "Shop",
+        "navigation": "Navigation"
     },
     "whats_new": {
         "title": "What's new",
-        "intro": "Since the last release:"
+        "intro": "Since the last release:",
+        "tip": "Mooneva is minimalist on the surface, but packed with powerful tools in <b>Settings</b>. Missing a feature? Look around: we update regularly and add requested ones."
     },
     "share_message": {
         "text": "Check out Mooneva. A private, offline period tracker from Sweden. No ads, no tracking."
@@ -112,7 +115,7 @@
         "contraception_time": "Reminder time",
         "contraception_warning_days": "Warning days (optional)",
         "contraception_standard_schedule": "Reminders follow the standard schedule for this method.",
-        "contraception_schedule_patch": "4 weeks: change weekly ×3, then remove.",
+        "contraception_schedule_patch": "4 weeks: change weekly for 3 weeks, then remove.",
         "contraception_schedule_ring": "4 weeks: in for 3 weeks, out for 1.",
         "contraception_schedule_due": "Due date reminder; early warning optional.",
         "contraception_date_required": "Enter a date before enabling this reminder.",
@@ -123,7 +126,9 @@
         "contraception_warning_invalid": "Enter warning days as a whole number from 0 to 365.",
         "remind_at": "Remind at",
         "next_period_days": "Next Period – {{count}} days left",
-        "next_period_unknown": "Next period prediction"
+        "next_period_unknown": "Next period prediction",
+        "permission_denied_message": "Notifications are disabled. Please enable them in your device settings to receive reminders.",
+        "exact_alarm_message": "Reminders may arrive late or not at all. Allow alarms & reminders in device settings for on-time delivery."
     },
     "nav": {
         "history": "History"
@@ -147,6 +152,7 @@
     },
     "dashboard": {
         "cycle_day": "Day {{day}}",
+        "cycle_day_progress": "Day {{day}}/<hl>{{total}}</hl>",
         "period_day": "Period Day {{day}}",
         "period_late": "Period Late",
         "period_soon": "Period Soon",
@@ -184,7 +190,9 @@
         "adaptive_mode": "Adaptive Mode",
         "learning_mode": "Learning Mode",
         "cycle_count_one": "{{count}} cycle",
-        "cycle_count_other": "{{count}} cycles"
+        "cycle_count_other": "{{count}} cycles",
+        "no_recent_data": "No recent data",
+        "log_to_resume": "Log a period to resume predictions"
     },
     "discrete": {
         "title": "My Tasks",
@@ -217,7 +225,8 @@
         },
         "guide": {
             "show": "Show Guide",
-            "hide": "Hide Guide"
+            "hide": "Hide Guide",
+            "label": "Guide"
         },
         "period_question": "Period?",
         "edit_period": "Edit Period",
@@ -234,8 +243,7 @@
         "how_to_log_period_tip": "To <strong>add a past period</strong>, swipe to a previous month first.",
         "how_to_log_daily_title": "Log daily symptoms",
         "how_to_log_daily_body": "<strong>Tap</strong> (to add) or <strong>double tap</strong> (to edit) any day on the calendar.",
-        "category_flow": "Flow & Bleeding",
-        "category_fertility": "Fertility",
+        "category_flow": "Cycle",
         "category_logs": "Log Details",
         "legend": {
             "show": "Show Legend",
@@ -252,7 +260,7 @@
             "pms": "PMS Days",
             "spotting": "Spotting",
             "symptoms": "Symptoms",
-            "pill_logged": "Pill logged",
+            "pill_logged": "Pill (cyan) / other medication (violet)",
             "protected_sex": "Protected sex",
             "unprotected_sex": "Unprotected sex",
             "notes": "Day Notes",
@@ -260,7 +268,8 @@
             "selected": "Selected Day",
             "orphan_flow": "Flow (No Period)",
             "withdrawal_bleed": "Withdrawal Bleed (Pill Bleed)"
-        }
+        },
+        "category_other": "Other"
     },
     "log": {
         "daily_log": "Daily Log",
@@ -280,12 +289,16 @@
         "flow": "Flow Intensity",
         "flow_tab": "Flow",
         "vitals_tab": "Body",
-        "pill_tab": "Pill",
+        "pill_tab": "Meds",
         "pill_taken": "Took pill",
+        "pill_taken_hint": "Your contraceptive pill",
         "pill_time": "Pill time",
         "pill_badge": "Pill",
         "pill_taken_at": "Pill taken at {{time}}",
         "pill_report_label": "Pill",
+        "meds_add": "Add medication or supplement",
+        "meds_hint": "Painkillers, other medication or supplements",
+        "meds_report_label": "Meds",
         "intensity_spotting": "Spot",
         "intensity_light": "Light",
         "intensity_medium": "Med",
@@ -339,7 +352,8 @@
         "withdrawal_bleed_label": "Withdrawal Bleeding",
         "excluded_label": "Excluded",
         "day_x_of_y": "Day {{day}} of {{total}}",
-        "no_period_advanced": "This date is not part of a period. Start or select a period day to access advanced options."
+        "no_period_advanced": "This date is not part of a period. Start or select a period day to access advanced options.",
+        "daily_log_tabs": "Daily log tabs"
     },
     "settings": {
         "community_care": "Community & Care",
@@ -410,7 +424,7 @@
         "set_backup_pwd": "Set Backup Password",
         "enter_import_pwd": "Enter Password to Import",
         "export_doctor_title": "Export for Doctor",
-        "export_doctor_desc": "PDF Report (Vital Signs & History)",
+        "export_doctor_desc": "PDF Report (Symptoms & Cycle History)",
         "nuclear_option": "Nuclear Option: Wipe All Data",
         "archive_confirm": "This will reset your predictions by ignoring all history before today. Your old data will still be visible in the calendar, but the algorithm will start fresh. Continue?",
         "import_confirm": "This will overwrite your current data with the backup. Are you sure you want to continue?",
@@ -431,8 +445,8 @@
         "pins_dont_match": "PINs do not match.",
         "wipe_confirm": "Are you sure?",
         "feedback_title": "Help us build something you love",
-        "feedback_desc": "Tell us in 30 seconds.",
-        "feedback_button": "Send Email",
+        "feedback_desc": "Found a bug, have a feature idea, or spotted a translation that's off? Tell us in 30 seconds.",
+        "feedback_button": "Send Feedback",
         "data_management_title": "Data Management",
         "create_backup": "Create Backup",
         "save_to_file": "Save your data to a file",
@@ -516,10 +530,9 @@
         "report_footer_new": "Mooneva Cycle: private period tracker",
         "birth_control_sub_desc": "Hide fertility, tag bleeds as withdrawal",
         "birth_control_pill_hint": "Best for combined pill, ring, or patch users.",
-        "pause_predictions_full_desc": "Pause all predictions (pregnancy, irregular, etc.) — e.g. in case of pregnancy or when you prefer not to see estimates.",
+        "pause_predictions_full_desc": "Pause all predictions (pregnancy, irregular, etc.), e.g. in case of pregnancy or when you prefer not to see estimates.",
         "adaptive_prediction_label": "Adaptive Prediction",
         "adaptive_prediction_desc_long": "Averages last 3 cycles to predict cycle length",
-        "fixed_prediction_hint": "Predictions follow your set cycle length",
         "cycle_length_label": "Cycle Length",
         "cycle_length_desc": "Days between periods",
         "period_length_label": "Period Length",
@@ -531,7 +544,15 @@
         "cycle_config_section": "Cycle Configuration",
         "on_bc_disabled": "Disabled while on birth control",
         "bc_protected_msg": "🛡️ Protected mode active. Fertility tracking disabled.",
-        "unarchive": "Unarchive"
+        "unarchive": "Unarchive",
+        "cycle_ongoing": "In progress",
+        "tracking_gap": "Tracking gap (not logged)",
+        "cycle_day_n": "Day {{count}}",
+        "report_range": "Date range",
+        "report_range_from": "From date",
+        "report_range_to": "To date",
+        "report_range_max": "Max 12 months",
+        "report_share_failed": "Failed to share PDF. Try a shorter date range."
     },
     "trends": {
         "header": "Insights",
@@ -548,6 +569,7 @@
         "90d": "3 Months",
         "180d": "6 Months",
         "year": "1 Year",
+        "completed_cycles_note": "This page only shows completed cycles data. Your current cycle is added once your next period starts.",
         "cycle_regularity": "Cycle Regularity",
         "average_label": "Average: {{count}} days",
         "regular": "Regular",
@@ -585,7 +607,7 @@
         "need_data_chart": "Log at least 2 cycles to see this chart.",
         "need_data_flow": "Log more period flow data to see patterns.",
         "need_data_mood": "Log mood data across your cycle to see emotional patterns.",
-        "pill_timeline": "Pill Timeline",
+        "pill_timeline": "Meds Timeline",
         "pill_taken": "Pill taken",
         "pill_low": "Missed",
         "pill_high": "Taken"
@@ -665,10 +687,10 @@
         "get_started": {
             "title": "Here's how to get started",
             "period_card_title": "Log your period",
-            "period_card_body": "Tap the button below, then tap days to add or remove period days. Tap Done when finished.",
-            "period_card_tip": "Swipe to a past month to log previous periods.",
+            "period_card_body": "Tap \"Period?\" → tap days to add or remove period days → tap Done.",
+            "period_card_tip": "To add a past period, swipe to a previous month first.",
             "daily_card_title": "Log daily symptoms",
-            "daily_card_body": "Tap any day on the calendar to log mood, symptoms, or notes.",
+            "daily_card_body": "Tap a day to preview it. Tap it again to edit.",
             "cta": "Let's Go"
         }
     },
@@ -676,7 +698,10 @@
         "backup_password": "Please set a password to secure your backup.",
         "backup_error": "We encountered an issue creating your secure backup. Please try again.",
         "import_password": "Please enter the password you used to encrypt this file.",
-        "decryption_failed": "Incorrect password or damaged file. Please verify your password and try again."
+        "decryption_failed": "Incorrect password or damaged file. Please verify your password and try again.",
+        "load_failed_title": "Could not unlock your data",
+        "load_failed_desc": "Your data is still on this device and has not been changed. Restarting the app usually fixes this.",
+        "import_too_large": "That file is too large to import (max 50MB)."
     },
     "months": {
         "jan": "Jan",
@@ -701,7 +726,7 @@
         "acne": "Acne",
         "backache": "Backache",
         "nausea": "Nausea",
-        "digestion": "Digestion",
+        "digestion": "Digestive Issues",
         "insomnia": "Insomnia",
         "cravings": "Cravings",
         "joint pain": "Joint Pain",

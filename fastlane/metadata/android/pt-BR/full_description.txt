@@ -23,8 +23,8 @@ A maioria dos aplicativos de rastreamento de menstruação envia os dados do seu
 <li>Tema escuro</li>
 </ul>
 
-<b>Disponível em 12 idiomas</b>
-Inglês, alemão, espanhol, sueco, chinês, persa, francês, ucraniano, italiano, húngaro, russo e português.
+<b>Disponível em 14 idiomas</b>
+Inglês, alemão, espanhol, sueco, chinês, persa, árabe, turco, francês, ucraniano, italiano, húngaro, russo e português.
 
 <b>Privacidade</b>
 Sem contas. Sem nuvem. Sem análise, sem relatórios de falhas, sem SDKs de publicidade, sem serviços de terceiros de qualquer tipo. O Mooneva não pode ver seus dados, porque nunca os recebe.

@@ -23,8 +23,8 @@ Most period tracking apps upload your cycle data to company servers, where it ca
 <li>Dark theme</li>
 </ul>
 
-<b>Available in 12 languages</b>
-English, German, Spanish, Swedish, Chinese, Persian, French, Ukrainian, Italian, Hungarian, Russian and Portuguese.
+<b>Available in 14 languages</b>
+English, German, Spanish, Swedish, Chinese, Persian, Arabic, Turkish, French, Ukrainian, Italian, Hungarian, Russian and Portuguese.
 
 <b>Privacy</b>
 No accounts. No cloud. No analytics, no crash reporters, no advertising SDKs, no third-party services of any kind. Mooneva cannot see your data, because it never receives it.

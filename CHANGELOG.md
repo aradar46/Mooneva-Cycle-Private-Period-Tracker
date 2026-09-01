@@ -2,6 +2,27 @@
 
 All notable changes to Mooneva Cycle. Versions follow the Android `versionCode` / iOS build numbers used at release time.
 
+## 2.3.0 — Android versionCode 18, iOS build 20
+
+- **New: medication logging.** Record other medications and supplements alongside mood, symptoms, flow and discharge.
+- Anything you type is now written to disk the moment the app goes to the background. Previously an edit made in the last second before you switched away could be lost.
+- Coming back after a long break works properly again. The app used to show an empty calendar and claim your period was hundreds of days late; it now says there is no recent data and picks predictions back up as soon as you log one.
+- Settings — including your PIN hash and lock timeout — are now encrypted on the device, matching how your cycle data was already stored.
+- If the app cannot unlock your data on startup it now refuses to save over it, and explains what happened instead of showing an empty app.
+- Fixed a case where a partially written PIN could lock you out of your own data with no way back in.
+- Fixed several date errors that could put an entry on the wrong day depending on your timezone, including on daylight-saving changeover days. The calendar also notices midnight passing while it is open.
+- Cycle day and phase now agree with each other on future dates, and period progress follows your adaptive cycle length instead of the fixed setting.
+- Imports from Flo and Clue no longer invent periods you never logged, and a corrupt export can no longer flood the app with tens of thousands of entries.
+- **New: Arabic and Turkish.** 14 languages in total, and Arabic joins Persian as a fully right-to-left layout.
+- **Clinical report: choose a date range** before exporting, instead of always exporting everything. Fixed a crash that could stop the PDF from being generated at all.
+- Onboarding now asks which day your week starts on, turns the fertile window on by default, and its period-logging instructions were rewritten in every language.
+- Medication history now goes back 60 days instead of 30.
+- Trends now says how many completed cycles a figure is based on, and its cycle-day numbers no longer shift by a day around daylight-saving changes.
+- Predictions recover more sensibly when your most recent logged period is old.
+- Calendar rework: clearer guide button, better contrast and readable text on dark theme.
+- The fertility disclaimer in Settings is clearer about what the fertile-window estimate can and cannot tell you.
+- 19 previously untranslated strings — including the backup warning and the data-error screen — are now translated in all 14 languages.
+
 ## 2.2.1 — Android versionCode 17, iOS build 19
 
 - PIN is now stored as a salted PBKDF2-SHA256 hash instead of plain text, with a 5-attempt/30-second lockout against guessing. Existing PINs migrate automatically on next launch.
