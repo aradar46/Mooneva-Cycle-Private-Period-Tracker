@@ -6,13 +6,11 @@ import Calendar from '../Calendar';
 import DailyLogPanel from '../DailyLogPanel';
 import { DayPreview } from '../DayPreview';
 import TimelineView from '../TimelineView';
-import DiscreteModeOverlay from '../DiscreteModeOverlay';
 import BottomNav from '../BottomNav';
 
 import { useMooneva } from '../../contexts/MoonevaContext';
 import { useTranslation } from 'react-i18next';
 import { useDiscreteMode } from '../../hooks/useDiscreteMode';
-import { useSwipe } from '../../hooks/useSwipe';
 import { SubViewType, ViewType } from '../../hooks/useAppNavigation';
 import { toLocalISOString } from '../../utils/dateUtils';
 import { hasDailyLogContent } from '../../utils/dailyLogContent';
@@ -153,10 +151,6 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({
                         onEditDone={handleEditDone}
                         onEditCancel={handleEditCancel}
                         todayIsPeriod={getDayMeta(toLocalISOString(new Date())).isPeriod}
-                        onStatusClick={() => {
-                            setSubView('predictions');
-                            setView('settings');
-                        }}
                     />
                 )}
 

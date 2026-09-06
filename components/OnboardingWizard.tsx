@@ -5,6 +5,7 @@ import { toLocalISOString } from '../utils/dateUtils';
 import { requestNotificationPermission } from '../services/notifications';
 import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
 import CycleSetupStep, { CycleSetupValues } from './onboarding/CycleSetupStep';
+import { applySettingsInterlocks } from '../services/logic/settingsInterlocks';
 
 interface OnboardingWizardProps {
   onComplete: (settings: AppSettings, initialLog?: { date: string, log: DailyLog }) => void;
@@ -47,21 +48,22 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
     // Request notification permission before finishing
     await requestNotificationPermission();
 
+    const normalizedCycleSetup = applySettingsInterlocks(cycleSetup, {});
     const newSettings: AppSettings = {
       userName: 'User',
       discreteMode: false,
       onboardingCompleted: true,
-      isOnBirthControl: cycleSetup.isOnBirthControl,
+      isOnBirthControl: normalizedCycleSetup.isOnBirthControl,
       symptoms: INITIAL_SYMPTOMS,
-      predictionsPaused: cycleSetup.predictionsPaused,
-      adaptivePrediction: cycleSetup.adaptivePrediction,
+      predictionsPaused: normalizedCycleSetup.predictionsPaused,
+      adaptivePrediction: normalizedCycleSetup.adaptivePrediction,
       pin: undefined,
-      cycleLength: cycleSetup.cycleLength,
-      periodLength: cycleSetup.periodLength,
-      lutealPhaseLength: cycleSetup.lutealPhaseLength,
-      pmsLength: cycleSetup.pmsLength,
-      showPMS: cycleSetup.showPMS,
-      showFertileWindow: cycleSetup.showFertileWindow,
+      cycleLength: normalizedCycleSetup.cycleLength,
+      periodLength: normalizedCycleSetup.periodLength,
+      lutealPhaseLength: normalizedCycleSetup.lutealPhaseLength,
+      pmsLength: normalizedCycleSetup.pmsLength,
+      showPMS: normalizedCycleSetup.showPMS,
+      showFertileWindow: normalizedCycleSetup.showFertileWindow,
       firstDayOfWeek
     };
 
@@ -85,8 +87,7 @@ const OnboardingWizard: React.FC<OnboardingWizardProps> = ({ onComplete }) => {
   // every value there before finishing.
   const selectGoal = (id: 'track' | 'fertility' | 'pregnancy' | 'birthControl') => {
     setGoal(id);
-    setCycleSetup(s => ({
-      ...s,
+    setCycleSetup(s => applySettingsInterlocks(s, {
       predictionsPaused: id === 'pregnancy',
       isOnBirthControl: id === 'birthControl',
       showFertileWindow: id === 'fertility',

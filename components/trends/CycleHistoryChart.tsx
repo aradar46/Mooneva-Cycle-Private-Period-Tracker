@@ -3,16 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { formatNumber } from '../../services/i18n';
 import { isCycleEligibleForAverage } from '../../services/logic/cycle';
 
-// Mock data for testing - remove or ignore in production
-export const MOCK_CYCLES: Cycle[] = [
-    { startDate: '2025-08-05', length: 28, periodLength: 5 },
-    { startDate: '2025-09-02', length: 30, periodLength: 6 },
-    { startDate: '2025-10-02', length: 27, periodLength: 5 },
-    { startDate: '2025-11-01', length: 29, periodLength: 5 },
-    { startDate: '2025-12-01', length: 35, periodLength: 6 }, // Irregular
-    { startDate: '2026-01-05', length: 28, periodLength: 5 },
-];
-
 interface CycleHistoryChartProps {
     cycles: Cycle[];
 }

@@ -271,6 +271,73 @@
         },
         "category_other": "Altro"
     },
+    "cycle_insight": {
+        "title": "Approfondimento sul ciclo",
+        "where_you_are": "A che punto sei",
+        "what_is_happening": "Cosa sta succedendo",
+        "what_you_may_notice": "Cosa potresti notare",
+        "helpful_suggestions": "Cosa può aiutare",
+        "disclaimer_title": "Nota:",
+        "disclaimer_text": "Queste sono informazioni generali su un ciclo tipico, non un consiglio medico. Il tuo andamento può essere diverso. Parla con un professionista sanitario di tutto ciò che ti preoccupa.",
+        "phases": {
+            "neutral": {
+                "name": "Dati ancora insufficienti",
+                "where_you_are": "Non ci sono ancora abbastanza dati registrati per collocarti in una fase del ciclo.",
+                "what_is_happening": "La stima delle fasi si basa sugli inizi delle mestruazioni che registri. Dopo qualche ciclo l'app riesce a capire dove cadono di solito le tue fasi.",
+                "what_you_may_notice": "Le previsioni e i nomi delle fasi restano nascosti finché non c'è una base sufficiente.",
+                "helpful_suggestions": "Registrare il primo e l'ultimo giorno di ogni mestruazione è ciò che migliora di più tutte le stime dell'app."
+            },
+            "birth_control": {
+                "name": "Contraccezione ormonale",
+                "where_you_are": "Hai attivato la contraccezione ormonale, quindi le fasi naturali del ciclo non vengono stimate.",
+                "what_is_happening": "La maggior parte dei contraccettivi ormonali impedisce l'ovulazione e mantiene stabili i livelli ormonali. Senza ovulazione non esiste una fase follicolare o luteale nel senso abituale.",
+                "what_you_may_notice": "Il sanguinamento durante la pausa è da sospensione, non una vera mestruazione. Spesso è più leggero e regolare, e con alcuni metodi scompare del tutto.",
+                "helpful_suggestions": "Registrare i sanguinamenti resta utile per notare cambiamenti nel tempo. Le indicazioni sulla fertilità sono nascoste qui perché non sarebbero significative."
+            },
+            "menstrual": {
+                "name": "Fase mestruale",
+                "where_you_are": "Sei nei giorni di sanguinamento all'inizio del ciclo.",
+                "what_is_happening": "Estrogeni e progesterone sono al minimo e l'endometrio formato nel ciclo precedente viene eliminato. Un nuovo follicolo sta già iniziando a svilupparsi.",
+                "what_you_may_notice": "Crampi, mal di schiena, stanchezza, mal di testa o umore basso sono comuni nei primi giorni e di solito si attenuano.",
+                "helpful_suggestions": "Il calore, il movimento leggero e il riposo aiutano molte persone. Un sanguinamento che supera la protezione ogni ora, o un dolore che ti impedisce la vita normale, va segnalato a un medico."
+            },
+            "follicular": {
+                "name": "Fase follicolare",
+                "where_you_are": "Sei tra la fine del sanguinamento e l'ovulazione.",
+                "what_is_happening": "I follicoli nell'ovaio maturano e gli estrogeni salgono. L'endometrio si ricostruisce.",
+                "what_you_may_notice": "Energia, umore e sonno spesso migliorano in questo periodo. Il muco cervicale diventa via via più fluido e trasparente man mano che si avvicina l'ovulazione.",
+                "helpful_suggestions": "È la parte più variabile del ciclo, ed è la sua durata a rendere un ciclo complessivamente più lungo o più corto. Qui le previsioni sono stime, non date fisse."
+            },
+            "ovulation": {
+                "name": "Ovulazione",
+                "where_you_are": "Questo è il giorno stimato del rilascio dell'ovulo, all'incirca tra la fase follicolare e quella luteale.",
+                "what_is_happening": "Un picco dell'ormone luteinizzante fa rilasciare l'ovulo dal follicolo maturo. L'ovulo sopravvive circa un giorno.",
+                "what_you_may_notice": "Alcune persone avvertono una fitta da un lato, più desiderio, seno sensibile, oppure notano muco cervicale chiaro e filante. Molte non sentono nulla.",
+                "helpful_suggestions": "Le stime del calendario contano a ritroso dalle mestruazioni attese, quindi il giorno reale può spostarsi di diversi giorni. Non usarlo come metodo contraccettivo."
+            },
+            "luteal": {
+                "name": "Fase luteale",
+                "where_you_are": "Sei tra l'ovulazione e le prossime mestruazioni attese.",
+                "what_is_happening": "Il follicolo svuotato diventa corpo luteo e produce progesterone, che mantiene l'endometrio. Senza gravidanza si degrada e i livelli ormonali calano.",
+                "what_you_may_notice": "Temperatura corporea leggermente più alta, più appetito, seno teso o gonfiore sono comuni. Verso la fine l'energia spesso cala.",
+                "helpful_suggestions": "Questa fase è la parte più stabile del ciclo, di solito dodici-quattordici giorni, ed è per questo che le previsioni delle mestruazioni si basano su di essa."
+            },
+            "pms": {
+                "name": "Fase luteale tardiva (SPM)",
+                "where_you_are": "Sei negli ultimi giorni prima delle mestruazioni attese.",
+                "what_is_happening": "Estrogeni e progesterone calano bruscamente, ed è questo a innescare lo sfaldamento dell'endometrio e l'inizio delle mestruazioni successive.",
+                "what_you_may_notice": "Sbalzi d'umore, irritabilità, sonno disturbato, voglie, gonfiore, seno dolente o mal di testa. Di solito passano entro un giorno o due dall'inizio del sanguinamento.",
+                "helpful_suggestions": "Sonno, alimentazione e movimento regolari smorzano spesso i sintomi peggiori. Sintomi tanto intensi da compromettere lavoro o relazioni a ogni ciclo vanno discussi con un medico."
+            },
+            "late": {
+                "name": "Mestruazioni in ritardo",
+                "where_you_are": "Le mestruazioni non sono iniziate alla data prevista.",
+                "what_is_happening": "Un ritardo è comune e spesso significa solo che questo ciclo è stato più lungo. Stress, malattia, viaggi, poco sonno, attività fisica intensa e variazioni di peso possono ritardare l'ovulazione.",
+                "what_you_may_notice": "La stima resta visibile e si sposta finché non registri un inizio delle mestruazioni.",
+                "helpful_suggestions": "Se una gravidanza è possibile, solo un test può escluderla. Cicli ripetutamente molto lunghi o assenti meritano un confronto con un medico."
+            }
+        }
+    },
     "log": {
         "daily_log": "Registro giornaliero",
         "mood": "Umore",
@@ -313,6 +380,8 @@
         "symptoms": "Sintomi",
         "symptoms_primary": "I 6 principali",
         "symptoms_secondary": "Corpo e intestino",
+        "more_symptoms": "Altri sintomi",
+        "fewer_symptoms": "Meno sintomi",
         "secretions": "Secrezioni",
         "discharge_dry": "Asciutte",
         "discharge_sticky_creamy": "Collose/cremose",
@@ -366,6 +435,8 @@
         "use_language_default": "Usa lingua predefinita",
         "daily_logging": "Registrazione giornaliera",
         "predictions": "Previsioni",
+        "show_fertility_level": "Mostra il livello di fertilità",
+        "show_fertility_level_desc": "Mostra il livello di fertilità nella scheda di stato",
         "cycle_mgmt_title": "Gestione del ciclo",
         "cycle_mgmt_desc": "Lunghezza del ciclo, previsioni, contraccezione, correzioni mediche",
         "birth_control": "Contraccezione ormonale",
@@ -735,6 +806,7 @@
         "dizziness": "Capogiri",
         "breast pain": "Dolore al seno",
         "hot flashes": "Vampate di calore",
+        "loss of appetite": "Perdita di appetito",
         "crying": "Pianto",
         "anger": "Rabbia"
     }

@@ -2,6 +2,49 @@ import type { TFunction } from 'i18next';
 import { AppSettings, PredictionResults, DayMeta } from '../../types';
 import { addDays, diffInDays, toLocalISOString } from '../../utils/dateUtils';
 
+/** Where the cycle is today, as a stable key. Views that need to branch on the phase
+ *  must read this, never match on the translated `subtitle`. */
+export type CyclePhaseKey =
+    | 'neutral'
+    | 'birth_control'
+    | 'menstrual'
+    | 'follicular'
+    | 'ovulation'
+    | 'luteal'
+    | 'pms'
+    | 'late';
+
+export type CycleDayPhase = Exclude<CyclePhaseKey, 'neutral' | 'birth_control' | 'late'>;
+
+/**
+ * Maps a cycle day to the same phase boundaries used by the dashboard status.
+ * The luteal phase is anchored to the configured luteal length; cycle-length
+ * variation therefore belongs to the follicular phase instead of being
+ * stretched across fixed 28-day ranges.
+ */
+export const phaseForCycleDay = (
+    dayOfCycle: number,
+    cycleLength: number,
+    periodLength: number,
+    lutealPhaseLength: number,
+    pmsLength: number,
+    showPMS = true,
+): CycleDayPhase => {
+    const day = Math.max(1, dayOfCycle);
+    const length = Math.max(1, cycleLength || 28);
+    const period = Math.max(1, Math.min(periodLength || 5, length));
+    const luteal = Math.max(1, lutealPhaseLength || 14);
+    const pms = Math.max(0, pmsLength || 0);
+    const ovulationDay = Math.max(1, length - luteal + 1);
+    const pmsStart = Math.max(1, length - pms + 1);
+
+    if (day <= period) return 'menstrual';
+    if (day === ovulationDay) return 'ovulation';
+    if (showPMS && pms > 0 && day >= pmsStart) return 'pms';
+    if (day < ovulationDay) return 'follicular';
+    return 'luteal';
+};
+
 export interface CycleStatusData {
     title: string;
     subtitle: string;
@@ -15,6 +58,7 @@ export interface CycleStatusData {
     titleIsCycleDay?: boolean;
     dayOfPeriod?: number;
     periodLength?: number;
+    phaseKey: CyclePhaseKey;
 }
 
 /**
@@ -61,7 +105,8 @@ export const calculateCycleStatus = (
         return {
             title: t('dashboard.tracking_paused'),
             subtitle: t('dashboard.resume_predictions', 'Resume to see predictions'),
-            statusVariant: 'neutral'
+            statusVariant: 'neutral',
+            phaseKey: 'neutral'
         };
     }
 
@@ -71,7 +116,8 @@ export const calculateCycleStatus = (
             return {
                 title: t('dashboard.protected', 'Protected'),
                 subtitle: t('dashboard.log_to_start', 'Log period to start'),
-                statusVariant: 'info'
+                statusVariant: 'info',
+                phaseKey: 'birth_control'
             };
         }
         // Continue with normal flow but with "Protected" context
@@ -87,7 +133,8 @@ export const calculateCycleStatus = (
         return {
             title: t('dashboard.hello', 'Hello'),
             subtitle: t('dashboard.log_to_start', 'Log period to start'),
-            statusVariant: 'neutral'
+            statusVariant: 'neutral',
+            phaseKey: 'neutral'
         };
     }
 
@@ -111,7 +158,8 @@ export const calculateCycleStatus = (
             statusVariant: 'info',
             chance: undefined,
             chanceVariant: undefined,
-            dayOfCycle: undefined // No cycle day before first period
+            dayOfCycle: undefined, // No cycle day before first period
+            phaseKey: 'neutral'
         };
     }
 
@@ -173,7 +221,8 @@ export const calculateCycleStatus = (
             title: t('dashboard.no_recent_data', 'No recent data'),
             subtitle: t('dashboard.log_to_resume', 'Log a period to resume predictions'),
             statusVariant: 'neutral',
-            dayOfCycle: undefined
+            dayOfCycle: undefined,
+            phaseKey: 'neutral'
         };
     }
 
@@ -191,7 +240,8 @@ export const calculateCycleStatus = (
             chance: undefined, // Hidden
             chanceVariant: undefined,
             dayOfCycle,
-            cycleLength: predictions.cycleLengthUsed || 28
+            cycleLength: predictions.cycleLengthUsed || 28,
+            phaseKey: 'late'
         };
     }
 
@@ -208,6 +258,18 @@ export const calculateCycleStatus = (
         if (ovulationDiff !== null && ovulationDiff >= 0) return t('dashboard.luteal_phase');
         return t('dashboard.follicular_phase');
     };
+
+    // Same ordering as phaseLabel(), so the key and the label can never disagree.
+    // Hormonal contraception suppresses the natural cycle, so it wins outright.
+    const phaseKey = ((): CyclePhaseKey => {
+        if (settings.isOnBirthControl) return 'birth_control';
+        if (flowActive) return 'menstrual';
+        if (fertilityEnabled && ovulationDiff === 0) return 'ovulation';
+        if (settings.showPMS && dueInDays !== null
+            && dueInDays >= 1 && dueInDays <= (settings.pmsLength ?? 3)) return 'pms';
+        if (ovulationDiff !== null && ovulationDiff >= 0) return 'luteal';
+        return 'follicular';
+    })();
 
     let baseTitle = t('dashboard.cycle_day', { day: dayOfCycle });
     let baseTitleIsCycleDay = true;
@@ -305,6 +367,7 @@ export const calculateCycleStatus = (
         dayOfCycle,
         cycleLength: predictions.cycleLengthUsed || 28,
         dayOfPeriod: baseDayOfPeriod,
-        periodLength: basePeriodLength
+        periodLength: basePeriodLength,
+        phaseKey
     };
 };

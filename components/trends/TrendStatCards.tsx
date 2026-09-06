@@ -25,7 +25,7 @@ const TrendStatCards: React.FC<TrendStatCardsProps> = ({ rangeAverages, defaultC
                     <span className="text-5xl font-black text-[#7598a0] tracking-tighter">{formatNumber(rangeAverages.avgCycle ?? defaultCycleLength)}</span>
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('common.days')}</span>
                 </div>
-                <div className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-slate-700 mt-4">{t('trends.avg_cycle_length')}</div>
+                <div className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-slate-700 mt-4 [overflow-wrap:anywhere]">{t('trends.avg_cycle_length')}</div>
             </div>
 
             {/* Avg Period Duration Card */}
@@ -37,7 +37,7 @@ const TrendStatCards: React.FC<TrendStatCardsProps> = ({ rangeAverages, defaultC
                     <span className="text-5xl font-black text-[#fb7185] tracking-tighter">{formatNumber(rangeAverages.avgPeriod ?? defaultPeriodLength)}</span>
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('common.days')}</span>
                 </div>
-                <div className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-slate-700 mt-4">{t('trends.avg_period_duration')}</div>
+                <div className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-slate-700 mt-4 [overflow-wrap:anywhere]">{t('trends.avg_period_duration')}</div>
             </div>
         </section>
     );

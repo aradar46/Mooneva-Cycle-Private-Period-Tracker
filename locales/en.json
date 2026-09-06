@@ -271,6 +271,73 @@
         },
         "category_other": "Other"
     },
+    "cycle_insight": {
+        "title": "Cycle insight",
+        "where_you_are": "Where you are",
+        "what_is_happening": "What is happening",
+        "what_you_may_notice": "What you may notice",
+        "helpful_suggestions": "What can help",
+        "disclaimer_title": "Note:",
+        "disclaimer_text": "This is general information about a typical cycle, not medical advice. Your own pattern may differ. Talk to a healthcare professional about anything that worries you.",
+        "phases": {
+            "neutral": {
+                "name": "Not enough data yet",
+                "where_you_are": "There is not enough logged history yet to place you in a cycle phase.",
+                "what_is_happening": "Phase estimates are built from your logged period start dates. Once a few cycles are recorded, the app can work out where each phase usually falls for you.",
+                "what_you_may_notice": "Predictions and phase names stay hidden until there is enough to base them on.",
+                "helpful_suggestions": "Logging the first and last day of each period is the single thing that improves every estimate the app makes."
+            },
+            "birth_control": {
+                "name": "On birth control",
+                "where_you_are": "You have hormonal birth control switched on, so natural cycle phases are not being estimated.",
+                "what_is_happening": "Most hormonal contraception works by preventing ovulation and keeping hormone levels steady. Without ovulation there is no follicular or luteal phase in the usual sense.",
+                "what_you_may_notice": "Bleeding during a pill break is a withdrawal bleed rather than a true period. It is often lighter and more predictable, and some methods stop it altogether.",
+                "helpful_suggestions": "Logging bleeding is still useful for spotting changes over time. Fertility estimates are hidden here because they would not be meaningful."
+            },
+            "menstrual": {
+                "name": "Menstrual phase",
+                "where_you_are": "You are in the bleeding days at the start of the cycle.",
+                "what_is_happening": "Oestrogen and progesterone are at their lowest, and the uterine lining that built up in the previous cycle is being shed. A new follicle is already starting to develop.",
+                "what_you_may_notice": "Cramps, lower back ache, tiredness, headaches or a low mood are common in the first couple of days and usually ease as bleeding settles.",
+                "helpful_suggestions": "Heat, gentle movement and rest help many people. Bleeding that soaks through protection every hour, or pain that stops you doing normal things, is worth raising with a clinician."
+            },
+            "follicular": {
+                "name": "Follicular phase",
+                "where_you_are": "You are between the end of bleeding and ovulation.",
+                "what_is_happening": "Follicles in the ovary are maturing and oestrogen is climbing. The uterine lining is rebuilding.",
+                "what_you_may_notice": "Energy, mood and sleep often improve across this stretch. Cervical fluid gradually becomes wetter and clearer as ovulation approaches.",
+                "helpful_suggestions": "This is the most variable part of the cycle, so its length is what makes cycles longer or shorter overall. Predictions here are estimates rather than fixed dates."
+            },
+            "ovulation": {
+                "name": "Ovulation",
+                "where_you_are": "This is the estimated day an egg is released, around the midpoint between the follicular and luteal phases.",
+                "what_is_happening": "A surge in luteinising hormone triggers the mature follicle to release an egg. The egg survives for roughly a day.",
+                "what_you_may_notice": "Some people feel a one-sided twinge, increased sex drive, breast tenderness, or notice clear stretchy cervical fluid. Many feel nothing at all.",
+                "helpful_suggestions": "Calendar estimates place ovulation by counting back from the expected period, so the real day can shift by several days. Do not rely on it to avoid pregnancy."
+            },
+            "luteal": {
+                "name": "Luteal phase",
+                "where_you_are": "You are between ovulation and your next expected period.",
+                "what_is_happening": "The emptied follicle becomes the corpus luteum and produces progesterone, which keeps the uterine lining in place. If no pregnancy occurs it breaks down and hormone levels fall.",
+                "what_you_may_notice": "Slightly higher body temperature, more appetite, breast tenderness or bloating are common. Energy often dips in the later part.",
+                "helpful_suggestions": "This phase is the steadiest part of the cycle, usually around twelve to fourteen days, which is why period predictions are anchored to it."
+            },
+            "pms": {
+                "name": "Late luteal (PMS)",
+                "where_you_are": "You are in the last few days before your period is expected.",
+                "what_is_happening": "Oestrogen and progesterone are both dropping sharply, which is what triggers the lining to shed and the next period to start.",
+                "what_you_may_notice": "Mood changes, irritability, poor sleep, cravings, bloating, sore breasts or headaches. These usually lift within a day or two of bleeding starting.",
+                "helpful_suggestions": "Consistent sleep, food and movement tend to blunt the worst of it. Symptoms severe enough to disrupt work or relationships every cycle are worth discussing with a clinician."
+            },
+            "late": {
+                "name": "Period is late",
+                "where_you_are": "Your period has not started by the predicted date.",
+                "what_is_happening": "A late period is common and often means nothing more than that this cycle ran long. Stress, illness, travel, sleep changes, heavy exercise and weight changes can all delay ovulation, which pushes the period back.",
+                "what_you_may_notice": "The estimate stays visible but shifts as the app waits for you to log a start date.",
+                "helpful_suggestions": "If pregnancy is possible, a test is the only way to rule it out. Cycles that are repeatedly very long or absent are worth a conversation with a clinician."
+            }
+        }
+    },
     "log": {
         "daily_log": "Daily Log",
         "mood": "Mood",
@@ -313,6 +380,8 @@
         "symptoms": "Symptoms",
         "symptoms_primary": "The Big 6",
         "symptoms_secondary": "Body & Gut",
+        "more_symptoms": "More symptoms",
+        "fewer_symptoms": "Fewer symptoms",
         "secretions": "Secretions",
         "discharge_dry": "Dry",
         "discharge_sticky_creamy": "Sticky/Creamy",
@@ -369,6 +438,8 @@
         "use_language_default": "Use language default",
         "daily_logging": "Daily Logging",
         "predictions": "Predictions",
+        "show_fertility_level": "Show fertility level",
+        "show_fertility_level_desc": "Show the fertility level on the status card",
         "cycle_mgmt_title": "Cycle Management",
         "cycle_mgmt_desc": "Cycle length, prediction, birth control, medical overrides",
         "birth_control": "Hormonal Birth Control",
@@ -721,7 +792,7 @@
         "cramps": "Cramps",
         "headache": "Headache",
         "bloating": "Bloating",
-        "tenderness": "Tenderness",
+        "tenderness": "Breast tenderness",
         "fatigue": "Fatigue",
         "acne": "Acne",
         "backache": "Backache",
@@ -735,6 +806,7 @@
         "dizziness": "Dizziness",
         "breast pain": "Breast Pain",
         "hot flashes": "Hot Flashes",
+        "loss of appetite": "Loss of Appetite",
         "crying": "Crying",
         "anger": "Anger"
     }

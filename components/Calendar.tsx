@@ -6,6 +6,8 @@ import { formatNumber } from '../services/i18n';
 import { CycleStatusData } from '../services/logic/status';
 import { DayCell } from './calendar/DayCell';
 import { SexMarkerIcon } from './calendar/SexMarkerIcon';
+import { CycleInsightModal } from './calendar/CycleInsightModal';
+import { CycleInsightMoon } from './calendar/CycleInsightMoon';
 import { useSwipe } from '../hooks/useSwipe';
 import { useCalendarSystem } from '../hooks/useCalendarSystem';
 
@@ -56,7 +58,6 @@ interface CalendarProps {
   onEditModeChange?: (isEdit: boolean) => void;
   onEditDone?: () => void;
   onEditCancel?: () => void;
-  onStatusClick?: () => void;
   todayIsPeriod?: boolean;
 }
 
@@ -76,11 +77,11 @@ const Calendar: React.FC<CalendarProps> = ({
   onEditModeChange,
   onEditDone,
   onEditCancel,
-  onStatusClick,
   todayIsPeriod
 }) => {
   const { t, i18n } = useTranslation();
   const [showLegend, setShowLegend] = useState(false);
+  const [showInsight, setShowInsight] = useState(false);
   const [localEditMode, setLocalEditMode] = useState(false);
   const [showSavedToast, setShowSavedToast] = useState(false);
   const calendarSystem = useCalendarSystem(settings.firstDayOfWeek);
@@ -146,8 +147,8 @@ const Calendar: React.FC<CalendarProps> = ({
       {!isCloaked && (
         <header className="w-full px-0">
           <div
-            onClick={onStatusClick}
-            className={`relative z-10 bg-[#F0F2F5] rounded-[32px] py-5 px-4 sm:py-8 sm:px-4 flex flex-col items-center text-center overflow-hidden transition-transform active:scale-[0.98] ${onStatusClick ? 'cursor-pointer' : ''}`}
+            onClick={() => setShowInsight(true)}
+            className="relative z-10 cursor-pointer bg-[#F0F2F5] rounded-[32px] py-5 px-4 sm:py-8 sm:px-4 flex flex-col items-center text-center overflow-hidden transition-transform active:scale-[0.98]"
             style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
           >
             <div className="flex flex-col items-center z-10 w-full px-2">
@@ -165,25 +166,43 @@ const Calendar: React.FC<CalendarProps> = ({
                 ) : cycleStatus.title}
               </h1>
               <div className="flex flex-col items-center mt-3 sm:mt-4 space-y-1.5 sm:space-y-2">
-                {cycleStatus.dayOfPeriod != null && cycleStatus.periodLength != null ? (
-                  <div className="flex items-center gap-2 whitespace-nowrap">
-                    <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)] flex-shrink-0"></span>
-                    <p className="text-rose-500 font-bold text-[clamp(11px,3.2vw,15px)] tracking-wide">
-                      {t('calendar.period_progress')} {formatNumber(cycleStatus.dayOfPeriod)} / {formatNumber(cycleStatus.periodLength)}
-                    </p>
+                {((cycleStatus.dayOfPeriod != null && cycleStatus.periodLength != null) || cycleStatus.subtitle) && (
+                  <div className="flex w-full min-w-0 items-center justify-center gap-2">
+                    {cycleStatus.dayOfPeriod != null && cycleStatus.periodLength != null ? (
+                      <div className="flex min-w-0 items-center gap-2 whitespace-nowrap">
+                        <span className="h-2 w-2 shrink-0 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]" />
+                        <p className="text-rose-500 font-bold text-[clamp(11px,3.2vw,15px)] tracking-wide">
+                          {t('calendar.period_progress')} {formatNumber(cycleStatus.dayOfPeriod)} / {formatNumber(cycleStatus.periodLength)}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className={`min-w-0 max-w-full font-bold text-[clamp(11px,3.2vw,15px)] tracking-wide leading-snug ${cycleStatus.statusVariant === 'primary' ? 'text-cycle-period' :
+                        cycleStatus.statusVariant === 'warning' ? 'text-warning' :
+                          cycleStatus.statusVariant === 'success' ? 'text-success' :
+                            cycleStatus.statusVariant === 'info' ? 'text-slate-600' :
+                              cycleStatus.statusVariant === 'secondary' ? 'text-slate-600' :
+                                'text-slate-500'
+                        }`}>
+                        {cycleStatus.subtitle}
+                      </p>
+                    )}
+                    <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
+                      <button
+                        type="button"
+                        className="cycle-insight-bulb period-action-icon animate-period-button h-5 w-5 p-0 transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-110 active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0] focus-visible:ring-offset-2"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setShowInsight(true);
+                        }}
+                        aria-label={t('cycle_insight.title')}
+                        title={t('cycle_insight.title')}
+                      >
+                        <CycleInsightMoon className="cycle-insight-moon-spin h-4 w-4" />
+                      </button>
+                    </span>
                   </div>
-                ) : cycleStatus.subtitle && (
-                  <p className={`font-bold text-[clamp(11px,3.2vw,15px)] tracking-wide leading-snug ${cycleStatus.statusVariant === 'primary' ? 'text-cycle-period' :
-                    cycleStatus.statusVariant === 'warning' ? 'text-warning' :
-                      cycleStatus.statusVariant === 'success' ? 'text-success' :
-                        cycleStatus.statusVariant === 'info' ? 'text-slate-600' :
-                          cycleStatus.statusVariant === 'secondary' ? 'text-slate-600' :
-                            'text-slate-500'
-                    }`}>
-                    {cycleStatus.subtitle}
-                  </p>
                 )}
-                {cycleStatus.chance && (
+                {cycleStatus.chance && !settings.hideFertilityLevel && (
                   <p className={`text-[clamp(10px,2.7vw,12px)] font-bold tracking-[0.04em] whitespace-nowrap ${cycleStatus.chanceVariant === 'peak' ? 'text-success animate-pulse' :
                     cycleStatus.chanceVariant === 'high' ? 'text-success' :
                       'text-slate-500'
@@ -195,6 +214,10 @@ const Calendar: React.FC<CalendarProps> = ({
             </div>
           </div>
         </header>
+      )}
+
+      {showInsight && (
+        <CycleInsightModal phaseKey={cycleStatus.phaseKey} onClose={() => setShowInsight(false)} />
       )}
 
       {!isCloaked && cycleStatus.statusVariant === 'neutral' && showHint && (

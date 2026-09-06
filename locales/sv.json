@@ -271,6 +271,73 @@
         "category_logs": "Loggdetaljer",
         "category_other": "Övrigt"
     },
+    "cycle_insight": {
+        "title": "Cykelinsikt",
+        "where_you_are": "Var du är",
+        "what_is_happening": "Vad som händer",
+        "what_you_may_notice": "Vad du kan märka",
+        "helpful_suggestions": "Vad som kan hjälpa",
+        "disclaimer_title": "Obs:",
+        "disclaimer_text": "Det här är allmän information om en typisk cykel, inte medicinsk rådgivning. Ditt eget mönster kan se annorlunda ut. Prata med vården om något oroar dig.",
+        "phases": {
+            "neutral": {
+                "name": "Inte tillräckligt med data än",
+                "where_you_are": "Det finns ännu inte tillräckligt med registrerad historik för att placera dig i en cykelfas.",
+                "what_is_happening": "Fasuppskattningen bygger på de mensstarter du registrerar. Efter några cykler kan appen se var dina faser brukar ligga.",
+                "what_you_may_notice": "Prognoser och fasnamn visas inte förrän det finns tillräckligt underlag.",
+                "helpful_suggestions": "Att registrera första och sista dagen för varje mens är det som förbättrar appens alla uppskattningar mest."
+            },
+            "birth_control": {
+                "name": "Hormonella preventivmedel",
+                "where_you_are": "Du har hormonella preventivmedel påslaget, så naturliga cykelfaser uppskattas inte.",
+                "what_is_happening": "De flesta hormonella preventivmedel hindrar ägglossning och håller hormonnivåerna jämna. Utan ägglossning finns ingen follikel- eller lutealfas i vanlig mening.",
+                "what_you_may_notice": "Blödning under uppehållet är en bortfallsblödning, inte en riktig mens. Den är ofta lättare och mer förutsägbar, och med vissa metoder försvinner den helt.",
+                "helpful_suggestions": "Att registrera blödning är fortfarande användbart för att se förändringar över tid. Fertilitetsuppgifter döljs här eftersom de inte skulle säga något."
+            },
+            "menstrual": {
+                "name": "Menstruationsfas",
+                "where_you_are": "Du är i blödningsdagarna i början av cykeln.",
+                "what_is_happening": "Östrogen och progesteron är som lägst, och livmoderslemhinnan som byggdes upp förra cykeln stöts bort. En ny follikel har redan börjat utvecklas.",
+                "what_you_may_notice": "Kramper, ryggvärk, trötthet, huvudvärk eller nedstämdhet är vanligt de första dagarna och brukar avta.",
+                "helpful_suggestions": "Värme, lugn rörelse och vila hjälper många. Blödning som går igenom skyddet varje timme, eller smärta som hindrar dig från vardagen, är värd att ta upp med vården."
+            },
+            "follicular": {
+                "name": "Follikelfas",
+                "where_you_are": "Du är mellan slutet av blödningen och ägglossningen.",
+                "what_is_happening": "Folliklar i äggstocken mognar och östrogenet stiger. Livmoderslemhinnan byggs upp igen.",
+                "what_you_may_notice": "Energi, humör och sömn brukar bli bättre under den här perioden. Livmoderhalssekretet blir gradvis blötare och klarare ju närmare ägglossningen du kommer.",
+                "helpful_suggestions": "Det här är cykelns mest varierande del, och det är dess längd som gör cykler längre eller kortare. Prognoser här är uppskattningar, inte fasta datum."
+            },
+            "ovulation": {
+                "name": "Ägglossning",
+                "where_you_are": "Det här är den uppskattade dagen då ett ägg frigörs, ungefär mellan follikel- och lutealfasen.",
+                "what_is_happening": "En topp av luteiniserande hormon får den mogna follikeln att släppa ägget. Ägget överlever ungefär ett dygn.",
+                "what_you_may_notice": "Vissa känner ett ensidigt hugg, ökad sexlust, ömma bröst eller ser klart och trådigt sekret. Många känner ingenting alls.",
+                "helpful_suggestions": "Kalenderuppskattningar räknar bakåt från förväntad mens, så den verkliga dagen kan skilja sig flera dagar. Förlita dig inte på det som preventivmetod."
+            },
+            "luteal": {
+                "name": "Lutealfas",
+                "where_you_are": "Du är mellan ägglossningen och nästa förväntade mens.",
+                "what_is_happening": "Den tömda follikeln blir gulkroppen och bildar progesteron, som håller livmoderslemhinnan på plats. Utan graviditet bryts den ned och hormonnivåerna faller.",
+                "what_you_may_notice": "Något högre kroppstemperatur, större aptit, ömma bröst eller uppblåsthet är vanligt. Energin sjunker ofta mot slutet.",
+                "helpful_suggestions": "Den här fasen är cykelns stabilaste del, oftast omkring tolv till fjorton dagar, och därför utgår mensprognoserna från den."
+            },
+            "pms": {
+                "name": "Sen lutealfas (PMS)",
+                "where_you_are": "Du är i de sista dagarna före förväntad mens.",
+                "what_is_happening": "Östrogen och progesteron faller båda kraftigt, vilket är det som får slemhinnan att stötas bort och nästa mens att börja.",
+                "what_you_may_notice": "Humörsvängningar, irritation, dålig sömn, sug, uppblåsthet, ömma bröst eller huvudvärk. Det brukar lätta inom en dag eller två efter att blödningen börjat.",
+                "helpful_suggestions": "Regelbunden sömn, mat och rörelse mildrar ofta det värsta. Besvär som varje cykel stör arbete eller relationer är värda att ta upp med vården."
+            },
+            "late": {
+                "name": "Mensen är försenad",
+                "where_you_are": "Din mens har inte börjat på det förutsagda datumet.",
+                "what_is_happening": "Försenad mens är vanligt och betyder ofta bara att den här cykeln blev lång. Stress, sjukdom, resor, sömnbrist, hård träning och viktförändringar kan skjuta upp ägglossningen.",
+                "what_you_may_notice": "Uppskattningen visas fortfarande och flyttas fram tills du registrerar en mensstart.",
+                "helpful_suggestions": "Om graviditet är möjlig är ett test det enda sättet att utesluta det. Cykler som gång på gång är mycket långa eller uteblir är värda att ta upp med vården."
+            }
+        }
+    },
     "log": {
         "daily_log": "Daglig logg",
         "mood": "Humör",
@@ -310,6 +377,8 @@
         "symptoms": "Symptom",
         "symptoms_primary": "De 6 vanligaste",
         "symptoms_secondary": "Kropp & Mage",
+        "more_symptoms": "Fler symtom",
+        "fewer_symptoms": "Färre symtom",
         "secretions": "Flytningar",
         "discharge_dry": "Torr",
         "discharge_sticky_creamy": "Klibbig/Krämig",
@@ -366,6 +435,8 @@
         "use_language_default": "Använd språkstandard",
         "daily_logging": "Daglig loggning",
         "predictions": "Prognoser",
+        "show_fertility_level": "Visa fertilitetsnivå",
+        "show_fertility_level_desc": "Visa fertilitetsnivån på statuskortet",
         "cycle_mgmt_title": "Cykelhantering",
         "cycle_mgmt_desc": "Cykellängd, prognos, preventivmedel, medicinska undantag",
         "birth_control": "Preventivmedel",
@@ -721,7 +792,7 @@
         "cramps": "Kramper",
         "headache": "Huvudvärk",
         "bloating": "Uppsvälldhet",
-        "tenderness": "Ömhet",
+        "tenderness": "Ömma bröst",
         "fatigue": "Trötthet",
         "acne": "Akne",
         "backache": "Ryggvärk",
@@ -735,6 +806,7 @@
         "dizziness": "Yrsel",
         "breast pain": "Bröstspänningar",
         "hot flashes": "Vallningar",
+        "loss of appetite": "Aptitlöshet",
         "crying": "Gråtmildhet",
         "anger": "Ilska"
     }

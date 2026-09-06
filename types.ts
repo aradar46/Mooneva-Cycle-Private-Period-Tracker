@@ -123,7 +123,7 @@ export interface AppSettings {
   lutealPhaseLength: number;      // Days from ovulation to period (default: 14)
   pmsLength: number;              // Days before period for PMS warning (default: 3)
   showFertileWindow: boolean;     // Whether to display fertile window
-  autoCreatePeriods?: boolean;    // Auto-create period when flow is logged
+  hideFertilityLevel?: boolean;   // Whether to hide the fertility level on the status card
 
   // Notification / Reminder toggles
   reminderPeriodStart?: boolean;
@@ -141,7 +141,7 @@ export interface AppSettings {
   reminderDailyLogTime?: string;
 
   // Smart Reminders
-  reminderPMS?: boolean; // 3 days before
+  reminderPMS?: boolean; // pmsLength days before
   reminderPMSTime?: string;
   reminderPeriodLate?: boolean; // Late period prompt
   reminderPeriodLateTime?: string;
@@ -157,7 +157,6 @@ export interface AppSettings {
 
   // Global Behaviour
   firstDayOfWeek?: FirstDayOfWeek;
-  reminderGentleMode?: boolean; // If true, suppress notifications if app used recently, etc.
 }
 
 const BIG_6 = [
@@ -168,12 +167,17 @@ const BODY_GUT = [
   'Backache', 'Nausea', 'Digestion', 'Insomnia', 'Cravings', 'Joint Pain', 'Fever', 'Chills'
 ];
 
+const MORE_SYMPTOMS = [
+  'Dizziness', 'Hot Flashes', 'Loss of Appetite'
+];
+
 export const SYMPTOM_GROUPS = {
   BIG_6: BIG_6.map(s => s.toLowerCase()),
-  BODY_GUT: BODY_GUT.map(s => s.toLowerCase())
+  BODY_GUT: BODY_GUT.map(s => s.toLowerCase()),
+  MORE: MORE_SYMPTOMS.map(s => s.toLowerCase())
 };
 
-const ALL_DEFAULT_SYMPTOMS = [...BIG_6, ...BODY_GUT];
+const ALL_DEFAULT_SYMPTOMS = [...BIG_6, ...BODY_GUT, ...MORE_SYMPTOMS];
 
 export const INITIAL_SYMPTOMS: SymptomConfig[] = ALL_DEFAULT_SYMPTOMS.map(s => ({
   id: s.toLowerCase(),

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { App as CapApp } from '@capacitor/app';
 
-export type ViewType = 'calendar' | 'timeline' | 'trends' | 'settings' | 'notifications';
-export type SubViewType = 'main' | 'add_log' | 'edit_log' | 'predictions' | 'data_management';
+export type ViewType = 'calendar' | 'trends' | 'settings' | 'notifications';
+export type SubViewType = 'main' | 'predictions' | 'data_management';
 
 export const useAppNavigation = () => {
     const [view, setViewState] = useState<ViewType>('calendar');

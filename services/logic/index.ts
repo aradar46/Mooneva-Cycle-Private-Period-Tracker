@@ -7,5 +7,5 @@ export * from './cycle';
 export * from './storage';
 export * from './status';
 export * from './importers';
-
+export * from './settingsInterlocks';
 

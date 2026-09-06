@@ -181,6 +181,22 @@ export const getEligibleCycles = (cycles: Cycle[]): Cycle[] => {
     });
 };
 
+/** Average only cycles that the prediction model considers eligible. */
+export const averageCycleLength = (cycles: Cycle[]): number | null => {
+    const eligible = getEligibleCycles(cycles);
+    if (eligible.length === 0) return null;
+
+    return Math.round(eligible.reduce((sum, cycle) => sum + (cycle.length || 0), 0) / eligible.length);
+};
+
+/** Average period duration using the same eligibility rules as cycle averages. */
+export const averagePeriodLength = (cycles: Cycle[]): number | null => {
+    const eligible = getEligibleCycles(cycles);
+    if (eligible.length === 0) return null;
+
+    return Math.round(eligible.reduce((sum, cycle) => sum + Math.min(cycle.periodLength || 0, 10), 0) / eligible.length);
+};
+
 /**
  * Computes adaptive cycle and period lengths dynamically from history.
  * Logic: requires at least MIN_ADAPTIVE_CYCLES (3) eligible cycles, then takes

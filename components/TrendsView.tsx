@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DailyLog, Cycle, SymptomConfig, PeriodRecord, AppSettings, MOOD_OPTIONS } from '../types';
 import { toLocalISOString, getTimestamp, diffInDays } from '../utils/dateUtils';
-import { isCycleEligibleForAverage } from '../services/logic/cycle';
+import { averageCycleLength, averagePeriodLength } from '../services/logic/cycle';
 
 // Inlined useTrendStats Hook
 interface TrendStatsProps {
@@ -97,25 +97,25 @@ const useTrendStats = ({
 
   // Average cycle and period length based on filtered data
   const rangeAverages = useMemo(() => {
-    const defaultCycle = settings.cycleLength ?? 28;
-    const defaultPeriod = settings.periodLength ?? 5;
+    const relevantCycleAverage = averageCycleLength(filteredCycles);
+    const relevantPeriodAverage = averagePeriodLength(filteredCycles);
 
-    const filterOutliers = (list: Cycle[]) => list.filter(c => isCycleEligibleForAverage(c.length || 0));
-    const validRelevant = filterOutliers(filteredCycles);
-
-    if (validRelevant.length === 0) {
-      const allValid = filterOutliers(cycles);
-      if (allValid.length === 0) return { avgCycle: null, avgPeriod: null, isInitial: true };
-
-      const avgCycle = Math.round(allValid.reduce((a, b) => a + (b.length || defaultCycle), 0) / allValid.length);
-      const avgPeriod = Math.round(allValid.reduce((a, b) => a + Math.min((b.periodLength || defaultPeriod), 10), 0) / allValid.length);
-      return { avgCycle, avgPeriod, isHistorical: true };
+    if (relevantCycleAverage !== null && relevantPeriodAverage !== null) {
+      return { avgCycle: relevantCycleAverage, avgPeriod: relevantPeriodAverage };
     }
 
-    const avgCycle = Math.round(validRelevant.reduce((a, b) => a + (b.length || defaultCycle), 0) / validRelevant.length);
-    const avgPeriod = Math.round(validRelevant.reduce((a, b) => a + Math.min((b.periodLength || defaultPeriod), 10), 0) / validRelevant.length);
-    return { avgCycle, avgPeriod };
-  }, [filteredCycles, cycles, settings.cycleLength, settings.periodLength]);
+    const historicalCycleAverage = averageCycleLength(cycles);
+    const historicalPeriodAverage = averagePeriodLength(cycles);
+    if (historicalCycleAverage === null || historicalPeriodAverage === null) {
+      return { avgCycle: null, avgPeriod: null, isInitial: true };
+    }
+
+    return {
+      avgCycle: historicalCycleAverage,
+      avgPeriod: historicalPeriodAverage,
+      isHistorical: true
+    };
+  }, [filteredCycles, cycles]);
 
   // Statistics for main charts
   const statistics = useMemo(() => {
@@ -422,7 +422,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
         <div className={`absolute bottom-0 left-0 w-[400px] h-[400px] phase-accent-ovulation blur-[120px] opacity-30 animate-blob-pulse delay-700`} />
       </div>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar px-6 pt-4 pb-32 space-y-6 relative z-10">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-6 pt-4 pb-32 space-y-6 relative z-10">
 
         {/* Range selector + stat cards grouped with tight spacing */}
         <div className="space-y-3">
@@ -509,7 +509,7 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
         <AverageFlowCurve logs={logs} periods={periods} />
 
         {/* Mood by Phase Breakdown */}
-        <MoodByPhase logs={logs} cycles={cycles} />
+        <MoodByPhase logs={logs} cycles={cycles} settings={settings} />
 
         {/* Mood Timeline Heatmap */}
         {maxMoodFreq > 0 && (

@@ -7,7 +7,7 @@ import { Capacitor } from '@capacitor/core';
 import type { LocalNotificationSchema } from '@capacitor/local-notifications';
 import type { AppSettings, ContraceptionReminder, PredictionResults } from '../types';
 import Logger from './logger';
-import { addDays, parseStrictLocalDate } from '../utils/dateUtils';
+import { parseStrictLocalDate } from '../utils/dateUtils';
 
 import i18n from './i18n';
 
@@ -490,11 +490,11 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
       }
 
       // --- 3. Smart Reminders (PMS & Late) ---
-      // A. PMS Reminder (3 days before)
+      // A. PMS Reminder: match the PMS window configured for the calendar.
       if (settings.reminderPMS && predictions.nextPeriodStart) {
         const { hour, minute } = parseTimeHHmm(settings.reminderPMSTime, REMINDER_DEFAULT_TIMES.reminderPMSTime);
         const targetDate = parseLocalDate(predictions.nextPeriodStart);
-        targetDate.setDate(targetDate.getDate() - 3);
+        targetDate.setDate(targetDate.getDate() - (settings.pmsLength ?? 3));
         targetDate.setHours(hour, minute, 0, 0);
 
         if (targetDate.getTime() > now.getTime()) {

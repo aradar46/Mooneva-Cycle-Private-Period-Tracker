@@ -12,6 +12,7 @@ import { ClinicalReportView } from './settings/ClinicalReportView';
 import { addDays, getTodayStr } from '../utils/dateUtils';
 import { PIN_MAX_LENGTH, isValidPin, normalizePinInput, hasPin, hashPin } from '../utils/pin';
 import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
+import { applySettingsInterlocks } from '../services/logic/settingsInterlocks';
 
 import { SubViewType, ViewType } from '../hooks/useAppNavigation';
 
@@ -68,6 +69,9 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
   const [periodForDialog, setPeriodForDialog] = useState<PeriodRecord | null>(null);
   const effectiveFirstDayOfWeek = resolveFirstDayOfWeek(i18n.language, settings.firstDayOfWeek);
   const pinEntryReady = isValidPin(pinInput) && isValidPin(pinConfirm);
+  const updateInterlockedSettings = (change: Partial<AppSettings>) => {
+    onUpdate(applySettingsInterlocks(settings, change));
+  };
 
   const handleCopyCoupon = () => {
     if (navigator.clipboard?.writeText) {
@@ -110,12 +114,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                   onClick={() => {
                     if (!settings.isOnBirthControl) {
                       const nextVal = !settings.adaptivePrediction;
-                      onUpdate({
-                        ...settings,
-                        adaptivePrediction: nextVal,
-                        // If turning ON adaptive prediction, unpause predictions
-                        ...(nextVal ? { predictionsPaused: false } : {})
-                      });
+                      updateInterlockedSettings({ adaptivePrediction: nextVal });
                     }
                   }}
                   disabled={settings.isOnBirthControl}
@@ -168,7 +167,11 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
               >
                 <Toggle
                   active={settings.showFertileWindow && !settings.isOnBirthControl}
-                  onClick={() => !settings.isOnBirthControl && onUpdate({ ...settings, showFertileWindow: !settings.showFertileWindow })}
+                  onClick={() => !settings.isOnBirthControl && onUpdate({
+                    ...settings,
+                    showFertileWindow: !settings.showFertileWindow,
+                    hideFertilityLevel: false
+                  })}
                   disabled={settings.isOnBirthControl}
                 />
               </SettingRow>
@@ -213,6 +216,19 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                   </div>
                 </div>
               )}
+              {settings.showFertileWindow && !settings.isOnBirthControl && (
+                <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-t border-slate-200/40">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold text-slate-500">{t('settings.show_fertility_level')}</p>
+                    <p className="text-[10px] text-slate-400 leading-snug">{t('settings.show_fertility_level_desc')}</p>
+                  </div>
+                  <Toggle
+                    small
+                    active={!settings.hideFertilityLevel}
+                    onClick={() => onUpdate({ ...settings, hideFertilityLevel: !settings.hideFertilityLevel })}
+                  />
+                </div>
+              )}
             </SettingCard>
 
             <SettingCard title={t('settings.pms_window_section')}>
@@ -251,13 +267,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                         setPendingAction('bc');
                         setShowAdaptiveOffWarning(true);
                       } else {
-                        onUpdate({
-                          ...settings,
-                          isOnBirthControl: true,
-                          showFertileWindow: false,
-                          adaptivePrediction: false,
-                          cycleLength: 28
-                        });
+                        updateInterlockedSettings({ isOnBirthControl: true });
                       }
                     } else {
                       // Turning OFF: check if there's an active period
@@ -296,13 +306,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                         setPendingAction('pause');
                         setShowAdaptiveOffWarning(true);
                       } else {
-                        onUpdate({
-                          ...settings,
-                          predictionsPaused: true,
-                          adaptivePrediction: false,
-                          showFertileWindow: false,
-                          showPMS: false
-                        });
+                        updateInterlockedSettings({ predictionsPaused: true });
                       }
                     } else {
                       onUpdate({ ...settings, predictionsPaused: false });
@@ -311,7 +315,6 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                 />
               </SettingRow>
             </SettingCard>
-
 
           </div>
         </div>
@@ -379,21 +382,9 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
                 <button
                   onClick={() => {
                     if (pendingAction === 'bc') {
-                      onUpdate({
-                        ...settings,
-                        isOnBirthControl: true,
-                        showFertileWindow: false,
-                        adaptivePrediction: false,
-                        cycleLength: 28
-                      });
+                      updateInterlockedSettings({ isOnBirthControl: true });
                     } else if (pendingAction === 'pause') {
-                      onUpdate({
-                        ...settings,
-                        predictionsPaused: true,
-                        adaptivePrediction: false,
-                        showFertileWindow: false,
-                        showPMS: false
-                      });
+                      updateInterlockedSettings({ predictionsPaused: true });
                     }
                     setShowAdaptiveOffWarning(false);
                     setPendingAction(null);

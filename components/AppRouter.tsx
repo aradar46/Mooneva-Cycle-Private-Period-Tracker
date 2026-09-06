@@ -4,7 +4,6 @@ import { useAppNavigation } from '../hooks/useAppNavigation';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useAppReview } from '../hooks/useAppReview';
 import { useAutoLock } from '../hooks/useAutoLock';
-import { hasPin } from '../utils/pin';
 
 import OnboardingWizard from './OnboardingWizard';
 import PinLock from './PinLock';
@@ -17,7 +16,7 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { NotificationManagerScreen } from './screens/NotificationManagerScreen';
 
 type PendingPinAction = 'exitDiscreteMode' | null;
-const WHATS_NEW_VERSION = '2.3.0';
+const WHATS_NEW_VERSION = '2.4.0';
 const WHATS_NEW_STORAGE_KEY = `mooneva_whats_new_seen_${WHATS_NEW_VERSION}`;
 
 export const AppRouter = () => {

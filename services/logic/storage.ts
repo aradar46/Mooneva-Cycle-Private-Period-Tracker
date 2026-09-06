@@ -32,6 +32,8 @@ const PBKDF2_ITERATIONS_BACKUP_V2 = 600000;
 const BACKUP_VERSION = 2;
 const DEVICE_SECRET_KEY = 'mooneva_device_secret';
 
+const BACKUP_SECURITY_SETTING_KEYS = ['pin', 'pinHash', 'pinSalt', 'lockTimeout'] as const;
+
 const isPlainRecord = (value: unknown): value is Record<string, unknown> => {
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
         return false;
@@ -191,6 +193,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     lutealPhaseLength: 14,
     pmsLength: 3,
     showFertileWindow: true,
+    hideFertilityLevel: false,
     showPMS: true, // #20
     adaptivePrediction: false
 };
@@ -478,10 +481,44 @@ export const __resetDeviceMasterKeyCacheForTests = (): void => {
     cachedMasterKeyPromise = null;
 };
 
+/**
+ * Backups contain health data and app preferences, but must not contain the
+ * credentials or lock policy belonging to the device that created them.
+ */
+export const sanitizeSettingsForBackup = (settings: AppSettings): AppSettings => {
+    const safeSettings = { ...settings };
+    for (const key of BACKUP_SECURITY_SETTING_KEYS) {
+        delete safeSettings[key];
+    }
+    return safeSettings;
+};
+
+/**
+ * Restore normal preferences from a backup while keeping this device's
+ * security settings. This also handles older backups that still contain the
+ * security fields.
+ */
+export const mergeRestoredSettings = (
+    restoredSettings: AppSettings,
+    currentSettings: AppSettings,
+): AppSettings => {
+    const safeSettings = sanitizeSettingsForBackup(restoredSettings);
+
+    if (Object.hasOwn(currentSettings, 'pin')) safeSettings.pin = currentSettings.pin;
+    if (Object.hasOwn(currentSettings, 'pinHash')) safeSettings.pinHash = currentSettings.pinHash;
+    if (Object.hasOwn(currentSettings, 'pinSalt')) safeSettings.pinSalt = currentSettings.pinSalt;
+    if (Object.hasOwn(currentSettings, 'lockTimeout')) safeSettings.lockTimeout = currentSettings.lockTimeout;
+
+    return safeSettings;
+};
+
 export const generateEncryptedBackup = async (data: BackupData, password: string): Promise<Blob> => {
     const version = new Uint8Array([BACKUP_VERSION]);
     const textEncoder = new TextEncoder();
-    const encodedData = textEncoder.encode(JSON.stringify(data));
+    const backupData: BackupData = data.settings
+        ? { ...data, settings: sanitizeSettingsForBackup(data.settings) }
+        : data;
+    const encodedData = textEncoder.encode(JSON.stringify(backupData));
     const salt = crypto.getRandomValues(new Uint8Array(16));
 
     const keyMaterial = await crypto.subtle.importKey(
@@ -567,7 +604,10 @@ export const generateBackup = async (data: BackupData, password?: string): Promi
         const blob = await generateEncryptedBackup(data, password);
         return { blob, filename: 'mooneva-backup.enc' };
     } else {
-        const json = JSON.stringify(data, null, 2);
+        const backupData: BackupData = data.settings
+            ? { ...data, settings: sanitizeSettingsForBackup(data.settings) }
+            : data;
+        const json = JSON.stringify(backupData, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
         return { blob, filename: 'mooneva-backup.json' };
     }

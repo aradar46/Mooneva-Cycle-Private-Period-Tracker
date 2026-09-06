@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SettingCard, SettingRow, Toggle } from '../settings/SettingsUI';
 import NumberSettingRow from '../settings/NumberSettingRow';
+import { applySettingsInterlocks } from '../../services/logic/settingsInterlocks';
 
 // Icons mirrored from Settings.tsx so this step matches the Cycle Management panel.
 const Icons = {
@@ -36,7 +37,7 @@ interface CycleSetupStepProps {
  */
 const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => {
     const { t } = useTranslation();
-    const set = (patch: Partial<CycleSetupValues>) => onChange({ ...values, ...patch });
+    const set = (patch: Partial<CycleSetupValues>) => onChange(applySettingsInterlocks(values, patch));
     const [fertilityDisclaimerExpanded, setFertilityDisclaimerExpanded] = React.useState(false);
 
     // Content usually overflows on small phones. Track scroll position so the
@@ -75,11 +76,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                                 onClick={() => {
                                     if (!values.isOnBirthControl) {
                                         const nextVal = !values.adaptivePrediction;
-                                        set({
-                                            adaptivePrediction: nextVal,
-                                            // Turning adaptive on resumes predictions
-                                            ...(nextVal ? { predictionsPaused: false } : {})
-                                        });
+                                        set({ adaptivePrediction: nextVal });
                                     }
                                 }}
                                 disabled={values.isOnBirthControl}
@@ -180,12 +177,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                                 active={values.isOnBirthControl}
                                 onClick={() => {
                                     if (!values.isOnBirthControl) {
-                                        set({
-                                            isOnBirthControl: true,
-                                            showFertileWindow: false,
-                                            adaptivePrediction: false,
-                                            cycleLength: 28
-                                        });
+                                        set({ isOnBirthControl: true });
                                     } else {
                                         set({ isOnBirthControl: false });
                                     }
@@ -213,12 +205,7 @@ const CycleSetupStep: React.FC<CycleSetupStepProps> = ({ values, onChange }) => 
                                 onClick={() => {
                                     const nextVal = !values.predictionsPaused;
                                     if (nextVal) {
-                                        set({
-                                            predictionsPaused: true,
-                                            adaptivePrediction: false,
-                                            showFertileWindow: false,
-                                            showPMS: false
-                                        });
+                                        set({ predictionsPaused: true });
                                     } else {
                                         set({ predictionsPaused: false });
                                     }

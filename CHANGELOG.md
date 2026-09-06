@@ -2,6 +2,21 @@
 
 All notable changes to Mooneva Cycle. Versions follow the Android `versionCode` / iOS build numbers used at release time.
 
+## 2.4.0 — Android versionCode 20, iOS build 22
+
+1. Added Cycle Insights with phase-specific explanations.
+2. Added the responsive Cycle Insight popup.
+3. Added the clickable pulsing moon icon to open insights.
+4. Improved moon colors and phase styling.
+5. Added breast tenderness wording and improved symptom translations.
+6. Added more symptoms and a collapsed “More symptoms” section.
+7. Added the option to hide the fertility level from the status card.
+8. Fixed PMS notification behavior.
+9. Fixed translated symptom names in clinical reports.
+10. Improved translated trend layouts on smaller screens.
+11. Improved iPad support for the discrete-mode app icon.
+12. Made backup restore safer so health data and preferences restore while the device PIN and lock timeout remain protected.
+
 ## 2.3.0 — Android versionCode 18, iOS build 20
 
 - **New: medication logging.** Record other medications and supplements alongside mood, symptoms, flow and discharge.

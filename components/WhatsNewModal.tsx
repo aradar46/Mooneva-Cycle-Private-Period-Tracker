@@ -25,10 +25,11 @@ export const WhatsNewModal: React.FC<WhatsNewModalProps> = ({ onClose }) => {
         {/* Release notes are intentionally English-only and hard-coded -- see RELEASE.md.
             Replace this list every release; do not add these strings to the locale files. */}
         <ul className="mt-3 list-disc space-y-1.5 pl-5 text-xs sm:text-sm leading-relaxed text-slate-600">
-          <li><strong>Medications & supplements</strong> in your daily entry.</li>
-          <li><strong>Edits save instantly</strong> when you switch away.</li>
-          <li><strong>Long breaks fixed</strong>, predictions pick right back up.</li>
-          <li><strong>Safer Flo & Clue imports</strong>, timezone fixes, encrypted settings.</li>
+          <li><strong>Cycle phase insights:</strong> tap the rotating moon.</li>
+          <li><strong>Hide the fertility level</strong> while still showing the fertility window—explore Settings.</li>
+          <li><strong>Need more symptoms?</strong> We added some.</li>
+          <li><strong>Mooneva is more secure.</strong></li>
+          <li><strong>Translation fixes and more.</strong></li>
         </ul>
 
         <p dir="auto" className="mt-5 rounded-2xl bg-[#F0F4F6] px-4 py-3.5 text-center text-xs sm:text-sm leading-relaxed text-slate-600">

@@ -271,6 +271,73 @@
         "category_logs": "日志详情",
         "category_other": "其他"
     },
+    "cycle_insight": {
+        "title": "周期解读",
+        "where_you_are": "你所处的阶段",
+        "what_is_happening": "身体在发生什么",
+        "what_you_may_notice": "你可能会注意到",
+        "helpful_suggestions": "什么可能有帮助",
+        "disclaimer_title": "提示：",
+        "disclaimer_text": "以上是关于典型周期的一般信息，不构成医疗建议。你自己的规律可能不同。任何让你担心的情况，请咨询医疗专业人员。",
+        "phases": {
+            "neutral": {
+                "name": "数据还不够",
+                "where_you_are": "记录的历史还不足以判断你处在周期的哪个阶段。",
+                "what_is_happening": "阶段推算基于你记录的经期开始日期。记录几个周期后，应用就能算出你的各阶段通常出现在什么时候。",
+                "what_you_may_notice": "在有足够依据之前，预测和阶段名称都不会显示。",
+                "helpful_suggestions": "记录每次经期的第一天和最后一天，是提升应用所有推算准确度最有效的一件事。"
+            },
+            "birth_control": {
+                "name": "使用激素避孕",
+                "where_you_are": "你已开启激素避孕，因此不会推算自然周期的各个阶段。",
+                "what_is_happening": "大多数激素避孕方式通过抑制排卵、维持激素水平平稳来起作用。没有排卵，也就没有通常意义上的卵泡期或黄体期。",
+                "what_you_may_notice": "停药期间的出血是撤退性出血，并非真正的月经。通常量更少、更规律，有些方式会让出血完全停止。",
+                "helpful_suggestions": "记录出血仍有价值，可以发现长期的变化。这里隐藏了受孕几率，因为在这种情况下没有参考意义。"
+            },
+            "menstrual": {
+                "name": "月经期",
+                "where_you_are": "你正处在周期开始的出血日。",
+                "what_is_happening": "雌激素和孕激素处于最低水平，上一个周期增厚的子宫内膜正在脱落。新的卵泡已经开始发育。",
+                "what_you_may_notice": "头几天常见痛经、腰酸、疲倦、头痛或情绪低落，通常之后会缓解。",
+                "helpful_suggestions": "热敷、轻度活动和休息对很多人有帮助。如果每小时就浸透一次卫生用品，或疼痛影响正常生活，建议就医。"
+            },
+            "follicular": {
+                "name": "卵泡期",
+                "where_you_are": "你处在出血结束与排卵之间。",
+                "what_is_happening": "卵巢中的卵泡逐渐成熟，雌激素上升，子宫内膜重新增厚。",
+                "what_you_may_notice": "这段时间精力、情绪和睡眠通常会变好。随着排卵临近，宫颈黏液会逐渐变得稀薄清亮。",
+                "helpful_suggestions": "这是周期中变化最大的一段，周期整体变长或变短，主要取决于它的长度。这里的预测是估算，不是固定日期。"
+            },
+            "ovulation": {
+                "name": "排卵期",
+                "where_you_are": "这是推算的排卵日，大致位于卵泡期和黄体期之间。",
+                "what_is_happening": "促黄体生成素激增，促使成熟卵泡排出卵子。卵子存活约一天。",
+                "what_you_may_notice": "有些人会感到单侧刺痛、性欲增强、乳房胀痛，或看到清亮拉丝的宫颈黏液。也有很多人毫无感觉。",
+                "helpful_suggestions": "日历推算是从预计的经期往回推的，实际排卵日可能相差好几天。请勿以此作为避孕依据。"
+            },
+            "luteal": {
+                "name": "黄体期",
+                "where_you_are": "你处在排卵与下次预计经期之间。",
+                "what_is_happening": "排空的卵泡形成黄体，分泌孕激素来维持子宫内膜。若没有怀孕，黄体萎缩，激素水平随之下降。",
+                "what_you_may_notice": "常见体温略升、食欲增加、乳房胀痛或腹胀。到后期精力往往会下降。",
+                "helpful_suggestions": "这一阶段是周期中最稳定的部分，通常约十二到十四天，经期预测也正是以它为基准。"
+            },
+            "pms": {
+                "name": "黄体期后段（经前期）",
+                "where_you_are": "你处在预计经期前的最后几天。",
+                "what_is_happening": "雌激素和孕激素同时快速下降，这正是子宫内膜脱落、下次月经开始的触发原因。",
+                "what_you_may_notice": "情绪波动、易怒、睡眠变差、嘴馋、腹胀、乳房胀痛或头痛。通常在出血开始后一两天内缓解。",
+                "helpful_suggestions": "规律的睡眠、饮食和活动通常能减轻最难受的部分。如果每个周期的症状都严重到影响工作或人际关系，建议就医。"
+            },
+            "late": {
+                "name": "经期推迟",
+                "where_you_are": "到了预测日期，你的月经还没有来。",
+                "what_is_happening": "推迟很常见，往往只是说明这个周期变长了。压力、生病、出行、睡眠改变、高强度运动和体重变化都可能推迟排卵，从而推迟经期。",
+                "what_you_may_notice": "在你记录经期开始之前，预测会继续显示并顺延。",
+                "helpful_suggestions": "如果有怀孕可能，只有验孕才能排除。若周期反复非常长或长期不来，建议与医生沟通。"
+            }
+        }
+    },
     "log": {
         "daily_log": "日常记录",
         "mood": "心情",
@@ -310,6 +377,8 @@
         "symptoms": "症状",
         "symptoms_primary": "主要症状",
         "symptoms_secondary": "身体 & 消化",
+        "more_symptoms": "更多症状",
+        "fewer_symptoms": "收起症状",
         "secretions": "分泌物",
         "discharge_dry": "干燥",
         "discharge_sticky_creamy": "粘稠/奶油状",
@@ -366,6 +435,8 @@
         "use_language_default": "使用语言默认值",
         "daily_logging": "日常记录",
         "predictions": "预测",
+        "show_fertility_level": "显示生育力水平",
+        "show_fertility_level_desc": "在状态卡片上显示生育力水平",
         "cycle_mgmt_title": "周期管理",
         "cycle_mgmt_desc": "周期长度、预测、避孕、医疗设置",
         "birth_control": "激素避孕",
@@ -735,6 +806,7 @@
         "dizziness": "晕眩",
         "breast pain": "乳房疼痛",
         "hot flashes": "潮热",
+        "loss of appetite": "食欲不振",
         "crying": "想哭",
         "anger": "愤怒"
     }

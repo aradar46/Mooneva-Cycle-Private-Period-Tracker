@@ -3,7 +3,7 @@ import React, { createContext, useContext, useCallback, useMemo, ReactNode } fro
 import { usePersistence } from '../hooks/usePersistence';
 import { useMoonevaModel } from '../hooks/useMoonevaModel';
 import type { MoonevaModel } from '../hooks/useMoonevaModel';
-import { DailyLog, AppSettings, DayMeta, PredictionResults, PeriodRecord, Cycle } from '../types';
+import { DailyLog, AppSettings, PeriodRecord } from '../types';
 import Logger from '../services/logger';
 import { toLocalISOString, diffInDays } from '../utils/dateUtils';
 

@@ -16,7 +16,7 @@ interface DayCellProps {
     settings: AppSettings;
     onDateClick: (dateStr: string) => void;
     onToggleBleedingDay?: (dateStr: string) => void;
-    idx: number; // for blob shape calculation
+    idx?: number; // retained for callers/tests; shape styling was removed
     label?: number; // Optional custom label (e.g. for Jalali day number)
 }
 
@@ -32,7 +32,6 @@ export const DayCell: React.FC<DayCellProps> = ({
     settings,
     onDateClick,
     onToggleBleedingDay,
-    idx,
     label
 }) => {
     const hasFlow = meta.isPeriodSpan;
@@ -56,9 +55,6 @@ export const DayCell: React.FC<DayCellProps> = ({
 
     const todayStr = getTodayStr();
     const isFutureLocked = diffInDays(dateStr, todayStr) > 7;
-
-    // Random blob shape for organic feel
-    const blobShape = `blob-${(idx % 5) + 1}`;
 
     let containerClass = "bg-transparent text-slate-600 hover:bg-white/70 border border-transparent";
     let shapeClass = "rounded-2xl";

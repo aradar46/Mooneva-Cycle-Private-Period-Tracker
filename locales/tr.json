@@ -271,6 +271,73 @@
         },
         "category_other": "Diğer"
     },
+    "cycle_insight": {
+        "title": "Döngü bilgisi",
+        "where_you_are": "Nerede olduğun",
+        "what_is_happening": "Neler oluyor",
+        "what_you_may_notice": "Fark edebileceklerin",
+        "helpful_suggestions": "Ne işe yarayabilir",
+        "disclaimer_title": "Not:",
+        "disclaimer_text": "Bu, tipik bir döngü hakkında genel bilgidir, tıbbi tavsiye değildir. Senin düzenin farklı olabilir. Seni endişelendiren her şey için bir sağlık uzmanına danış.",
+        "phases": {
+            "neutral": {
+                "name": "Henüz yeterli veri yok",
+                "where_you_are": "Seni bir döngü evresine yerleştirmek için henüz yeterli kayıt yok.",
+                "what_is_happening": "Evre tahmini, kaydettiğin regl başlangıçlarına dayanır. Birkaç döngüden sonra uygulama evrelerinin genellikle nereye denk geldiğini çıkarabilir.",
+                "what_you_may_notice": "Yeterli dayanak oluşana kadar tahminler ve evre adları gizli kalır.",
+                "helpful_suggestions": "Her reglin ilk ve son gününü kaydetmek, uygulamanın bütün tahminlerini en çok iyileştiren tek şeydir."
+            },
+            "birth_control": {
+                "name": "Hormonal doğum kontrolü",
+                "where_you_are": "Hormonal doğum kontrolü açık, bu yüzden doğal döngü evreleri tahmin edilmiyor.",
+                "what_is_happening": "Hormonal doğum kontrol yöntemlerinin çoğu yumurtlamayı engeller ve hormon düzeylerini sabit tutar. Yumurtlama olmadan alışılmış anlamda foliküler ya da luteal evre bulunmaz.",
+                "what_you_may_notice": "Ara verilen günlerdeki kanama gerçek bir regl değil, çekilme kanamasıdır. Genelde daha hafif ve daha öngörülebilirdir, bazı yöntemlerde tamamen kesilir.",
+                "helpful_suggestions": "Kanamayı kaydetmek zaman içindeki değişimleri görmek için hâlâ yararlıdır. Anlamlı olmayacağı için doğurganlık bilgileri burada gizlenir."
+            },
+            "menstrual": {
+                "name": "Regl evresi",
+                "where_you_are": "Döngünün başındaki kanama günlerindesin.",
+                "what_is_happening": "Östrojen ve progesteron en düşük seviyede ve önceki döngüde oluşan rahim iç zarı atılıyor. Yeni bir folikül şimdiden gelişmeye başlıyor.",
+                "what_you_may_notice": "İlk günlerde kramp, bel ağrısı, yorgunluk, baş ağrısı veya düşük ruh hali yaygındır ve genelde sonra hafifler.",
+                "helpful_suggestions": "Sıcak uygulama, hafif hareket ve dinlenme çoğu kişiye iyi gelir. Her saat pedi aşan bir kanama ya da günlük işlerini engelleyen bir ağrı için hekime danış."
+            },
+            "follicular": {
+                "name": "Foliküler evre",
+                "where_you_are": "Kanamanın bitişi ile yumurtlama arasındasın.",
+                "what_is_happening": "Yumurtalıktaki foliküller olgunlaşıyor ve östrojen yükseliyor. Rahim iç zarı yeniden oluşuyor.",
+                "what_you_may_notice": "Bu dönemde enerji, ruh hali ve uyku genelde düzelir. Yumurtlama yaklaştıkça rahim ağzı salgısı giderek daha ıslak ve berrak olur.",
+                "helpful_suggestions": "Döngünün en değişken bölümü burasıdır, bir döngüyü uzun ya da kısa yapan da bu evrenin süresidir. Buradaki tahminler kesin tarih değil, öngörüdür."
+            },
+            "ovulation": {
+                "name": "Yumurtlama",
+                "where_you_are": "Bu, yumurtanın salındığı tahmini gün, kabaca foliküler ve luteal evrelerin ortası.",
+                "what_is_happening": "Luteinleştirici hormondaki ani yükseliş olgun folikülün yumurtayı salmasını tetikler. Yumurta yaklaşık bir gün canlı kalır.",
+                "what_you_may_notice": "Bazı kişiler tek taraflı bir batma, cinsel istekte artış, göğüs hassasiyeti hisseder veya berrak, uzayan bir salgı fark eder. Birçok kişi hiçbir şey hissetmez.",
+                "helpful_suggestions": "Takvim tahmini beklenen regl tarihinden geriye sayarak hesaplanır, gerçek gün birkaç gün kayabilir. Korunmak için buna güvenme."
+            },
+            "luteal": {
+                "name": "Luteal evre",
+                "where_you_are": "Yumurtlama ile beklenen bir sonraki reglin arasındasın.",
+                "what_is_happening": "Boşalan folikül korpus luteuma dönüşür ve rahim iç zarını yerinde tutan progesteronu üretir. Gebelik olmazsa çözülür ve hormon düzeyleri düşer.",
+                "what_you_may_notice": "Hafif yüksek vücut ısısı, artan iştah, göğüs hassasiyeti veya şişkinlik yaygındır. Enerji genelde son bölümde düşer.",
+                "helpful_suggestions": "Bu evre döngünün en istikrarlı bölümüdür, genelde on iki ile on dört gün sürer, regl tahminleri de bu yüzden buna dayanır."
+            },
+            "pms": {
+                "name": "Geç luteal evre (PMS)",
+                "where_you_are": "Beklenen reglinden önceki son günlerdesin.",
+                "what_is_happening": "Östrojen ve progesteron birlikte hızla düşer, rahim iç zarının atılmasını ve bir sonraki reglin başlamasını tetikleyen budur.",
+                "what_you_may_notice": "Ruh hali değişimleri, sinirlilik, kötü uyku, yeme istekleri, şişkinlik, göğüs ağrısı veya baş ağrısı. Genelde kanama başladıktan bir iki gün sonra geçer.",
+                "helpful_suggestions": "Düzenli uyku, beslenme ve hareket en ağır belirtileri genelde yumuşatır. Her döngüde işini ya da ilişkilerini bozacak kadar şiddetli belirtileri hekimle konuş."
+            },
+            "late": {
+                "name": "Regl gecikti",
+                "where_you_are": "Reglin tahmin edilen tarihte başlamadı.",
+                "what_is_happening": "Gecikme yaygındır ve çoğu zaman yalnızca bu döngünün uzun sürdüğü anlamına gelir. Stres, hastalık, seyahat, uyku düzensizliği, ağır egzersiz ve kilo değişimleri yumurtlamayı geciktirebilir.",
+                "what_you_may_notice": "Bir regl başlangıcı kaydedene kadar tahmin görünür kalır ve ileriye kayar.",
+                "helpful_suggestions": "Gebelik ihtimali varsa bunu yalnızca bir test dışlayabilir. Tekrar tekrar çok uzun süren ya da hiç gelmeyen döngüler için hekime danış."
+            }
+        }
+    },
     "log": {
         "daily_log": "Günlük kayıt",
         "mood": "Ruh hâli",
@@ -313,6 +380,8 @@
         "symptoms": "Belirtiler",
         "symptoms_primary": "Başlıca 6 belirti",
         "symptoms_secondary": "Vücut ve sindirim",
+        "more_symptoms": "Daha fazla belirti",
+        "fewer_symptoms": "Daha az belirti",
         "secretions": "Akıntı",
         "discharge_dry": "Kuru",
         "discharge_sticky_creamy": "Yapışkan/kremsi",
@@ -369,6 +438,8 @@
         "use_language_default": "Dilin varsayılanını kullan",
         "daily_logging": "Günlük kayıt",
         "predictions": "Tahminler",
+        "show_fertility_level": "Doğurganlık seviyesini göster",
+        "show_fertility_level_desc": "Doğurganlık seviyesini durum kartında göster",
         "cycle_mgmt_title": "Döngü yönetimi",
         "cycle_mgmt_desc": "Döngü uzunluğu, tahmin, doğum kontrolü, tıbbi ayarlar",
         "birth_control": "Hormonal doğum kontrolü",
@@ -721,7 +792,7 @@
         "cramps": "Kramp",
         "headache": "Baş ağrısı",
         "bloating": "Şişkinlik",
-        "tenderness": "Hassasiyet",
+        "tenderness": "Göğüs hassasiyeti",
         "fatigue": "Yorgunluk",
         "acne": "Akne",
         "backache": "Sırt ağrısı",
@@ -735,6 +806,7 @@
         "dizziness": "Baş dönmesi",
         "breast pain": "Göğüs ağrısı",
         "hot flashes": "Ateş basması",
+        "loss of appetite": "İştahsızlık",
         "crying": "Ağlama",
         "anger": "Öfke"
     }

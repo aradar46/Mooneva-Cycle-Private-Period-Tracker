@@ -1,14 +1,14 @@
 import React from 'react';
 
 // 1. Neumorphic Toggle
-export const Toggle = ({ active, onClick, disabled }: { active: boolean; onClick: () => void; disabled?: boolean }) => (
+export const Toggle = ({ active, onClick, disabled, small = false }: { active: boolean; onClick: () => void; disabled?: boolean; small?: boolean }) => (
     <button
         type="button"
         role="switch"
         aria-checked={active}
         onClick={disabled ? undefined : onClick}
         disabled={disabled}
-        className={`w-14 h-8 rounded-full relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0] focus-visible:ring-offset-2 ${active ? 'bg-[#7598a0]' : 'bg-[#E8EAED]'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`${small ? 'w-10 h-6' : 'w-14 h-8'} rounded-full relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0] focus-visible:ring-offset-2 ${active ? 'bg-[#7598a0]' : 'bg-[#E8EAED]'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         style={{
             boxShadow: active
                 ? 'inset 2px 2px 4px rgba(0,0,0,0.1), 0 0 8px rgba(117, 152, 160, 0.3)'
@@ -16,11 +16,11 @@ export const Toggle = ({ active, onClick, disabled }: { active: boolean; onClick
         }}
     >
         <div
-            className={`absolute top-1 w-6 h-6 rounded-full transition-transform duration-300 ${active
-                ? 'ltr:translate-x-7 rtl:-translate-x-7 bg-white'
+            className={`absolute ${small ? 'top-1 w-4 h-4' : 'top-1 w-6 h-6'} rounded-full transition-transform duration-300 ${active
+                ? `${small ? 'ltr:translate-x-5 rtl:-translate-x-5' : 'ltr:translate-x-7 rtl:-translate-x-7'} bg-white`
                 : 'ltr:translate-x-1 rtl:-translate-x-1 bg-[#F0F2F5]'
                 } ltr:left-0 rtl:right-0`}
-            style={{ boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.5), -1px -1px 3px rgba(255, 255, 255, 0.8)' }}
+            style={{ boxShadow: small ? '1px 1px 3px rgba(163, 177, 198, 0.5), -1px -1px 2px rgba(255, 255, 255, 0.8)' : '2px 2px 4px rgba(163, 177, 198, 0.5), -1px -1px 3px rgba(255, 255, 255, 0.8)' }}
         ></div>
     </button>
 );

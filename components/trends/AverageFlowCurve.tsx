@@ -3,35 +3,6 @@ import { DailyLog, PeriodRecord } from '../../types';
 import { useTranslation } from 'react-i18next';
 import { addDays } from '../../utils/dateUtils';
 
-// Mock data for testing - remove or ignore in production
-export const MOCK_PERIODS: PeriodRecord[] = [
-    { id: '1', startDate: '2025-11-01', days: 5 },
-    { id: '2', startDate: '2025-12-01', days: 6 },
-    { id: '3', startDate: '2026-01-05', days: 5 },
-];
-
-export const MOCK_LOGS: Record<string, DailyLog> = {
-    // Period 1 (Nov)
-    '2025-11-01': { date: '2025-11-01', flow: 'heavy', symptoms: [], notes: '' },
-    '2025-11-02': { date: '2025-11-02', flow: 'heavy', symptoms: [], notes: '' },
-    '2025-11-03': { date: '2025-11-03', flow: 'medium', symptoms: [], notes: '' },
-    '2025-11-04': { date: '2025-11-04', flow: 'light', symptoms: [], notes: '' },
-    '2025-11-05': { date: '2025-11-05', flow: 'spotting', symptoms: [], notes: '' },
-    // Period 2 (Dec)
-    '2025-12-01': { date: '2025-12-01', flow: 'medium', symptoms: [], notes: '' },
-    '2025-12-02': { date: '2025-12-02', flow: 'heavy', symptoms: [], notes: '' },
-    '2025-12-03': { date: '2025-12-03', flow: 'heavy', symptoms: [], notes: '' },
-    '2025-12-04': { date: '2025-12-04', flow: 'medium', symptoms: [], notes: '' },
-    '2025-12-05': { date: '2025-12-05', flow: 'light', symptoms: [], notes: '' },
-    '2025-12-06': { date: '2025-12-06', flow: 'spotting', symptoms: [], notes: '' },
-    // Period 3 (Jan)
-    '2026-01-05': { date: '2026-01-05', flow: 'heavy', symptoms: [], notes: '' },
-    '2026-01-06': { date: '2026-01-06', flow: 'heavy', symptoms: [], notes: '' },
-    '2026-01-07': { date: '2026-01-07', flow: 'medium', symptoms: [], notes: '' },
-    '2026-01-08': { date: '2026-01-08', flow: 'light', symptoms: [], notes: '' },
-    '2026-01-09': { date: '2026-01-09', flow: 'spotting', symptoms: [], notes: '' },
-};
-
 interface AverageFlowCurveProps {
     logs: Record<string, DailyLog>;
     periods: PeriodRecord[];

@@ -1,14 +1,11 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { DailyLog, FlowIntensity, MoodOptionConfig, MOOD_OPTIONS, PeriodRecord, SYMPTOM_GROUPS, DischargeType, SexDriveType, SexType } from '../types';
-import { findNearbyPeriod } from '../services/logic';
-import { toLocalISOString, addDays, diffInDays } from '../utils/dateUtils';
+import { FlowIntensity, MoodOptionConfig, MOOD_OPTIONS, DischargeType, SexDriveType, SexType } from '../types';
+import { toLocalISOString, addDays } from '../utils/dateUtils';
 import { formatLocalTimeHHmm } from '../utils/timeFormat';
 import { useAutoSave } from '../hooks/useAutoSave';
 import { useMooneva } from '../contexts/MoonevaContext';
-import { createPortal } from 'react-dom';
-import PeriodEditView from './PeriodEditView';
 
 interface DailyLogPanelProps {
     date: string;
@@ -42,13 +39,11 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
     } = useMooneva();
 
     const { getDayMeta } = model;
-    const { updateLog, startPeriod, editPeriod, deletePeriod, updatePeriodWithdrawalBleed, updatePeriodIgnoreForAverages } = actions;
+    const { updateLog, updatePeriodWithdrawalBleed, updatePeriodIgnoreForAverages } = actions;
 
     const log = logs[date];
 
     // Internal state
-    const [showPeriodEdit, setShowPeriodEdit] = useState(false);
-    const [mergePrompt, setMergePrompt] = useState<{ show: boolean; nearbyPeriod: PeriodRecord } | null>(null);
     const [flow, setFlow] = useState<FlowIntensity>(() => logs[date]?.flow || null);
     const [symptoms, setSymptoms] = useState<string[]>(() => logs[date]?.symptoms || []);
     const [notes, setNotes] = useState<string>(() => logs[date]?.notes || '');
@@ -155,28 +150,6 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
 
     useAutoSave(saveToLog, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, saveToLog]);
 
-    const handleMerge = () => {
-        if (!mergePrompt?.nearbyPeriod) return;
-        const nearby = mergePrompt.nearbyPeriod;
-        const periodEnd = addDays(nearby.startDate, nearby.days - 1);
-
-        if (date > periodEnd) {
-            const newDays = diffInDays(date, nearby.startDate) + 1;
-            editPeriod(nearby.id, newDays);
-        } else if (date < nearby.startDate) {
-            const periodEnd = addDays(nearby.startDate, nearby.days - 1);
-            const newDays = diffInDays(periodEnd, date) + 1;
-            deletePeriod(nearby.id);
-            startPeriod(date, newDays);
-        }
-        setMergePrompt(null);
-    };
-
-    const handleDeclineMerge = () => {
-        startPeriod(date, model.predictions.effective.periodLength);
-        setMergePrompt(null);
-    };
-
     const toggleSymptom = (sym: string) => {
         if (symptoms.includes(sym)) {
             setSymptoms(symptoms.filter(s => s !== sym));
@@ -185,8 +158,10 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
         }
     };
 
-    const isFuture = !!meta.isUnavailableFuture;
     const visibleSymptoms = settings.symptoms.filter(s => !s.isHidden);
+    const sortedVisibleSymptoms = [...visibleSymptoms].sort((a, b) => a.label.localeCompare(b.label));
+    const [showMoreSymptoms, setShowMoreSymptoms] = useState(false);
+    const displayedSymptoms = showMoreSymptoms ? sortedVisibleSymptoms : sortedVisibleSymptoms.slice(0, 8);
 
     type TabId = 'flow' | 'mood' | 'symptoms' | 'notes' | 'pill';
     const [activeTab, setActiveTab] = useState<TabId>('flow');
@@ -201,6 +176,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
 
     useEffect(() => {
         setIsAdvancedOpen(false);
+        setShowMoreSymptoms(false);
     }, [date]);
 
     const toggleMood = (m: string) => {
@@ -395,14 +371,6 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
 
     return (
         <>
-            {showPeriodEdit && activePeriod && createPortal(
-                <PeriodEditView
-                    period={activePeriod}
-                    onClose={() => setShowPeriodEdit(false)}
-                />,
-                document.body
-            )}
-
             <div
                 className="daily-log-panel relative z-0 w-[95%] max-w-[95%] mx-auto bg-[#F0F2F5] rounded-b-[32px] px-4 py-4 animate-fade-in space-y-4"
                 style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
@@ -548,10 +516,10 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                         )}
 
                         {activeTab === 'symptoms' && (
-                            <section className="flex flex-col gap-5 py-2">
+                            <section className="flex flex-col gap-4 py-2">
+                                <div className="flex flex-col gap-1">
                                 <div className="flex flex-wrap gap-2">
-                                    {visibleSymptoms
-                                        .sort((a, b) => a.label.localeCompare(b.label))
+                                    {displayedSymptoms
                                         .map(sym => {
                                             const isSelected = symptoms.includes(sym.label);
                                             return (
@@ -574,6 +542,16 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                                 </button>
                                             );
                                         })}
+                                </div>
+                                {sortedVisibleSymptoms.length > 8 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowMoreSymptoms(open => !open)}
+                                        className="self-center mt-1 px-2 py-0.5 text-[10px] font-semibold text-slate-400 hover:text-[#7598a0] transition-colors"
+                                    >
+                                        {showMoreSymptoms ? t('log.fewer_symptoms', 'Fewer symptoms') : t('log.more_symptoms', 'More symptoms')}
+                                    </button>
+                                )}
                                 </div>
 
                                 {settings.showFertileWindow && (
@@ -770,20 +748,6 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                 )}
             </div>
 
-            {mergePrompt?.show && createPortal(
-                <>
-                    <div className="fixed inset-0 bg-black/30 z-[301] animate-fade-in" onClick={() => setMergePrompt(null)} />
-                    <div className="fixed inset-x-6 top-1/2 -translate-y-1/2 z-[302] bg-white rounded-3xl p-6 shadow-2xl animate-fade-in">
-                        <h3 className="text-lg font-black text-slate-800 mb-2">Nearby Period Detected</h3>
-                        <p className="text-sm text-slate-500 mb-6">Would you like to merge this day into the existing period?</p>
-                        <div className="flex gap-3">
-                            <button onClick={handleDeclineMerge} className="flex-1 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest text-slate-500 bg-slate-100">New Period</button>
-                            <button onClick={handleMerge} className="flex-1 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest text-white bg-rose-500">Merge</button>
-                        </div>
-                    </div>
-                </>,
-                document.body
-            )}
         </>
     );
 };

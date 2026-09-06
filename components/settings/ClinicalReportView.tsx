@@ -8,6 +8,7 @@ import { addDays, diffInDays, getTodayStr, toLocalISOString } from '../../utils/
 import { hasDailyLogContent } from '../../utils/dailyLogContent';
 import { formatNumber } from '../../services/i18n';
 import { Cycle, DailyLog, MOOD_OPTIONS } from '../../types';
+import { averageCycleLength, averagePeriodLength } from '../../services/logic/cycle';
 
 // Rasterising the report is the expensive step (html2canvas over the whole DOM), so the
 // window is capped rather than left open-ended: a multi-year export on a phone with a
@@ -249,15 +250,13 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
 
     // Calculate Averages (exclude ongoing from stats to avoid skewing)
     const averages = useMemo(() => {
-        const validCycles = model.cycles.filter(c => !c.isWithdrawalBleed && !c.isOutlier && c.isValid !== false);
-        if (validCycles.length === 0) return { avgCycle: '-', avgPeriod: '-' };
-
-        const totalCycle = validCycles.reduce((sum, c) => sum + (c.length || 0), 0);
-        const totalPeriod = validCycles.reduce((sum, c) => sum + (c.periodLength || 0), 0);
+        const avgCycle = averageCycleLength(model.cycles);
+        const avgPeriod = averagePeriodLength(model.cycles);
+        if (avgCycle === null || avgPeriod === null) return { avgCycle: '-', avgPeriod: '-' };
 
         return {
-            avgCycle: Math.round(totalCycle / validCycles.length),
-            avgPeriod: Math.round(totalPeriod / validCycles.length)
+            avgCycle,
+            avgPeriod
         };
     }, [model.cycles]);
 
@@ -278,7 +277,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
     // Formatting Helpers
     const formatSymptoms = (symptoms: string[] = []) => {
         if (!symptoms.length) return '-';
-        const display = symptoms.slice(0, 3).map(s => t(`symptom.${s}`, s));
+        const display = symptoms.slice(0, 3).map(s => t(`symptom.${s.toLowerCase()}`, s));
         if (symptoms.length > 3) display.push('...');
         return display.join(', ');
     };

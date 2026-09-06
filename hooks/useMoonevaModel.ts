@@ -102,23 +102,37 @@ export const useMoonevaModel = (
     }, [periods, settings.historyArchivedDate, settings.lutealPhaseLength]);
 
     // 2. Predictions (Future)
+    const {
+        cycleLength,
+        periodLength,
+        lutealPhaseLength,
+        pmsLength,
+        predictionsPaused,
+        isOnBirthControl,
+        showFertileWindow,
+        adaptivePrediction,
+        historyArchivedDate,
+    } = settings;
+
     const predictions = useMemo(() => {
         return getCyclePredictions(
             periods,
             {
-                cycleLength: settings.cycleLength,
-                periodLength: settings.periodLength,
-                lutealPhaseLength: settings.lutealPhaseLength,
-                pmsLength: settings.pmsLength,
-                isPaused: settings.predictionsPaused,
-                isOnBirthControl: settings.isOnBirthControl,
-                showFertileWindow: settings.showFertileWindow,
-                adaptivePrediction: settings.adaptivePrediction
+                cycleLength,
+                periodLength,
+                lutealPhaseLength,
+                pmsLength,
+                isPaused: predictionsPaused,
+                isOnBirthControl,
+                showFertileWindow,
+                adaptivePrediction
             },
-            settings.historyArchivedDate,
+            historyArchivedDate,
             6 // Predict 6 months ahead for Calendar
         );
-    }, [periods, settings]);
+    }, [periods, cycleLength, periodLength, lutealPhaseLength, pmsLength,
+        predictionsPaused, isOnBirthControl, showFertileWindow, adaptivePrediction,
+        historyArchivedDate]);
 
     // 3. Day Meta Factory (The single source of truth for UI data)
     const getDayMeta = useCallback((dateStr: string): DayMeta => {

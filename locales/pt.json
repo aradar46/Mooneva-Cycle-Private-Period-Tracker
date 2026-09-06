@@ -271,6 +271,73 @@
         },
         "category_other": "Outro"
     },
+    "cycle_insight": {
+        "title": "Informação do ciclo",
+        "where_you_are": "Onde estás",
+        "what_is_happening": "O que está a acontecer",
+        "what_you_may_notice": "O que podes notar",
+        "helpful_suggestions": "O que pode ajudar",
+        "disclaimer_title": "Nota:",
+        "disclaimer_text": "Esta é informação geral sobre um ciclo típico, não aconselhamento médico. O teu próprio padrão pode ser diferente. Fala com um profissional de saúde sobre tudo o que te preocupe.",
+        "phases": {
+            "neutral": {
+                "name": "Ainda sem dados suficientes",
+                "where_you_are": "Ainda não há histórico suficiente registado para te situar numa fase do ciclo.",
+                "what_is_happening": "A estimativa de fases baseia-se nos inícios de menstruação que registas. Ao fim de alguns ciclos, a app consegue perceber onde costumam cair as tuas fases.",
+                "what_you_may_notice": "As previsões e os nomes das fases ficam ocultos enquanto não houver base suficiente.",
+                "helpful_suggestions": "Registar o primeiro e o último dia de cada menstruação é o que mais melhora todas as estimativas da app."
+            },
+            "birth_control": {
+                "name": "Contraceção hormonal",
+                "where_you_are": "Tens a contraceção hormonal ativada, por isso não são estimadas fases naturais do ciclo.",
+                "what_is_happening": "A maioria dos contracetivos hormonais impede a ovulação e mantém os níveis hormonais estáveis. Sem ovulação não existe fase folicular nem lútea no sentido habitual.",
+                "what_you_may_notice": "O sangramento durante a pausa é de privação, não uma menstruação verdadeira. Costuma ser mais leve e previsível, e com alguns métodos desaparece por completo.",
+                "helpful_suggestions": "Registar o sangramento continua a ser útil para detetar mudanças ao longo do tempo. Os dados de fertilidade estão ocultos aqui porque não seriam significativos."
+            },
+            "menstrual": {
+                "name": "Fase menstrual",
+                "where_you_are": "Estás nos dias de sangramento do início do ciclo.",
+                "what_is_happening": "O estrogénio e a progesterona estão no nível mais baixo e o endométrio formado no ciclo anterior está a ser eliminado. Um novo folículo já começou a desenvolver-se.",
+                "what_you_may_notice": "Cólicas, dor lombar, cansaço, dores de cabeça ou humor em baixo são comuns nos primeiros dias e costumam aliviar depois.",
+                "helpful_suggestions": "Calor, movimento suave e descanso ajudam muitas pessoas. Sangramento que atravessa a proteção a cada hora, ou dor que te impede a vida normal, merece avaliação médica."
+            },
+            "follicular": {
+                "name": "Fase folicular",
+                "where_you_are": "Estás entre o fim do sangramento e a ovulação.",
+                "what_is_happening": "Os folículos do ovário amadurecem e o estrogénio sobe. O endométrio volta a formar-se.",
+                "what_you_may_notice": "A energia, o humor e o sono costumam melhorar nesta fase. O muco cervical torna-se gradualmente mais húmido e transparente à medida que a ovulação se aproxima.",
+                "helpful_suggestions": "É a parte mais variável do ciclo, e é a sua duração que torna um ciclo mais longo ou mais curto. Aqui as previsões são estimativas, não datas fixas."
+            },
+            "ovulation": {
+                "name": "Ovulação",
+                "where_you_are": "Este é o dia estimado da libertação do óvulo, aproximadamente entre a fase folicular e a lútea.",
+                "what_is_happening": "Um pico de hormona luteinizante faz o folículo maduro libertar o óvulo, que sobrevive cerca de um dia.",
+                "what_you_may_notice": "Algumas pessoas sentem uma pontada de um lado, mais desejo, sensibilidade nos seios, ou notam muco cervical transparente e elástico. Muitas não sentem nada.",
+                "helpful_suggestions": "As estimativas do calendário contam para trás a partir da menstruação esperada, por isso o dia real pode variar vários dias. Não uses isto como método contracetivo."
+            },
+            "luteal": {
+                "name": "Fase lútea",
+                "where_you_are": "Estás entre a ovulação e a próxima menstruação esperada.",
+                "what_is_happening": "O folículo vazio transforma-se em corpo lúteo e produz progesterona, que mantém o endométrio. Sem gravidez, degrada-se e os níveis hormonais descem.",
+                "what_you_may_notice": "Temperatura corporal ligeiramente mais alta, mais apetite, seios sensíveis ou inchaço são comuns. A energia costuma descer na parte final.",
+                "helpful_suggestions": "Esta fase é a parte mais estável do ciclo, normalmente cerca de doze a catorze dias, e por isso as previsões da menstruação assentam nela."
+            },
+            "pms": {
+                "name": "Fase lútea tardia (TPM)",
+                "where_you_are": "Estás nos últimos dias antes da menstruação esperada.",
+                "what_is_happening": "O estrogénio e a progesterona descem acentuadamente, e é isso que desencadeia a descamação do endométrio e o início da menstruação seguinte.",
+                "what_you_may_notice": "Alterações de humor, irritabilidade, sono perturbado, desejos alimentares, inchaço, seios doridos ou dores de cabeça. Costumam passar um ou dois dias depois de começar o sangramento.",
+                "helpful_suggestions": "Sono, alimentação e movimento regulares costumam suavizar o pior. Sintomas fortes o suficiente para perturbar o trabalho ou as relações em todos os ciclos merecem avaliação médica."
+            },
+            "late": {
+                "name": "Menstruação atrasada",
+                "where_you_are": "A tua menstruação não começou na data prevista.",
+                "what_is_happening": "Um atraso é comum e muitas vezes significa apenas que este ciclo foi mais longo. Stress, doença, viagens, dormir pouco, exercício intenso e alterações de peso podem atrasar a ovulação.",
+                "what_you_may_notice": "A estimativa continua visível e vai-se deslocando enquanto não registares um início de menstruação.",
+                "helpful_suggestions": "Se houver possibilidade de gravidez, só um teste a exclui. Ciclos repetidamente muito longos ou ausentes merecem uma conversa com um profissional de saúde."
+            }
+        }
+    },
     "log": {
         "daily_log": "Registro diário",
         "mood": "Humor",
@@ -313,6 +380,8 @@
         "symptoms": "Sintomas",
         "symptoms_primary": "Os 6 principais",
         "symptoms_secondary": "Corpo e intestino",
+        "more_symptoms": "Mais sintomas",
+        "fewer_symptoms": "Menos sintomas",
         "secretions": "Secreções",
         "discharge_dry": "Seca",
         "discharge_sticky_creamy": "Pegajosa/cremosa",
@@ -366,6 +435,8 @@
         "use_language_default": "Usar padrão do idioma",
         "daily_logging": "Registro diário",
         "predictions": "Previsões",
+        "show_fertility_level": "Mostrar nível de fertilidade",
+        "show_fertility_level_desc": "Mostrar o nível de fertilidade no cartão de estado",
         "cycle_mgmt_title": "Gerenciamento do ciclo",
         "cycle_mgmt_desc": "Duração do ciclo, previsões, contracepção, ajustes médicos",
         "birth_control": "Contracepção hormonal",
@@ -721,7 +792,7 @@
         "cramps": "Cólicas",
         "headache": "Dor de cabeça",
         "bloating": "Inchaço",
-        "tenderness": "Sensibilidade",
+        "tenderness": "Sensibilidade nos seios",
         "fatigue": "Fadiga",
         "acne": "Acne",
         "backache": "Dor nas costas",
@@ -735,6 +806,7 @@
         "dizziness": "Tontura",
         "breast pain": "Dor nos seios",
         "hot flashes": "Ondas de calor",
+        "loss of appetite": "Perda de apetite",
         "crying": "Choro",
         "anger": "Raiva"
     }

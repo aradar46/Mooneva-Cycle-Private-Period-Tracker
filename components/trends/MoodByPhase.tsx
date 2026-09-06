@@ -1,13 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { DailyLog, Cycle, MOOD_OPTIONS } from '../../types';
 import { useTranslation } from 'react-i18next';
 import { formatNumber } from '../../services/i18n';
 import { toLocalISOString } from '../../utils/dateUtils';
+import { phaseForCycleDay } from '../../services/logic/status';
+import type { AppSettings } from '../../types';
 
 
 interface MoodByPhaseProps {
     logs: Record<string, DailyLog>;
     cycles: Cycle[];
+    settings: Pick<AppSettings, 'periodLength' | 'lutealPhaseLength' | 'pmsLength' | 'showPMS'>;
 }
 
 interface PhaseMood {
@@ -15,23 +18,65 @@ interface PhaseMood {
     icon: string;
     iconColor: string;
     dominantMood: string;
-    moodEmoji: string;
     percentage: number;
     color: string;
     glowColor: string;
 }
 
-const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles }) => {
+/** Mood names run long in some locales (de "Ausgeglichen", tr "Enerjik hissediyorum").
+ *  Shrink to fit the grid cell rather than wrapping or clipping. */
+const DynamicMoodText: React.FC<{ text: string; color: string }> = ({ text, color }) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const textRef = useRef<HTMLSpanElement>(null);
+    const [scale, setScale] = useState(1);
+
+    useLayoutEffect(() => {
+        const container = containerRef.current;
+        const span = textRef.current;
+        if (!container || !span) return;
+
+        const updateScale = () => {
+            const containerWidth = container.clientWidth;
+            const textWidth = span.scrollWidth;
+            setScale(containerWidth > 0 && textWidth > containerWidth
+                ? Math.min(1, (containerWidth - 2) / textWidth)
+                : 1);
+        };
+
+        updateScale();
+        document.fonts?.ready.then(updateScale);
+
+        if (typeof ResizeObserver === 'undefined') return;
+        const ro = new ResizeObserver(updateScale);
+        ro.observe(container);
+        return () => ro.disconnect();
+    }, [text]);
+
+    return (
+        <div ref={containerRef} className="w-full min-w-0 overflow-hidden">
+            <span
+                ref={textRef}
+                className="text-sm font-bold whitespace-nowrap inline-block ltr:origin-left rtl:origin-right"
+                style={{ color, transform: scale < 1 ? `scale(${scale})` : undefined }}
+            >
+                {text}
+            </span>
+        </div>
+    );
+};
+
+const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, settings }) => {
     const { t } = useTranslation();
 
     // Calculate mood distribution by cycle phase
     const phaseMoods = useMemo(() => {
-        // Phase definitions (day ranges within a 28-day cycle)
+        // The UI keeps PMS grouped with luteal because it has four cards;
+        // the day assignment itself still follows the dashboard phase rules.
         const phases = {
-            menstrual: { name: t('trends.phase_menstrual'), range: [1, 5], icon: '🩸', iconColor: 'text-rose-500' },
-            follicular: { name: t('trends.phase_follicular'), range: [6, 13], icon: '🌱', iconColor: 'text-lime-500' },
-            ovulation: { name: t('trends.phase_ovulation'), range: [14, 16], icon: '✨', iconColor: 'text-amber-400' },
-            luteal: { name: t('trends.phase_luteal'), range: [17, 28], icon: '🌙', iconColor: 'text-orange-400' },
+            menstrual: { name: t('trends.phase_menstrual'), icon: '🩸', iconColor: 'text-rose-500' },
+            follicular: { name: t('trends.phase_follicular'), icon: '🌱', iconColor: 'text-lime-500' },
+            ovulation: { name: t('trends.phase_ovulation'), icon: '✨', iconColor: 'text-amber-400' },
+            luteal: { name: t('trends.phase_luteal'), icon: '🌙', iconColor: 'text-orange-400' },
         };
 
         const phaseMoodCounts: Record<string, Record<string, number>> = {
@@ -61,17 +106,15 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles }) => {
                 const log = logs[dateStr];
 
                 if (log?.mood) {
-                    // Determine which phase this day belongs to
-                    // Normalize to 28-day cycle
-                    const normalizedDay = Math.round((dayNum / cycleLength) * 28);
-
-                    let phaseKey = 'luteal';
-                    for (const [key, phase] of Object.entries(phases)) {
-                        if (normalizedDay >= phase.range[0] && normalizedDay <= phase.range[1]) {
-                            phaseKey = key;
-                            break;
-                        }
-                    }
+                    const actualPhase = phaseForCycleDay(
+                        dayNum,
+                        cycleLength,
+                        cycle.periodLength || settings.periodLength,
+                        settings.lutealPhaseLength,
+                        settings.pmsLength,
+                        settings.showPMS,
+                    );
+                    const phaseKey = actualPhase === 'pms' ? 'luteal' : actualPhase;
 
                     const logMoods = log.mood;
                     logMoods.forEach(m => {
@@ -96,7 +139,6 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles }) => {
                     icon: phaseData.icon,
                     iconColor: phaseData.iconColor,
                     dominantMood: t('trends.no_data'),
-                    moodEmoji: '—',
                     percentage: 0,
                     color: '#94a3b8', // slate-400 equivalent
                     glowColor: 'transparent'
@@ -123,7 +165,6 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles }) => {
                 icon: phaseData.icon,
                 iconColor: phaseData.iconColor,
                 dominantMood: t(moodConfig.labelKey),
-                moodEmoji: moodConfig.emoji,
                 percentage,
                 color: moodConfig.color, // Return hex directly
                 glowColor: moodConfig.shadow
@@ -131,7 +172,7 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles }) => {
         }
 
         return results;
-    }, [logs, cycles]);
+    }, [logs, cycles, settings]);
 
     if (cycles.length === 0) {
         return (
@@ -163,20 +204,14 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles }) => {
                         style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
                     >
                         {/* Phase Icon & Label */}
-                        <div className="flex items-center gap-2">
-                            <span className="text-base">{phaseData.icon}</span>
-                            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500">
+                        <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-base shrink-0">{phaseData.icon}</span>
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 min-w-0 [overflow-wrap:anywhere]">
                                 {phaseData.phase}
                             </span>
                         </div>
 
-                        {/* Mood Info - left aligned */}
-                        <div className="flex items-center gap-2">
-                            <span className="text-xl leading-none">{phaseData.moodEmoji}</span>
-                            <span className="text-sm font-bold" style={{ color: phaseData.color }}>
-                                {phaseData.dominantMood}
-                            </span>
-                        </div>
+                        <DynamicMoodText text={phaseData.dominantMood} color={phaseData.color} />
 
                         {phaseData.percentage > 0 && (
                             <p className="text-[10px] text-slate-400 font-medium">

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSettings } from '../../types';
-import { generateEncryptedBackup, shareOrDownloadBackup, loadData, wipeAllData, decryptBackup, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport, MAX_IMPORT_FILE_SIZE_BYTES } from '../../services/logic';
+import { shareOrDownloadBackup, loadData, wipeAllData, decryptBackup, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport, MAX_IMPORT_FILE_SIZE_BYTES, mergeRestoredSettings } from '../../services/logic';
 import Logger from '../../services/logger';
 import { toLocalISOString } from '../../utils/dateUtils';
 import { PICKER_SESSION_KEY } from '../../hooks/useAutoLock';
@@ -25,7 +25,6 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
     const [showWipeConfirm, setShowWipeConfirm] = useState(false);
     const [showFinalWipeConfirm, setShowFinalWipeConfirm] = useState(false);
     const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
-    const [showArchiveFinalConfirm, setShowArchiveFinalConfirm] = useState(false);
     const [archiveDate, setArchiveDate] = useState(toLocalISOString(new Date()));
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -77,7 +76,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                 if (Array.isArray(restored.periods)) {
                     await savePeriods(restored.periods);
                 }
-                onUpdate(restored.settings);
+                onUpdate(mergeRestoredSettings(restored.settings, settings));
                 window.location.reload();
             } else {
                 // If decryptBackup returns null or incomplete structure

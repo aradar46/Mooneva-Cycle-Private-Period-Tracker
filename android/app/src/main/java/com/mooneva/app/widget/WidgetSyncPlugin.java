@@ -79,26 +79,4 @@ public class WidgetSyncPlugin extends Plugin {
         call.resolve(result);
     }
 
-    @PluginMethod
-    public void getWidgetStatus(PluginCall call) {
-        Context context = getContext();
-        if (context == null) {
-            call.reject("Context not available");
-            return;
-        }
-
-        AppWidgetManager widgetManager = AppWidgetManager.getInstance(context);
-        int totalWidgets = 0;
-
-        for (Class<?> providerClass : WIDGET_PROVIDERS) {
-            int[] widgetIds = widgetManager.getAppWidgetIds(
-                    new ComponentName(context, providerClass));
-            totalWidgets += widgetIds.length;
-        }
-
-        JSObject result = new JSObject();
-        result.put("widgetCount", totalWidgets);
-        result.put("hasWidgets", totalWidgets > 0);
-        call.resolve(result);
-    }
 }

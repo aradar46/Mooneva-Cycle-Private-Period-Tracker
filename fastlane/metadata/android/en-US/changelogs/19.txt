@@ -1,0 +1,3 @@
+Cycle Insights now open from a pulsing moon icon and explain the current cycle phase.
+
+You can hide the fertility level on the status card while keeping cycle phases visible. Includes UI fixes for smaller screens, translated layouts, and clearer symptom logging.

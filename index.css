@@ -325,6 +325,64 @@ body[data-theme="dark-neumorphism"] .calendar-guide-scroll::-webkit-scrollbar-th
   border-radius: 999px;
 }
 
+/* Cycle insight modal: a layered, phase-led treatment rather than a flat dialog. */
+/* iOS Safari ignores border-radius clipping when a child uses filter (the blurred
+   wash blob), leaving the hero's top-right corner square. The mask forces the clip. */
+.cycle-insight-hero {
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
+}
+
+body[data-theme="dark-neumorphism"] .cycle-insight-backdrop {
+  background: rgba(8, 12, 16, 0.68) !important;
+  backdrop-filter: blur(12px);
+}
+
+body[data-theme="dark-neumorphism"] .cycle-insight-shell {
+  background: #151b20 !important;
+  box-shadow: 16px 20px 42px rgba(3, 6, 8, 0.72), -8px -8px 20px rgba(61, 71, 80, 0.16) !important;
+}
+
+body[data-theme="dark-neumorphism"] .cycle-insight-modal {
+  background: #20262c !important;
+  box-shadow: inset 0 1px 0 rgba(184, 198, 201, 0.1) !important;
+}
+
+body[data-theme="dark-neumorphism"] .cycle-insight-hero {
+  background: linear-gradient(135deg, #293b40, #20262c) !important;
+}
+
+body[data-theme="dark-neumorphism"] .cycle-insight-hero .bg-white\/75,
+body[data-theme="dark-neumorphism"] .cycle-insight-close,
+body[data-theme="dark-neumorphism"] .cycle-insight-sections span {
+  background-color: #2a343b !important;
+  color: #b8c6c9 !important;
+}
+
+body[data-theme="dark-neumorphism"] .cycle-insight-sections > .bg-slate-200,
+body[data-theme="dark-neumorphism"] .cycle-insight-sections .bg-slate-200 {
+  background-color: rgba(184, 198, 201, 0.16) !important;
+}
+
+body[data-theme="dark-neumorphism"] .cycle-insight-section {
+  background: #252c33 !important;
+  box-shadow: var(--shadow-raised-xs) !important;
+}
+
+body[data-theme="dark-neumorphism"] .cycle-insight-section-featured {
+  background: linear-gradient(135deg, #2d4146, #29343a) !important;
+}
+
+body[data-theme="dark-neumorphism"] .cycle-insight-section p {
+  color: #c0cccf !important;
+}
+
+body[data-theme="dark-neumorphism"] .cycle-insight-disclaimer {
+  background: rgba(184, 198, 201, 0.07) !important;
+  color: #9dabad !important;
+}
+
+
 body[data-theme="dark-neumorphism"] .calendar-guide-list>div:not([class*="text-[9px]"]) {
   min-height: 2.5rem;
 }
@@ -1066,6 +1124,16 @@ body[data-theme="dark-neumorphism"] #report-content [class*="border-slate-"] {
 .animate-period-button {
   animation: period-button-pulse 7.5s ease-in-out infinite;
   will-change: transform, color;
+}
+
+.cycle-insight-moon-spin {
+  transform-origin: 50% 50%;
+  animation: cycle-insight-moon-spin 8s linear infinite;
+}
+
+@keyframes cycle-insight-moon-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes guide-button-color {

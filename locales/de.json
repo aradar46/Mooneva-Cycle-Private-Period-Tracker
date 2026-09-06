@@ -271,6 +271,73 @@
         "category_logs": "Eintragsdetails",
         "category_other": "Sonstiges"
     },
+    "cycle_insight": {
+        "title": "Zyklus-Einblick",
+        "where_you_are": "Wo du gerade bist",
+        "what_is_happening": "Was gerade passiert",
+        "what_you_may_notice": "Was du bemerken kannst",
+        "helpful_suggestions": "Was helfen kann",
+        "disclaimer_title": "Hinweis:",
+        "disclaimer_text": "Das sind allgemeine Informationen zu einem typischen Zyklus, keine medizinische Beratung. Dein eigener Rhythmus kann davon abweichen. Sprich bei Sorgen mit einer Ärztin oder einem Arzt.",
+        "phases": {
+            "neutral": {
+                "name": "Noch zu wenig Daten",
+                "where_you_are": "Es sind noch nicht genug Einträge vorhanden, um dich einer Zyklusphase zuzuordnen.",
+                "what_is_happening": "Die Phasenschätzung beruht auf den eingetragenen Periodenstarts. Nach ein paar Zyklen kann die App erkennen, wann deine Phasen üblicherweise liegen.",
+                "what_you_may_notice": "Vorhersagen und Phasennamen bleiben ausgeblendet, solange die Grundlage dafür fehlt.",
+                "helpful_suggestions": "Den ersten und letzten Tag jeder Periode einzutragen verbessert alle Schätzungen der App am stärksten."
+            },
+            "birth_control": {
+                "name": "Hormonelle Verhütung",
+                "where_you_are": "Du hast hormonelle Verhütung aktiviert, deshalb werden keine natürlichen Zyklusphasen geschätzt.",
+                "what_is_happening": "Die meisten hormonellen Verhütungsmittel verhindern den Eisprung und halten den Hormonspiegel gleichmäßig. Ohne Eisprung gibt es keine Follikel- oder Lutealphase im üblichen Sinn.",
+                "what_you_may_notice": "Eine Blutung in der Einnahmepause ist eine Abbruchblutung, keine echte Periode. Sie ist oft leichter und regelmäßiger, bei manchen Methoden bleibt sie ganz aus.",
+                "helpful_suggestions": "Blutungen einzutragen bleibt sinnvoll, um Veränderungen zu erkennen. Fruchtbarkeitsangaben werden hier ausgeblendet, weil sie nicht aussagekräftig wären."
+            },
+            "menstrual": {
+                "name": "Menstruationsphase",
+                "where_you_are": "Du bist in den Blutungstagen am Anfang des Zyklus.",
+                "what_is_happening": "Östrogen und Progesteron sind am niedrigsten, und die im letzten Zyklus aufgebaute Gebärmutterschleimhaut wird abgestoßen. Ein neuer Follikel beginnt bereits zu reifen.",
+                "what_you_may_notice": "Krämpfe, Rückenschmerzen, Müdigkeit, Kopfschmerzen oder gedrückte Stimmung sind in den ersten Tagen häufig und lassen meist nach.",
+                "helpful_suggestions": "Wärme, sanfte Bewegung und Ruhe helfen vielen. Wenn du stündlich durchblutest oder Schmerzen dich am Alltag hindern, sprich das ärztlich an."
+            },
+            "follicular": {
+                "name": "Follikelphase",
+                "where_you_are": "Du bist zwischen dem Ende der Blutung und dem Eisprung.",
+                "what_is_happening": "Follikel im Eierstock reifen heran und das Östrogen steigt. Die Gebärmutterschleimhaut baut sich wieder auf.",
+                "what_you_may_notice": "Energie, Stimmung und Schlaf werden in dieser Zeit oft besser. Der Zervixschleim wird allmählich feuchter und klarer, je näher der Eisprung rückt.",
+                "helpful_suggestions": "Das ist der variabelste Teil des Zyklus, seine Länge bestimmt, ob ein Zyklus insgesamt länger oder kürzer wird. Vorhersagen sind hier Schätzungen, keine festen Termine."
+            },
+            "ovulation": {
+                "name": "Eisprung",
+                "where_you_are": "Das ist der geschätzte Tag des Eisprungs, ungefähr zwischen Follikel- und Lutealphase.",
+                "what_is_happening": "Ein Anstieg des luteinisierenden Hormons löst die Freisetzung der Eizelle aus dem reifen Follikel aus. Die Eizelle überlebt etwa einen Tag.",
+                "what_you_may_notice": "Manche spüren ein einseitiges Ziehen, mehr Lust, empfindliche Brüste oder bemerken klaren, spinnbaren Zervixschleim. Viele merken gar nichts.",
+                "helpful_suggestions": "Kalenderschätzungen rechnen vom erwarteten Periodenbeginn zurück, der echte Tag kann also mehrere Tage abweichen. Verlass dich zur Verhütung nicht darauf."
+            },
+            "luteal": {
+                "name": "Lutealphase",
+                "where_you_are": "Du bist zwischen dem Eisprung und der nächsten erwarteten Periode.",
+                "what_is_happening": "Aus dem entleerten Follikel wird der Gelbkörper, der Progesteron bildet und die Schleimhaut erhält. Ohne Schwangerschaft bildet er sich zurück und die Hormonwerte fallen.",
+                "what_you_may_notice": "Etwas höhere Körpertemperatur, mehr Appetit, empfindliche Brüste oder ein Blähgefühl sind häufig. Gegen Ende sinkt oft die Energie.",
+                "helpful_suggestions": "Diese Phase ist der stabilste Teil des Zyklus, meist etwa zwölf bis vierzehn Tage. Deshalb sind die Periodenvorhersagen daran ausgerichtet."
+            },
+            "pms": {
+                "name": "Späte Lutealphase (PMS)",
+                "where_you_are": "Du bist in den letzten Tagen vor der erwarteten Periode.",
+                "what_is_happening": "Östrogen und Progesteron fallen beide stark ab, was das Abstoßen der Schleimhaut und den Beginn der nächsten Periode auslöst.",
+                "what_you_may_notice": "Stimmungsschwankungen, Reizbarkeit, schlechter Schlaf, Heißhunger, Blähgefühl, spannende Brüste oder Kopfschmerzen. Meist lässt das ein bis zwei Tage nach Blutungsbeginn nach.",
+                "helpful_suggestions": "Regelmäßiger Schlaf, Essen und Bewegung mildern das oft ab. Beschwerden, die jeden Zyklus Arbeit oder Beziehungen stark belasten, gehören ärztlich besprochen."
+            },
+            "late": {
+                "name": "Periode ist überfällig",
+                "where_you_are": "Deine Periode hat am vorhergesagten Tag nicht eingesetzt.",
+                "what_is_happening": "Eine verspätete Periode ist häufig und bedeutet oft nur, dass dieser Zyklus länger war. Stress, Krankheit, Reisen, Schlafmangel, viel Sport und Gewichtsveränderungen können den Eisprung verschieben.",
+                "what_you_may_notice": "Die Schätzung bleibt sichtbar und verschiebt sich, bis du einen Periodenstart einträgst.",
+                "helpful_suggestions": "Wenn eine Schwangerschaft möglich ist, klärt nur ein Test das sicher. Wiederholt sehr lange oder ausbleibende Zyklen solltest du ärztlich abklären lassen."
+            }
+        }
+    },
     "log": {
         "daily_log": "Tagesprotokoll",
         "mood": "Stimmung",
@@ -310,6 +377,8 @@
         "symptoms": "Symptome",
         "symptoms_primary": "Die 6 Häufigsten",
         "symptoms_secondary": "Körper & Verdauung",
+        "more_symptoms": "Weitere Symptome",
+        "fewer_symptoms": "Weniger Symptome",
         "secretions": "Zervixschleim",
         "discharge_dry": "Trocken",
         "discharge_sticky_creamy": "Klebrig/Cremig",
@@ -366,6 +435,8 @@
         "use_language_default": "Sprachstandard verwenden",
         "daily_logging": "Tägliches Loggen",
         "predictions": "Prognosen",
+        "show_fertility_level": "Fruchtbarkeitsstufe anzeigen",
+        "show_fertility_level_desc": "Fruchtbarkeitsstufe auf der Statuskarte anzeigen",
         "cycle_mgmt_title": "Zyklusverwaltung",
         "cycle_mgmt_desc": "Zykluslänge, Prognose, Verhütung, medizinische Überschreibungen",
         "birth_control": "Hormonelle Verhütung",
@@ -721,7 +792,7 @@
         "cramps": "Krämpfe",
         "headache": "Kopfschmerzen",
         "bloating": "Blähbauch",
-        "tenderness": "Empfindlichkeit",
+        "tenderness": "Brustspannen",
         "fatigue": "Müdigkeit",
         "acne": "Akne",
         "backache": "Rückenschmerzen",
@@ -735,6 +806,7 @@
         "dizziness": "Schwindel",
         "breast pain": "Brustschmerzen",
         "hot flashes": "Hitzewallungen",
+        "loss of appetite": "Appetitlosigkeit",
         "crying": "Weinerlichkeit",
         "anger": "Wut"
     }

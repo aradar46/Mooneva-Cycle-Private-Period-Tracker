@@ -271,6 +271,73 @@
         "category_logs": "Detalles del registro",
         "category_other": "Otro"
     },
+    "cycle_insight": {
+        "title": "Información del ciclo",
+        "where_you_are": "Dónde estás",
+        "what_is_happening": "Qué está pasando",
+        "what_you_may_notice": "Qué puedes notar",
+        "helpful_suggestions": "Qué puede ayudar",
+        "disclaimer_title": "Nota:",
+        "disclaimer_text": "Esta es información general sobre un ciclo típico, no consejo médico. Tu propio patrón puede ser distinto. Consulta a un profesional sanitario sobre cualquier cosa que te preocupe.",
+        "phases": {
+            "neutral": {
+                "name": "Aún no hay datos suficientes",
+                "where_you_are": "Todavía no hay suficiente historial registrado para situarte en una fase del ciclo.",
+                "what_is_happening": "La estimación de fases se basa en los inicios de regla que registras. Tras unos ciclos, la app puede deducir dónde suelen caer tus fases.",
+                "what_you_may_notice": "Las predicciones y los nombres de las fases permanecen ocultos mientras no haya base suficiente.",
+                "helpful_suggestions": "Registrar el primer y el último día de cada regla es lo que más mejora todas las estimaciones de la app."
+            },
+            "birth_control": {
+                "name": "Anticoncepción hormonal",
+                "where_you_are": "Tienes activada la anticoncepción hormonal, así que no se estiman fases naturales del ciclo.",
+                "what_is_happening": "La mayoría de los anticonceptivos hormonales impiden la ovulación y mantienen los niveles hormonales estables. Sin ovulación no hay fase folicular ni lútea en el sentido habitual.",
+                "what_you_may_notice": "El sangrado durante el descanso es un sangrado por deprivación, no una regla real. Suele ser más ligero y previsible, y con algunos métodos desaparece del todo.",
+                "helpful_suggestions": "Registrar el sangrado sigue siendo útil para detectar cambios con el tiempo. Aquí se ocultan los datos de fertilidad porque no serían significativos."
+            },
+            "menstrual": {
+                "name": "Fase menstrual",
+                "where_you_are": "Estás en los días de sangrado del inicio del ciclo.",
+                "what_is_happening": "Los estrógenos y la progesterona están en su nivel más bajo y se desprende el endometrio formado en el ciclo anterior. Ya empieza a desarrollarse un folículo nuevo.",
+                "what_you_may_notice": "Cólicos, dolor lumbar, cansancio, dolor de cabeza o ánimo bajo son habituales los primeros días y suelen aliviarse después.",
+                "helpful_suggestions": "El calor, el movimiento suave y el descanso ayudan a muchas personas. Un sangrado que traspasa la protección cada hora, o un dolor que te impide hacer vida normal, conviene consultarlo."
+            },
+            "follicular": {
+                "name": "Fase folicular",
+                "where_you_are": "Estás entre el final del sangrado y la ovulación.",
+                "what_is_happening": "Los folículos del ovario maduran y los estrógenos suben. El endometrio se reconstruye.",
+                "what_you_may_notice": "La energía, el ánimo y el sueño suelen mejorar durante esta etapa. El moco cervical se vuelve más húmedo y transparente a medida que se acerca la ovulación.",
+                "helpful_suggestions": "Es la parte más variable del ciclo, y su duración es lo que hace que un ciclo sea más largo o más corto. Aquí las predicciones son estimaciones, no fechas fijas."
+            },
+            "ovulation": {
+                "name": "Ovulación",
+                "where_you_are": "Este es el día estimado de liberación del óvulo, aproximadamente entre la fase folicular y la lútea.",
+                "what_is_happening": "Un pico de hormona luteinizante hace que el folículo maduro libere el óvulo, que sobrevive alrededor de un día.",
+                "what_you_may_notice": "Algunas personas sienten una punzada en un lado, más deseo sexual, sensibilidad en el pecho, o notan moco cervical claro y elástico. Muchas no notan nada.",
+                "helpful_suggestions": "Las estimaciones del calendario cuentan hacia atrás desde la regla esperada, así que el día real puede variar varios días. No lo uses como método anticonceptivo."
+            },
+            "luteal": {
+                "name": "Fase lútea",
+                "where_you_are": "Estás entre la ovulación y tu próxima regla esperada.",
+                "what_is_happening": "El folículo vacío se convierte en cuerpo lúteo y produce progesterona, que mantiene el endometrio. Si no hay embarazo, se degrada y las hormonas caen.",
+                "what_you_may_notice": "Temperatura corporal algo más alta, más apetito, sensibilidad en el pecho o hinchazón son frecuentes. La energía suele bajar en la parte final.",
+                "helpful_suggestions": "Esta fase es la parte más estable del ciclo, normalmente unos doce a catorce días, y por eso las predicciones de la regla se anclan a ella."
+            },
+            "pms": {
+                "name": "Fase lútea tardía (SPM)",
+                "where_you_are": "Estás en los últimos días antes de la regla esperada.",
+                "what_is_happening": "Los estrógenos y la progesterona caen bruscamente, y eso es lo que desencadena el desprendimiento del endometrio y el inicio de la siguiente regla.",
+                "what_you_may_notice": "Cambios de humor, irritabilidad, mal sueño, antojos, hinchazón, dolor en el pecho o dolor de cabeza. Suele remitir uno o dos días después de empezar el sangrado.",
+                "helpful_suggestions": "Dormir, comer y moverte con regularidad suele suavizar lo peor. Síntomas lo bastante intensos como para alterar el trabajo o las relaciones cada ciclo merecen consulta médica."
+            },
+            "late": {
+                "name": "Regla con retraso",
+                "where_you_are": "Tu regla no ha empezado en la fecha prevista.",
+                "what_is_happening": "Un retraso es común y muchas veces solo significa que este ciclo ha sido largo. El estrés, una enfermedad, viajar, dormir poco, el ejercicio intenso y los cambios de peso pueden retrasar la ovulación.",
+                "what_you_may_notice": "La estimación sigue visible y se va desplazando mientras no registres un inicio de regla.",
+                "helpful_suggestions": "Si es posible un embarazo, solo un test lo descarta. Ciclos repetidamente muy largos o ausentes conviene comentarlos con un profesional sanitario."
+            }
+        }
+    },
     "log": {
         "daily_log": "Registro diario",
         "mood": "Ánimo",
@@ -310,6 +377,8 @@
         "symptoms": "Síntomas",
         "symptoms_primary": "Los 6 principales",
         "symptoms_secondary": "Cuerpo y digestión",
+        "more_symptoms": "Más síntomas",
+        "fewer_symptoms": "Menos síntomas",
         "secretions": "Flujo vaginal",
         "discharge_dry": "Seco",
         "discharge_sticky_creamy": "Pegajoso/Cremoso",
@@ -366,6 +435,8 @@
         "use_language_default": "Usar predeterminado del idioma",
         "daily_logging": "Registro Diario",
         "predictions": "Predicciones",
+        "show_fertility_level": "Mostrar nivel de fertilidad",
+        "show_fertility_level_desc": "Mostrar el nivel de fertilidad en la tarjeta de estado",
         "cycle_mgmt_title": "Gestión del ciclo",
         "cycle_mgmt_desc": "Duración del ciclo, predicción, anticonceptivos, configuraciones médicas",
         "birth_control": "Anticonceptivos",
@@ -721,7 +792,7 @@
         "cramps": "Cólicos",
         "headache": "Dolor de cabeza",
         "bloating": "Hinchazón",
-        "tenderness": "Sensibilidad",
+        "tenderness": "Sensibilidad mamaria",
         "fatigue": "Fatiga",
         "acne": "Acné",
         "backache": "Dolor de espalda",
@@ -735,6 +806,7 @@
         "dizziness": "Mareos",
         "breast pain": "Dolor de senos",
         "hot flashes": "Sofocos",
+        "loss of appetite": "Pérdida de apetito",
         "crying": "Ganas de llorar",
         "anger": "Enojo"
     }

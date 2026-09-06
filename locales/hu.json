@@ -271,6 +271,73 @@
         },
         "category_other": "Egyéb"
     },
+    "cycle_insight": {
+        "title": "Ciklusinformáció",
+        "where_you_are": "Hol tartasz",
+        "what_is_happening": "Mi történik",
+        "what_you_may_notice": "Mit vehetsz észre",
+        "helpful_suggestions": "Mi segíthet",
+        "disclaimer_title": "Megjegyzés:",
+        "disclaimer_text": "Ez általános tájékoztatás egy tipikus ciklusról, nem orvosi tanács. A saját ritmusod ettől eltérhet. Bármi, ami aggaszt, beszéld meg egészségügyi szakemberrel.",
+        "phases": {
+            "neutral": {
+                "name": "Még nincs elég adat",
+                "where_you_are": "Még nincs elég rögzített előzmény ahhoz, hogy a ciklus egy szakaszához rendeljünk.",
+                "what_is_happening": "A szakaszbecslés a rögzített menstruációkezdetekre épül. Néhány ciklus után az alkalmazás ki tudja számolni, hol szoktak lenni a szakaszaid.",
+                "what_you_may_notice": "Az előrejelzések és a szakasznevek rejtve maradnak, amíg nincs elég alap hozzájuk.",
+                "helpful_suggestions": "Minden menstruáció első és utolsó napjának rögzítése javítja a legtöbbet az alkalmazás összes becslésén."
+            },
+            "birth_control": {
+                "name": "Hormonális fogamzásgátlás",
+                "where_you_are": "A hormonális fogamzásgátlás be van kapcsolva, ezért nem becsüljük a természetes ciklusszakaszokat.",
+                "what_is_happening": "A legtöbb hormonális fogamzásgátló megakadályozza a peteérést és egyenletesen tartja a hormonszintet. Peteérés nélkül a szokásos értelemben nincs follikuláris vagy luteális szakasz.",
+                "what_you_may_notice": "A szünetben jelentkező vérzés megvonásos vérzés, nem valódi menstruáció. Gyakran enyhébb és kiszámíthatóbb, egyes módszereknél teljesen elmarad.",
+                "helpful_suggestions": "A vérzés rögzítése továbbra is hasznos a változások követéséhez. A termékenységi adatok itt rejtve vannak, mert nem lennének értelmezhetők."
+            },
+            "menstrual": {
+                "name": "Menstruációs szakasz",
+                "where_you_are": "A ciklus eleji vérzéses napokban vagy.",
+                "what_is_happening": "Az ösztrogén és a progeszteron a legalacsonyabb szinten van, és az előző ciklusban felépült méhnyálkahártya leválik. Egy új tüsző már fejlődésnek indult.",
+                "what_you_may_notice": "Görcsök, derékfájás, fáradtság, fejfájás vagy nyomott hangulat az első napokban gyakori, és általában enyhül.",
+                "helpful_suggestions": "Sokaknak segít a meleg, a kímélő mozgás és a pihenés. Ha a vérzés óránként átüt a betéten, vagy a fájdalom akadályoz a mindennapokban, érdemes orvoshoz fordulni."
+            },
+            "follicular": {
+                "name": "Follikuláris szakasz",
+                "where_you_are": "A vérzés vége és a peteérés között vagy.",
+                "what_is_happening": "A petefészekben tüszők érnek, és emelkedik az ösztrogénszint. A méhnyálkahártya újraépül.",
+                "what_you_may_notice": "Az energia, a hangulat és az alvás ilyenkor gyakran javul. A méhnyaknyák a peteérés közeledtével fokozatosan nedvesebb és tisztább lesz.",
+                "helpful_suggestions": "Ez a ciklus legváltozékonyabb része, és a hossza dönti el, hogy egy ciklus összességében hosszabb vagy rövidebb lesz. Az itteni előrejelzések becslések, nem fix dátumok."
+            },
+            "ovulation": {
+                "name": "Peteérés",
+                "where_you_are": "Ez a petesejt kilökődésének becsült napja, nagyjából a follikuláris és a luteális szakasz között.",
+                "what_is_happening": "A luteinizáló hormon megugrása váltja ki, hogy az érett tüsző kibocsássa a petesejtet. A petesejt körülbelül egy napig marad életképes.",
+                "what_you_may_notice": "Van, aki féloldali szúrást, erősebb vágyat, mellérzékenységet érez, vagy tiszta, nyúlós méhnyaknyákot vesz észre. Sokan semmit nem tapasztalnak.",
+                "helpful_suggestions": "A naptári becslés a várt menstruációtól visszafelé számol, így a valódi nap több nappal is eltérhet. Fogamzásgátlásra ne támaszkodj rá."
+            },
+            "luteal": {
+                "name": "Luteális szakasz",
+                "where_you_are": "A peteérés és a következő várt menstruáció között vagy.",
+                "what_is_happening": "A kiürült tüszőből sárgatest lesz, ami progeszteront termel, és ez tartja fenn a méhnyálkahártyát. Terhesség híján leépül, és a hormonszintek leesnek.",
+                "what_you_may_notice": "Kicsit magasabb testhőmérséklet, nagyobb étvágy, mellérzékenység vagy puffadás gyakori. A vége felé az energia gyakran csökken.",
+                "helpful_suggestions": "Ez a ciklus legállandóbb része, általában tizenkét-tizennégy nap, ezért is erre épülnek a menstruációs előrejelzések."
+            },
+            "pms": {
+                "name": "Késői luteális szakasz (PMS)",
+                "where_you_are": "A várt menstruáció előtti utolsó napokban vagy.",
+                "what_is_happening": "Az ösztrogén és a progeszteron is meredeken esik, és ez indítja el a méhnyálkahártya leválását és a következő menstruációt.",
+                "what_you_may_notice": "Hangulatingadozás, ingerlékenység, rossz alvás, sóvárgás, puffadás, mellfeszülés vagy fejfájás. Ezek általában a vérzés kezdete után egy-két nappal enyhülnek.",
+                "helpful_suggestions": "A rendszeres alvás, étkezés és mozgás gyakran tompítja a legrosszabbat. Ha a tünetek minden ciklusban zavarják a munkát vagy a kapcsolataidat, beszéld meg orvossal."
+            },
+            "late": {
+                "name": "Késik a menstruáció",
+                "where_you_are": "A menstruációd nem indult meg az előre jelzett napon.",
+                "what_is_happening": "A késés gyakori, és sokszor csak annyit jelent, hogy ez a ciklus hosszabbra nyúlt. A stressz, betegség, utazás, kevés alvás, intenzív sport és a súlyváltozás mind késleltetheti a peteérést.",
+                "what_you_may_notice": "A becslés látható marad, és addig tolódik, amíg nem rögzítesz egy menstruációkezdetet.",
+                "helpful_suggestions": "Ha terhesség lehetséges, csak teszttel zárható ki. Az ismétlődően nagyon hosszú vagy elmaradó ciklusokat érdemes orvossal megbeszélni."
+            }
+        }
+    },
     "log": {
         "daily_log": "Napi napló",
         "mood": "Hangulat",
@@ -313,6 +380,8 @@
         "symptoms": "Tünetek",
         "symptoms_primary": "A nagy 6",
         "symptoms_secondary": "Test és emésztés",
+        "more_symptoms": "További tünetek",
+        "fewer_symptoms": "Kevesebb tünet",
         "secretions": "Váladék",
         "discharge_dry": "Száraz",
         "discharge_sticky_creamy": "Ragacsos/krémes",
@@ -366,6 +435,8 @@
         "use_language_default": "Nyelvi alapértelmezés használata",
         "daily_logging": "Napi naplózás",
         "predictions": "Előrejelzések",
+        "show_fertility_level": "Termékenységi szint megjelenítése",
+        "show_fertility_level_desc": "A termékenységi szint megjelenítése az állapotkártyán",
         "cycle_mgmt_title": "Cikluskezelés",
         "cycle_mgmt_desc": "Ciklushossz, előrejelzés, fogamzásgátlás, orvosi felülbírálás",
         "birth_control": "Hormonális fogamzásgátlás",
@@ -721,7 +792,7 @@
         "cramps": "Görcsök",
         "headache": "Fejfájás",
         "bloating": "Puffadás",
-        "tenderness": "Érzékenység",
+        "tenderness": "Mellérzékenység",
         "fatigue": "Fáradtság",
         "acne": "Pattanások",
         "backache": "Hátfájás",
@@ -735,6 +806,7 @@
         "dizziness": "Szédülés",
         "breast pain": "Mellfájdalom",
         "hot flashes": "Hőhullámok",
+        "loss of appetite": "Étvágytalanság",
         "crying": "Sírás",
         "anger": "Harag"
     }

@@ -271,6 +271,73 @@
         },
         "category_other": "Autre"
     },
+    "cycle_insight": {
+        "title": "Aperçu du cycle",
+        "where_you_are": "Où tu en es",
+        "what_is_happening": "Ce qui se passe",
+        "what_you_may_notice": "Ce que tu peux remarquer",
+        "helpful_suggestions": "Ce qui peut aider",
+        "disclaimer_title": "Remarque :",
+        "disclaimer_text": "Ce sont des informations générales sur un cycle typique, pas un avis médical. Ton propre rythme peut être différent. Parle à un professionnel de santé de tout ce qui t'inquiète.",
+        "phases": {
+            "neutral": {
+                "name": "Pas encore assez de données",
+                "where_you_are": "Il n'y a pas encore assez d'historique enregistré pour te situer dans une phase du cycle.",
+                "what_is_happening": "L'estimation des phases repose sur les débuts de règles enregistrés. Après quelques cycles, l'application peut repérer où tes phases se situent habituellement.",
+                "what_you_may_notice": "Les prévisions et les noms de phases restent masqués tant qu'il n'y a pas de base suffisante.",
+                "helpful_suggestions": "Noter le premier et le dernier jour de chaque période est ce qui améliore le plus toutes les estimations de l'application."
+            },
+            "birth_control": {
+                "name": "Contraception hormonale",
+                "where_you_are": "La contraception hormonale est activée, les phases naturelles du cycle ne sont donc pas estimées.",
+                "what_is_happening": "La plupart des contraceptifs hormonaux empêchent l'ovulation et maintiennent des niveaux hormonaux stables. Sans ovulation, il n'y a pas de phase folliculaire ni lutéale au sens habituel.",
+                "what_you_may_notice": "Un saignement pendant la pause est une hémorragie de privation, pas de vraies règles. Il est souvent plus léger et plus régulier, et certaines méthodes le suppriment complètement.",
+                "helpful_suggestions": "Noter les saignements reste utile pour repérer les changements dans le temps. Les indications de fertilité sont masquées ici car elles n'auraient pas de sens."
+            },
+            "menstrual": {
+                "name": "Phase menstruelle",
+                "where_you_are": "Tu es dans les jours de saignement au début du cycle.",
+                "what_is_happening": "Les œstrogènes et la progestérone sont au plus bas, et la muqueuse utérine formée au cycle précédent est évacuée. Un nouveau follicule commence déjà à se développer.",
+                "what_you_may_notice": "Crampes, douleurs lombaires, fatigue, maux de tête ou humeur basse sont fréquents les premiers jours et s'atténuent généralement ensuite.",
+                "helpful_suggestions": "La chaleur, une activité douce et le repos aident beaucoup de personnes. Un saignement qui traverse la protection toutes les heures, ou une douleur qui t'empêche de fonctionner, mérite un avis médical."
+            },
+            "follicular": {
+                "name": "Phase folliculaire",
+                "where_you_are": "Tu es entre la fin des saignements et l'ovulation.",
+                "what_is_happening": "Les follicules de l'ovaire mûrissent et les œstrogènes augmentent. La muqueuse utérine se reconstruit.",
+                "what_you_may_notice": "L'énergie, l'humeur et le sommeil s'améliorent souvent sur cette période. La glaire cervicale devient progressivement plus fluide et transparente à l'approche de l'ovulation.",
+                "helpful_suggestions": "C'est la partie la plus variable du cycle, sa durée est ce qui rend un cycle globalement plus long ou plus court. Les prévisions ici sont des estimations, pas des dates fixes."
+            },
+            "ovulation": {
+                "name": "Ovulation",
+                "where_you_are": "C'est le jour estimé de la libération de l'ovule, à peu près entre la phase folliculaire et la phase lutéale.",
+                "what_is_happening": "Un pic d'hormone lutéinisante déclenche la libération de l'ovule par le follicule mûr. L'ovule survit environ une journée.",
+                "what_you_may_notice": "Certaines personnes ressentent un tiraillement d'un côté, plus de désir, une sensibilité des seins, ou remarquent une glaire claire et filante. Beaucoup ne ressentent rien.",
+                "helpful_suggestions": "Les estimations du calendrier comptent à rebours à partir des règles attendues, le jour réel peut donc varier de plusieurs jours. Ne t'y fie pas comme moyen de contraception."
+            },
+            "luteal": {
+                "name": "Phase lutéale",
+                "where_you_are": "Tu es entre l'ovulation et tes prochaines règles attendues.",
+                "what_is_happening": "Le follicule vidé devient le corps jaune et produit de la progestérone, qui maintient la muqueuse utérine en place. Sans grossesse, il se dégrade et les hormones chutent.",
+                "what_you_may_notice": "Température corporelle légèrement plus élevée, plus d'appétit, seins sensibles ou ballonnements sont fréquents. L'énergie baisse souvent vers la fin.",
+                "helpful_suggestions": "Cette phase est la partie la plus stable du cycle, généralement douze à quatorze jours, c'est pourquoi les prévisions de règles s'y rattachent."
+            },
+            "pms": {
+                "name": "Phase lutéale tardive (SPM)",
+                "where_you_are": "Tu es dans les derniers jours avant les règles attendues.",
+                "what_is_happening": "Les œstrogènes et la progestérone chutent fortement, ce qui déclenche l'évacuation de la muqueuse et le début des règles suivantes.",
+                "what_you_may_notice": "Changements d'humeur, irritabilité, sommeil perturbé, envies alimentaires, ballonnements, seins douloureux ou maux de tête. Cela s'estompe généralement un ou deux jours après le début des saignements.",
+                "helpful_suggestions": "Un sommeil, une alimentation et une activité réguliers atténuent souvent le plus fort. Des symptômes assez sévères pour perturber le travail ou les relations à chaque cycle méritent un avis médical."
+            },
+            "late": {
+                "name": "Règles en retard",
+                "where_you_are": "Tes règles n'ont pas commencé à la date prévue.",
+                "what_is_happening": "Un retard est fréquent et signifie souvent simplement que ce cycle a été plus long. Le stress, une maladie, un voyage, le manque de sommeil, un sport intense et les variations de poids peuvent décaler l'ovulation.",
+                "what_you_may_notice": "L'estimation reste visible et se décale tant que tu n'as pas enregistré de début de règles.",
+                "helpful_suggestions": "Si une grossesse est possible, seul un test permet de l'exclure. Des cycles très longs ou absents de façon répétée méritent d'être discutés avec un professionnel de santé."
+            }
+        }
+    },
     "log": {
         "daily_log": "Enregistrement quotidien",
         "mood": "Humeur",
@@ -313,6 +380,8 @@
         "symptoms": "Symptômes",
         "symptoms_primary": "Les 6 essentiels",
         "symptoms_secondary": "Corps & Digestion",
+        "more_symptoms": "Plus de symptômes",
+        "fewer_symptoms": "Moins de symptômes",
         "secretions": "Sécrétions",
         "discharge_dry": "Sec",
         "discharge_sticky_creamy": "Collant/Crémeux",
@@ -366,6 +435,8 @@
         "use_language_default": "Utiliser la langue par défaut",
         "daily_logging": "Enregistrement quotidien",
         "predictions": "Prédictions",
+        "show_fertility_level": "Afficher le niveau de fertilité",
+        "show_fertility_level_desc": "Afficher le niveau de fertilité sur la carte d’état",
         "cycle_mgmt_title": "Gestion du cycle",
         "cycle_mgmt_desc": "Durée du cycle, prédiction, contraception, dérogations médicales",
         "birth_control": "Contraception hormonale",
@@ -721,7 +792,7 @@
         "cramps": "Crampes",
         "headache": "Mal de tête",
         "bloating": "Ballonnements",
-        "tenderness": "Sensibilité",
+        "tenderness": "Sensibilité des seins",
         "fatigue": "Fatigue",
         "acne": "Acné",
         "backache": "Mal de dos",
@@ -735,6 +806,7 @@
         "dizziness": "Vertiges",
         "breast pain": "Douleur aux seins",
         "hot flashes": "Bouffées de chaleur",
+        "loss of appetite": "Perte d’appétit",
         "crying": "Pleurs",
         "anger": "Colère"
     }
