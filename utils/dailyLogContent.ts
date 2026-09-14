@@ -7,6 +7,7 @@ export const hasDailyLogContent = (log?: DailyLog | null): boolean => {
 
     return Boolean(
         log.flow ||
+        log.pregnancyStart ||
         log.pillTakenAt ||
         (log.meds && log.meds.length > 0) ||
         log.notes ||

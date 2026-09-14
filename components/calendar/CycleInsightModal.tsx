@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { pushBackInterceptor } from '../../hooks/useAppNavigation';
 import type { CyclePhaseKey } from '../../services/logic/status';
 
 interface CycleInsightModalProps {
@@ -11,11 +12,11 @@ interface CycleInsightModalProps {
 const SECTIONS = ['where_you_are', 'what_is_happening', 'what_you_may_notice', 'helpful_suggestions'] as const;
 
 const PHASE_ART: Record<CyclePhaseKey, { symbol: string; color: string; wash: string }> = {
-    neutral: { symbol: '✦', color: '#7598a0', wash: 'from-[#e4f0ef] to-[#f7f8f6]' },
+    neutral: { symbol: '○', color: '#7598a0', wash: 'from-[#e4f0ef] to-[#f7f8f6]' },
     birth_control: { symbol: '◌', color: '#7598a0', wash: 'from-[#e5eeee] to-[#f7f8f6]' },
     menstrual: { symbol: '●', color: '#d77d8d', wash: 'from-[#fbe8eb] to-[#fff8f6]' },
     follicular: { symbol: '◒', color: '#87a66b', wash: 'from-[#edf4e8] to-[#f9faf5]' },
-    ovulation: { symbol: '✦', color: '#d3a14c', wash: 'from-[#fff2d4] to-[#fffaf1]' },
+    ovulation: { symbol: '◉', color: '#d3a14c', wash: 'from-[#fff2d4] to-[#fffaf1]' },
     luteal: { symbol: '◐', color: '#a185b5', wash: 'from-[#f0eafa] to-[#faf8fc]' },
     pms: { symbol: '☾', color: '#9b789f', wash: 'from-[#eee8f4] to-[#faf8fc]' },
     late: { symbol: '↻', color: '#c38a62', wash: 'from-[#f9eadf] to-[#fffaf6]' },
@@ -28,10 +29,14 @@ export const CycleInsightModal: React.FC<CycleInsightModalProps> = ({ phaseKey, 
     useEffect(() => {
         const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
         window.addEventListener('keydown', onKeyDown);
+        // Hardware/gesture back closes this, instead of falling through to navigation,
+        // which sees view === 'calendar' and exits the app.
+        const releaseBack = pushBackInterceptor(onClose);
         const previousOverflow = document.body.style.overflow;
         document.body.style.overflow = 'hidden';
         return () => {
             window.removeEventListener('keydown', onKeyDown);
+            releaseBack();
             document.body.style.overflow = previousOverflow;
         };
     }, [onClose]);
@@ -50,20 +55,9 @@ export const CycleInsightModal: React.FC<CycleInsightModalProps> = ({ phaseKey, 
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="cycle-insight-modal relative flex h-full min-h-0 flex-col overflow-hidden rounded-none bg-white px-4 pb-[max(env(safe-area-inset-bottom),1rem)] pt-[max(env(safe-area-inset-top),1rem)] shadow-none sm:px-8 sm:pt-8">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="cycle-insight-close absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-slate-400 shadow-[2px_2px_6px_rgba(163,177,198,0.25),-2px_-2px_6px_rgba(255,255,255,0.8)] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-rotate-6 hover:text-slate-700 active:scale-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7598a0]"
-                        aria-label={t('common.close')}
-                    >
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                            <path d="M6 6l12 12M18 6L6 18" />
-                        </svg>
-                    </button>
-
                     <header className={`cycle-insight-hero relative mx-auto w-full max-w-2xl shrink-0 overflow-hidden rounded-[1.35rem] bg-gradient-to-br ${art.wash} px-4 pb-5 pt-4`}>
                         <div className="absolute -right-8 -top-10 h-32 w-32 rounded-full bg-white/40 blur-2xl" />
-                        <div className="relative flex items-start gap-3 pr-10">
+                        <div className="relative flex items-start gap-3">
                             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/75 text-xl shadow-[3px_4px_10px_rgba(163,177,198,0.2)]" style={{ color: art.color }} aria-hidden="true">
                                 {art.symbol}
                             </div>

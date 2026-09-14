@@ -45,6 +45,8 @@ export interface DailyLog {
   meds?: string[]; // Free-form names of other medications/supplements taken this day
   // --- Medical Flags ---
   ignoreForAverages?: boolean;   // Manual override for outliers (miscarriage, stress, etc)
+  /** This day starts a pregnancy. The span ends at the next period; no end is stored. */
+  pregnancyStart?: boolean;
 
 }
 
@@ -72,6 +74,8 @@ export interface Cycle {
   isWithdrawalBleed?: boolean;
   /** Manual override to exclude this cycle from adaptive predictions */
   ignoreForAverages?: boolean;
+  /** A pregnancy started inside this cycle, so its length is a pregnancy, not a tracking gap */
+  isPregnancy?: boolean;
   isOngoing?: boolean;
   // Computed Fertile Window (for historical display)
   ovulationDate?: string;
@@ -155,8 +159,24 @@ export interface AppSettings {
   reminderPillDailyTime?: string;
   contraceptionReminder?: ContraceptionReminder;
 
+  /** Kid mode: hides the Sex & Libido tracking everywhere in the app. */
+  kidMode?: boolean;
+
   // Global Behaviour
   firstDayOfWeek?: FirstDayOfWeek;
+
+  // --- Automatic encrypted backup (device-local; never travels inside a backup) ---
+  autoBackupEnabled?: boolean;
+  /** Opaque native folder handle: a SAF tree URI on Android, a security-scoped bookmark on iOS. */
+  autoBackupTarget?: string;
+  /** Human-readable folder name, shown in Settings so the user knows where backups land. */
+  autoBackupTargetLabel?: string;
+  /** Epoch ms of the last successful write. */
+  autoBackupLastRunAt?: number;
+  /** Fingerprint of the data at the last successful write, used to skip unchanged backups. */
+  autoBackupLastFingerprint?: string;
+  /** Message from the last failed attempt, surfaced in Settings so failures are never silent. */
+  autoBackupLastError?: string;
 }
 
 const BIG_6 = [
@@ -170,12 +190,6 @@ const BODY_GUT = [
 const MORE_SYMPTOMS = [
   'Dizziness', 'Hot Flashes', 'Loss of Appetite'
 ];
-
-export const SYMPTOM_GROUPS = {
-  BIG_6: BIG_6.map(s => s.toLowerCase()),
-  BODY_GUT: BODY_GUT.map(s => s.toLowerCase()),
-  MORE: MORE_SYMPTOMS.map(s => s.toLowerCase())
-};
 
 const ALL_DEFAULT_SYMPTOMS = [...BIG_6, ...BODY_GUT, ...MORE_SYMPTOMS];
 
@@ -251,6 +265,10 @@ export interface DayMeta {
   isOvulation: boolean;
   isPMS: boolean;
   isWithdrawalBleed?: boolean;
+  /** Inside a pregnancy span (marker day through the day before the next period) */
+  isPregnancy?: boolean;
+  /** 1-based week within that span, for the dashboard headline */
+  pregnancyWeek?: number;
   isUnavailableFuture?: boolean;
   // Visuals
   intensity?: FlowIntensity;

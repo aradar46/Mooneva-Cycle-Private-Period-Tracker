@@ -45,8 +45,6 @@
         "navigation": "Gezinme"
     },
     "whats_new": {
-        "title": "Yenilikler",
-        "intro": "Son sürümden bu yana:",
         "tip": "Mooneva yüzeyde sade görünür ama <b>Ayarlar</b> bölümü güçlü araçlarla dolu. Bir özelliği mi arıyorsun? Etrafa göz at: düzenli olarak güncelliyor ve istenen özellikleri ekliyoruz."
     },
     "share_message": {
@@ -54,7 +52,7 @@
     },
     "notifications": {
         "title": "Bildirim yöneticisi",
-        "discrete_mode_note": "Gizli mod açıkken bildirimler nötr, göreve benzer bir dil kullanır.",
+        "discrete_mode_note": "Gizli mod açıkken bildirimler nötr bir dil kullanır ve kilit ekranında görünmez.",
         "section_action_needed": "İşlem gerekli",
         "section_cycle_updates": "Döngü güncellemeleri",
         "section_period_ovulation": "Regl ve yumurtlama",
@@ -128,7 +126,8 @@
         "next_period_days": "Sonraki regl – {{count}} gün kaldı",
         "next_period_unknown": "Sonraki regl tahmini",
         "permission_denied_message": "Bildirimler kapalı. Hatırlatmaları almak için cihaz ayarlarından etkinleştir.",
-        "exact_alarm_message": "Hatırlatıcılar geç gelebilir veya hiç gelmeyebilir. Zamanında ulaşması için cihaz ayarlarından alarmlara ve hatırlatıcılara izin verin."
+        "exact_alarm_message": "Hatırlatıcılar geç gelebilir veya hiç gelmeyebilir. Zamanında ulaşması için cihaz ayarlarından alarmlara ve hatırlatıcılara izin verin.",
+        "pill_reminder_discrete": "Hatırlatma"
     },
     "nav": {
         "history": "Geçmiş"
@@ -192,7 +191,9 @@
         "cycle_count_one": "{{count}} döngü",
         "cycle_count_other": "{{count}} döngü",
         "no_recent_data": "Yakın zamanlı veri yok",
-        "log_to_resume": "Tahminleri sürdürmek için bir regl kaydet"
+        "log_to_resume": "Tahminleri sürdürmek için bir regl kaydet",
+        "pregnancy": "Gebelik",
+        "pregnancy_week": "{{week}}. hafta"
     },
     "discrete": {
         "title": "Görevlerim",
@@ -269,7 +270,9 @@
             "orphan_flow": "Akış (regl yok)",
             "withdrawal_bleed": "Çekilme kanaması (hap kanaması)"
         },
-        "category_other": "Diğer"
+        "category_other": "Diğer",
+        "jump_to_month": "Aya git",
+        "jump_close": "Kapat"
     },
     "cycle_insight": {
         "title": "Döngü bilgisi",
@@ -414,15 +417,21 @@
         "withdrawal_bleed_desc": "Hormonal doğum kontrolü (hap, halka, bant) kullanıyorsan işaretle",
         "withdrawal_tagged": "Bu regl çekilme kanaması olarak işaretlendi ve doğal döngü istatistiklerine dahil edilmeyecek.",
         "stats": "İstatistikler",
-        "ignore_averages_question": "Döngü ortalamalarından çıkarılsın mı?",
+        "ignore_averages_question": "Ortalamalardan ve grafiklerden çıkarılsın mı?",
         "ignore_averages_desc": "Düzensiz döngüler için (stres, hastalık vb.)",
-        "ignore_tagged": "Bu regl, döngü uzunluğu hesaplarına ve ortalamalara dahil edilmeyecek.",
+        "ignore_tagged": "Bu regl, döngü ortalamalarına ve İçgörüler bölümündeki grafiklere dahil edilmez.",
         "tap_to_edit": "Düzenlemek için dokun",
         "withdrawal_bleed_label": "Çekilme kanaması",
         "excluded_label": "Hariç tutuldu",
         "day_x_of_y": "{{total}} günün {{day}}. günü",
         "no_period_advanced": "Bu tarih bir reglin parçası değil. Gelişmiş seçeneklere erişmek için bir regl başlat veya bir regl günü seç.",
-        "daily_log_tabs": "Günlük kayıt sekmeleri"
+        "daily_log_tabs": "Günlük kayıt sekmeleri",
+        "pregnancy": "Gebelik",
+        "experimental": "Deneysel, geri bildirim gerekiyor",
+        "pregnancy_start_question": "Gebelik bu gün mü başladı?",
+        "pregnancy_start_desc": "Bir sonraki regl başladığında kendiliğinden biter",
+        "pregnancy_tagged": "Bu aralık takip boşluğu değil, gebelik olarak gösterilecek.",
+        "pregnancy_paused_note": "Tahminler duraklatıldı; uyarlanabilir tahmin, doğurgan dönem ve PMS de kapatıldı. Bunları Ayarlar'dan yeniden açabilirsin."
     },
     "settings": {
         "community_care": "Topluluk ve bakım",
@@ -506,6 +515,7 @@
         "repeat_pin": "PIN'i tekrar gir",
         "enable_pin": "PIN'i etkinleştir",
         "pin_security_desc": "Sağlık verilerin bu cihazda şifrelenir. Bu PIN uygulamaya erişimi denetler.",
+        "pin_forgot_hint": "PIN'i mi unuttun? Yedek dosyan varsa Mooneva'yı yeniden kur ve yedeği geri yükle. Yedek yoksa yeniden kurmak verilerini siler.",
         "pin_unlock_prompt": "PIN'ini gir (4-12 hane)",
         "pin_placeholder": "4-12 haneli PIN",
         "pin_exit_discrete_prompt": "Gizli moddan çıkmak için PIN'ini gir",
@@ -514,6 +524,7 @@
         "enter_password": "Parolayı gir",
         "repeat_password": "Parolayı tekrar gir",
         "pins_dont_match": "PIN'ler eşleşmiyor.",
+        "passwords_dont_match": "Parolalar eşleşmiyor.",
         "wipe_confirm": "Emin misin?",
         "feedback_title": "Seveceğin bir şey yapmamıza yardım et",
         "feedback_desc": "Bir hata mı buldun, bir özellik fikrin mi var ya da hatalı bir çeviri mi gördün? 30 saniyede bize anlat.",
@@ -601,7 +612,7 @@
         "report_footer_new": "Mooneva Cycle: gizli regl takip uygulaması",
         "birth_control_sub_desc": "Doğurganlığı gizle, kanamaları çekilme olarak işaretle",
         "birth_control_pill_hint": "Kombine hap, halka veya bant kullananlar için en uygunu.",
-        "pause_predictions_full_desc": "Tüm tahminleri duraklat (gebelik, düzensizlik vb.), örneğin gebelik durumunda ya da tahminleri görmek istemediğinde.",
+        "pause_predictions_full_desc": "Regl, yumurtlama ve PMS tahminlerini sen tekrar açana kadar gizler.",
         "adaptive_prediction_label": "Uyarlanabilir tahmin",
         "adaptive_prediction_desc_long": "Döngü uzunluğunu tahmin etmek için son 3 döngünün ortalamasını alır",
         "cycle_length_label": "Döngü uzunluğu",
@@ -610,6 +621,9 @@
         "period_length_desc": "Tipik kanama günleri",
         "luteal_phase_label": "Luteal faz",
         "luteal_phase_desc": "Yumurtlamadan regle kadar geçen günler",
+        "kid_mode_section": "Çocuk modu",
+        "kid_mode_label": "Çocuk modu",
+        "kid_mode_desc": "Şimdilik gerekli olmayan şeyleri gizler.",
         "fertility_pms_section": "Doğurganlık ve PMS",
         "pms_window_section": "PMS dönemi",
         "cycle_config_section": "Döngü yapılandırması",
@@ -623,7 +637,19 @@
         "report_range_from": "Başlangıç tarihi",
         "report_range_to": "Bitiş tarihi",
         "report_range_max": "En fazla 12 ay",
-        "report_share_failed": "PDF paylaşılamadı. Daha kısa bir tarih aralığı dene."
+        "report_share_failed": "PDF paylaşılamadı. Daha kısa bir tarih aralığı dene.",
+        "auto_backup": "Otomatik yedekleme",
+        "auto_backup_subtitle": "Şifreli, seçtiğin bir klasöre. Günde en fazla bir kez çalışır.",
+        "auto_backup_enable": "Otomatik olarak yedekle",
+        "auto_backup_password_warning": "Bir parola seçin ve güvenli bir yerde saklayın. Bu parola PIN'iniz değildir. Otomatik yedekler bu parolayla şifrelenir ve parola olmadan verileriniz kurtarılamaz. Parolayı sıfırlamanın bir yolu yoktur.",
+        "auto_backup_sync_tip": "İpucu: başka bir uygulamanın senkronize tuttuğu bir klasör seçin (Drive, Dropbox, Nextcloud, iCloud, Syncthing); böylece telefon kaybolsa ya da bozulsa bile yedekleriniz kalır. Mooneva Cycle'ın kendi internet erişimi yoktur ve dosya yazılmadan önce şifrelenir, bu yüzden parolanız olmadan kimse açamaz, dosyayı saklayan bile.",
+        "auto_backup_choose_folder": "Klasör seç",
+        "auto_backup_destination": "Klasör",
+        "auto_backup_last_run": "Son yedekleme",
+        "auto_backup_run_now": "Şimdi yedekle",
+        "wipe_auto_backup_note": "\"{{folder}}\" klasörüne daha önce kaydedilmiş otomatik yedekler silinmez. Parola da silindiği için artık açılamazlar. Onlardan kurtulmak istiyorsanız kendiniz silin.",
+        "pregnancy": "Gebelik",
+        "auto_backup_saved_to": "{{folder}} konumuna yedeklendi"
     },
     "trends": {
         "header": "İçgörüler",
@@ -642,12 +668,13 @@
         "year": "1 yıl",
         "completed_cycles_note": "Bu sayfa yalnızca tamamlanmış döngülerin verilerini gösterir. Mevcut döngün, bir sonraki reglin başladığında eklenir.",
         "cycle_regularity": "Döngü düzenliliği",
-        "average_label": "Ortalama: {{count}} gün",
-        "regular": "Düzenli",
-        "varying": "Değişken",
-        "irregular": "Düzensiz",
+        "cycle_range": "{{min}} ile {{max}} gün arası, {{spread}} günlük fark",
+        "includes_withdrawal": "Doğal döngü olmayan çekilme kanamalarını da içerir.",
         "flow_pattern": "Kanama deseni",
-        "last_3_periods_avg": "Son 3 reglin ortalaması",
+        "based_on_cycles_one": "{{count}} döngüye göre",
+        "based_on_cycles_other": "{{count}} döngüye göre",
+        "based_on_periods_one": "{{count}} regl dönemine göre",
+        "based_on_periods_other": "{{count}} regl dönemine göre",
         "lighter": "Daha az",
         "heavier": "Daha yoğun",
         "mood_by_phase": "Faza göre ruh hâli",
@@ -681,7 +708,9 @@
         "pill_timeline": "İlaç zaman çizelgesi",
         "pill_taken": "Hap alındı",
         "pill_low": "Atlandı",
-        "pill_high": "Alındı"
+        "pill_high": "Alındı",
+        "pregnancy_note": "Döngü grafikleri hamilelik boyunca duraklar ve ilk reglinden sonra geri gelir.",
+        "pregnancy_charts_paused": "Henüz gösterilecek bir şey yok. Bu grafikler döngü günlerini sayar, hamilelikte ise döngü olmaz."
     },
     "timeline": {
         "header": "Zaman çizelgesi",
@@ -692,7 +721,8 @@
         "started": "Başladı",
         "gap_hint": "Takip boşluğu – tahminlerde kullanılmaz",
         "short_cycle_hint": "Döngü çok kısa (<18 gün) – tahminlerde kullanılmaz",
-        "show_more_count": "Daha fazla geçmiş göster ({{count}})"
+        "show_more_count": "Daha fazla geçmiş göster ({{count}})",
+        "pregnancy_hint": "Gebelik, tahminlerde kullanılmaz"
     },
     "onboarding": {
         "trust": {

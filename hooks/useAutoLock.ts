@@ -3,14 +3,14 @@ import { App } from '@capacitor/app';
 import { clearDeliveredNotifications } from '../services/notifications';
 import { hasPin } from '../utils/pin';
 import type { AppSettings } from '../types';
+import { PICKER_SESSION_KEY, PICKER_GRACE_PERIOD_MS } from '../utils/pickerSession';
 
 interface UseAutoLockParams {
     settings: AppSettings;
     loading: boolean;
 }
 
-export const PICKER_SESSION_KEY = 'mooneva_picking_file';
-export const PICKER_GRACE_PERIOD_MS = 20000;
+export { PICKER_SESSION_KEY, PICKER_GRACE_PERIOD_MS } from '../utils/pickerSession';
 
 export const useAutoLock = ({ settings, loading }: UseAutoLockParams) => {
     const isPinConfigured = hasPin(settings);

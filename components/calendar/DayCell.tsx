@@ -51,7 +51,10 @@ export const DayCell: React.FC<DayCellProps> = ({
 
     const hasSymptoms = (meta.symptoms?.length || 0) > 0;
     const isSpotting = meta.isSpotting;
-    const sexType = log?.sexType;
+    const sexType = settings.kidMode ? undefined : log?.sexType;
+    // The day the span was marked. The rest of the span carries the wash only, so without
+    // this the start is indistinguishable from any other day inside it.
+    const isPregnancyStart = !!log?.pregnancyStart;
 
     const todayStr = getTodayStr();
     const isFutureLocked = diffInDays(dateStr, todayStr) > 7;
@@ -89,6 +92,11 @@ export const DayCell: React.FC<DayCellProps> = ({
         shapeClass = "rounded-full";
     } else if (isPredFertile) {
         containerClass = `border-2 border-teal-300 text-teal-700`;
+        shapeClass = "rounded-full";
+    } else if (meta.isPregnancy) {
+        // Above the symptom branch on purpose: people log symptoms most days while
+        // pregnant, and losing the span tint on all of them would defeat the point.
+        containerClass = `bg-violet-50 text-violet-700 border border-violet-200/60`;
         shapeClass = "rounded-full";
     } else if (hasLog && (hasSymptoms || isSpotting)) {
         containerClass = `bg-transparent ${isPMS ? 'text-blue-600' : 'text-slate-700'} hover:bg-white/70 border border-transparent`;
@@ -194,9 +202,25 @@ export const DayCell: React.FC<DayCellProps> = ({
                 )
             }
 
+            {/* Pregnancy Start – same top-right slot, only when no period starts here */}
+            {
+                isPregnancyStart && !isStart && (
+                    <div className="absolute top-[13%] right-[13%] translate-x-1/2 -translate-y-1/2 bg-white rounded-full p-0.5 z-10 shadow-sm border border-violet-100">
+                        {/* Sprout, not a heart: the heart is the sex marker (SexMarkerIcon).
+                            Drawn a size up from the period star, which is a common marker;
+                            this one appears once per pregnancy and has to be readable. */}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-violet-500">
+                            <path d="M12 22a1 1 0 0 1-1-1v-7a1 1 0 1 1 2 0v7a1 1 0 0 1-1 1Z" />
+                            <path d="M11 14c0-3.314-2.686-6-6-6 0 3.314 2.686 6 6 6Z" />
+                            <path d="M13 12.5C13 9.462 15.462 7 18.5 7c0 3.038-2.462 5.5-5.5 5.5Z" />
+                        </svg>
+                    </div>
+                )
+            }
+
             {/* Fertility Dot Indicators – center on circle border (top-right) */}
             {
-                (isOvulation || isPredFertile) && !isStart && (
+                (isOvulation || isPredFertile) && !isStart && !isPregnancyStart && (
                     <div className={`absolute top-[13%] right-[13%] translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center ${isOvulation ? 'bg-white rounded-full p-0.5 shadow-sm border border-[#b0f4eb]' : ''}`}>
                         {isOvulation ? (
                             // Ovulation: Large pulsing dot

@@ -9,3 +9,4 @@ export * from './status';
 export * from './importers';
 export * from './settingsInterlocks';
 
+export * from './autoBackup';

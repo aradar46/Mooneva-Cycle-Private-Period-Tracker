@@ -51,8 +51,6 @@
         "navigation": "التنقل"
     },
     "whats_new": {
-        "title": "ما الجديد",
-        "intro": "منذ الإصدار الأخير:",
         "tip": "مونيفا بسيط في مظهره، لكنه مليء بأدوات قوية في <b>الإعدادات</b>. تفتقد ميزة ما؟ تصفّح الإعدادات: نحدّث التطبيق بانتظام ونضيف الميزات المطلوبة."
     },
     "share_message": {
@@ -60,7 +58,7 @@
     },
     "notifications": {
         "title": "مدير الإشعارات",
-        "discrete_mode_note": "أثناء تفعيل الوضع المتحفّظ، تستخدم الإشعارات صياغة محايدة تشبه المهام.",
+        "discrete_mode_note": "عندما يكون الوضع الخفي مفعّلًا، تستخدم الإشعارات صياغة محايدة ولا تظهر على شاشة القفل.",
         "section_action_needed": "إجراء مطلوب",
         "section_cycle_updates": "تحديثات الدورة",
         "section_period_ovulation": "الدورة والإباضة",
@@ -134,7 +132,8 @@
         "next_period_days": "الدورة القادمة – باقٍ {{count}} يوم",
         "next_period_unknown": "توقّع الدورة القادمة",
         "permission_denied_message": "الإشعارات معطّلة. فعّلها من إعدادات جهازك لتصلك التذكيرات.",
-        "exact_alarm_message": "قد تصل التذكيرات متأخرة أو لا تصل إطلاقًا. اسمح بالمنبهات والتذكيرات في إعدادات الجهاز لتصلك في موعدها."
+        "exact_alarm_message": "قد تصل التذكيرات متأخرة أو لا تصل إطلاقًا. اسمح بالمنبهات والتذكيرات في إعدادات الجهاز لتصلك في موعدها.",
+        "pill_reminder_discrete": "تذكير"
     },
     "nav": {
         "history": "السجل"
@@ -202,7 +201,9 @@
         "cycle_count_zero": "لا توجد دورات",
         "cycle_count_two": "دورتان",
         "cycle_count_few": "{{count}} دورات",
-        "cycle_count_many": "{{count}} دورة"
+        "cycle_count_many": "{{count}} دورة",
+        "pregnancy": "الحمل",
+        "pregnancy_week": "الأسبوع {{week}}"
     },
     "discrete": {
         "title": "مهامي",
@@ -279,7 +280,9 @@
             "orphan_flow": "تدفق (بدون دورة)",
             "withdrawal_bleed": "نزيف انسحابي (نزيف الحبوب)"
         },
-        "category_other": "أخرى"
+        "category_other": "أخرى",
+        "jump_to_month": "الانتقال إلى شهر",
+        "jump_close": "إغلاق"
     },
     "cycle_insight": {
         "title": "نظرة على الدورة",
@@ -424,15 +427,21 @@
         "withdrawal_bleed_desc": "حدّديه إذا كنت تستخدمين وسيلة هرمونية (حبوب، حلقة، لصقة)",
         "withdrawal_tagged": "هذه الدورة مصنّفة كنزيف انسحابي وسيتم استبعادها من إحصاءات الدورة الطبيعية.",
         "stats": "الإحصاءات",
-        "ignore_averages_question": "استبعاد من متوسطات الدورة؟",
+        "ignore_averages_question": "استبعاد من المتوسطات والرسوم البيانية؟",
         "ignore_averages_desc": "للدورات غير المنتظمة (توتر، مرض، إلخ)",
-        "ignore_tagged": "سيتم استبعاد هذه الدورة من حسابات طول الدورة والمتوسطات.",
+        "ignore_tagged": "يتم استبعاد هذه الدورة من متوسطات دورتك ومن الرسوم البيانية في قسم رؤى.",
         "tap_to_edit": "اضغطي للتعديل",
         "withdrawal_bleed_label": "نزيف انسحابي",
         "excluded_label": "مستبعدة",
         "day_x_of_y": "اليوم {{day}} من {{total}}",
         "no_period_advanced": "هذا التاريخ ليس جزءاً من دورة. ابدئي دورة أو اختاري يوم دورة للوصول إلى الخيارات المتقدمة.",
-        "daily_log_tabs": "تبويبات السجل اليومي"
+        "daily_log_tabs": "تبويبات السجل اليومي",
+        "pregnancy": "الحمل",
+        "experimental": "تجريبي، نحتاج ملاحظاتك",
+        "pregnancy_start_question": "هل بدأ الحمل في هذا اليوم؟",
+        "pregnancy_start_desc": "ينتهي تلقائيًا عند بدء دورتك التالية",
+        "pregnancy_tagged": "سيظهر هذا النطاق كحمل وليس كفجوة في التسجيل.",
+        "pregnancy_paused_note": "التوقعات متوقفة، ومعها التوقع التكيفي ونافذة الخصوبة وأعراض ما قبل الدورة. يمكنك تشغيلها مجددًا من الإعدادات."
     },
     "settings": {
         "community_care": "المجتمع والعناية",
@@ -516,6 +525,7 @@
         "repeat_pin": "أعيدي إدخال الرمز",
         "enable_pin": "تفعيل الرمز",
         "pin_security_desc": "بياناتك الصحية مشفّرة على هذا الجهاز. يتحكم هذا الرمز في الوصول إلى التطبيق.",
+        "pin_forgot_hint": "هل نسيتِ الرمز؟ إذا كان لديكِ ملف نسخة احتياطية، أعيدي تثبيت Mooneva واستعيديه. بدون نسخة احتياطية، ستمحو إعادة التثبيت بياناتك.",
         "pin_unlock_prompt": "أدخلي رمزك (٤ إلى ١٢ رقماً)",
         "pin_placeholder": "رمز من ٤ إلى ١٢ رقماً",
         "pin_exit_discrete_prompt": "أدخلي رمزك للخروج من الوضع المتحفّظ",
@@ -524,6 +534,7 @@
         "enter_password": "أدخلي كلمة المرور",
         "repeat_password": "أعيدي إدخال كلمة المرور",
         "pins_dont_match": "الرمزان غير متطابقين.",
+        "passwords_dont_match": "كلمتا المرور غير متطابقتين.",
         "wipe_confirm": "هل أنت متأكدة؟",
         "feedback_title": "ساعدينا في بناء شيء تحبينه",
         "feedback_desc": "وجدتِ خللاً، أو لديكِ فكرة لميزة جديدة، أو لاحظتِ ترجمة غير دقيقة؟ أخبرينا في ٣٠ ثانية.",
@@ -611,7 +622,7 @@
         "report_footer_new": "مونيفا: تطبيق خاص لتتبع الدورة الشهرية",
         "birth_control_sub_desc": "إخفاء الخصوبة وتصنيف النزيف كانسحابي",
         "birth_control_pill_hint": "الأنسب لمستخدمات الحبوب المركبة أو الحلقة أو اللصقة.",
-        "pause_predictions_full_desc": "إيقاف جميع التوقعات (الحمل، عدم الانتظام، إلخ)، مثلاً في حالة الحمل أو عندما تفضّلين عدم رؤية التقديرات.",
+        "pause_predictions_full_desc": "يخفي توقعات الدورة والإباضة وأعراض ما قبل الدورة حتى تعيدي تفعيله.",
         "adaptive_prediction_label": "التوقع التكيفي",
         "adaptive_prediction_desc_long": "يحسب متوسط آخر ٣ دورات لتوقع طول الدورة",
         "cycle_length_label": "طول الدورة",
@@ -620,6 +631,9 @@
         "period_length_desc": "أيام نزول دم الحيض المعتادة",
         "luteal_phase_label": "المرحلة الأصفرية",
         "luteal_phase_desc": "الأيام من الإباضة حتى الدورة",
+        "kid_mode_section": "وضع الأطفال",
+        "kid_mode_label": "وضع الأطفال",
+        "kid_mode_desc": "يخفي الأشياء غير اللازمة في الوقت الحالي.",
         "fertility_pms_section": "الخصوبة وما قبل الطمث",
         "pms_window_section": "فترة ما قبل الطمث",
         "cycle_config_section": "إعدادات الدورة",
@@ -633,7 +647,19 @@
         "report_range_from": "من تاريخ",
         "report_range_to": "إلى تاريخ",
         "report_range_max": "١٢ شهراً كحد أقصى",
-        "report_share_failed": "تعذّرت مشاركة ملف PDF. جرّبي نطاقاً زمنياً أقصر."
+        "report_share_failed": "تعذّرت مشاركة ملف PDF. جرّبي نطاقاً زمنياً أقصر.",
+        "auto_backup": "نسخ احتياطي تلقائي",
+        "auto_backup_subtitle": "مشفّر، إلى مجلد تختاره. يعمل مرة واحدة في اليوم على الأكثر.",
+        "auto_backup_enable": "النسخ الاحتياطي تلقائيًا",
+        "auto_backup_password_warning": "اختاري كلمة مرور واحفظيها في مكان آمن. هي ليست رمز PIN الخاص بكِ. يتم تشفير النسخ الاحتياطية التلقائية بها، وبدونها لا يمكن استعادة بياناتك. ولا توجد طريقة لإعادة تعيينها.",
+        "auto_backup_sync_tip": "نصيحة: اختاري مجلدًا يبقيه تطبيق آخر متزامنًا (Drive أو Dropbox أو Nextcloud أو iCloud أو Syncthing) لتبقى نسخك الاحتياطية حتى لو فُقد الهاتف أو تعطّل. لا يملك Mooneva Cycle وصولًا إلى الإنترنت، ويُشفَّر الملف قبل كتابته، فلا يستطيع أحد فتحه بدون كلمة المرور، ولا حتى من يخزّنه.",
+        "auto_backup_choose_folder": "اختيار مجلد",
+        "auto_backup_destination": "مجلد",
+        "auto_backup_last_run": "آخر نسخة احتياطية",
+        "auto_backup_run_now": "نسخ احتياطي الآن",
+        "wipe_auto_backup_note": "لا يتم حذف ملفات النسخ الاحتياطي التلقائي المحفوظة مسبقًا في «{{folder}}». ولن يعود من الممكن فتحها، لأن كلمة المرور تُمحى أيضًا. احذفيها بنفسك إذا أردت التخلص منها.",
+        "pregnancy": "الحمل",
+        "auto_backup_saved_to": "تم النسخ الاحتياطي إلى {{folder}}"
     },
     "trends": {
         "header": "رؤى",
@@ -652,12 +678,21 @@
         "year": "سنة واحدة",
         "completed_cycles_note": "تعرض هذه الصفحة بيانات الدورات المكتملة فقط. تُضاف دورتك الحالية بمجرد بدء دورتك التالية.",
         "cycle_regularity": "انتظام الدورة",
-        "average_label": "المتوسط: {{count}} يوم",
-        "regular": "منتظمة",
-        "varying": "متفاوتة",
-        "irregular": "غير منتظمة",
+        "cycle_range": "من {{min}} إلى {{max}} يومًا، بفارق {{spread}}",
+        "includes_withdrawal": "يشمل نزيف الانقطاع، وهو ليس دورة طبيعية.",
         "flow_pattern": "نمط التدفق",
-        "last_3_periods_avg": "متوسط آخر ٣ دورات",
+        "based_on_cycles_zero": "بناءً على {{count}} دورة",
+        "based_on_cycles_one": "بناءً على دورة واحدة",
+        "based_on_cycles_two": "بناءً على دورتين",
+        "based_on_cycles_few": "بناءً على {{count}} دورات",
+        "based_on_cycles_many": "بناءً على {{count}} دورة",
+        "based_on_cycles_other": "بناءً على {{count}} دورة",
+        "based_on_periods_zero": "بناءً على {{count}} دورة شهرية",
+        "based_on_periods_one": "بناءً على دورة شهرية واحدة",
+        "based_on_periods_two": "بناءً على دورتين شهريتين",
+        "based_on_periods_few": "بناءً على {{count}} دورات شهرية",
+        "based_on_periods_many": "بناءً على {{count}} دورة شهرية",
+        "based_on_periods_other": "بناءً على {{count}} دورة شهرية",
         "lighter": "أخف",
         "heavier": "أغزر",
         "mood_by_phase": "المزاج حسب المرحلة",
@@ -695,7 +730,9 @@
         "adaptive_learning_remaining_zero": "لم تتبقَّ أي دورة مكتملة مؤهلة لتفعيل التوقع التكيفي",
         "adaptive_learning_remaining_two": "تبقّت دورتان مكتملتان مؤهلتان لتفعيل التوقع التكيفي",
         "adaptive_learning_remaining_few": "تبقّت {{count}} دورات مكتملة مؤهلة لتفعيل التوقع التكيفي",
-        "adaptive_learning_remaining_many": "تبقّت {{count}} دورة مكتملة مؤهلة لتفعيل التوقع التكيفي"
+        "adaptive_learning_remaining_many": "تبقّت {{count}} دورة مكتملة مؤهلة لتفعيل التوقع التكيفي",
+        "pregnancy_note": "تتوقف رسوم الدورة أثناء الحمل وتعود بعد أول دورة لك.",
+        "pregnancy_charts_paused": "لا يوجد ما يُعرض بعد. تحسب هذه الرسوم أيام دورتك، والحمل ليس فيه دورة."
     },
     "timeline": {
         "header": "الخط الزمني",
@@ -706,7 +743,8 @@
         "started": "بدأت",
         "gap_hint": "فجوة في التسجيل، لا تُستخدم في التوقعات",
         "short_cycle_hint": "الدورة قصيرة جداً (أقل من ١٨ يوماً) – غير مستخدمة في التوقعات",
-        "show_more_count": "عرض المزيد من السجل ({{count}})"
+        "show_more_count": "عرض المزيد من السجل ({{count}})",
+        "pregnancy_hint": "الحمل، لا يُستخدم في التوقعات"
     },
     "onboarding": {
         "trust": {

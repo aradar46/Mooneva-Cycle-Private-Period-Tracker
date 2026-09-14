@@ -45,8 +45,6 @@
         "navigation": "导航"
     },
     "whats_new": {
-        "title": "最新变化",
-        "intro": "自上一版本以来：",
         "tip": "Mooneva 界面简洁，<b>设置</b>里却藏着不少实用功能。觉得少了什么？去看看吧，我们定期更新，也会加入大家提出的功能。"
     },
     "share_message": {
@@ -54,7 +52,7 @@
     },
     "notifications": {
         "title": "通知管理",
-        "discrete_mode_note": "在隐蔽模式下，通知将使用中性、办公风格的措辞。",
+        "discrete_mode_note": "隐蔽模式开启时，通知使用中性措辞，并且不会显示在锁屏上。",
         "section_period_ovulation": "经期与排卵",
         "gentle_mode": "温和模式",
         "gentle_mode_desc": "仅在经期内 48 小时无操作时提醒。",
@@ -128,7 +126,8 @@
         "section_action_needed": "需采取行动",
         "section_cycle_updates": "周期更新",
         "permission_denied_message": "通知已关闭。请在设备设置中启用通知以接收提醒。",
-        "exact_alarm_message": "提醒可能会延迟送达或完全收不到。请在设备设置中允许闹钟和提醒，以便准时收到。"
+        "exact_alarm_message": "提醒可能会延迟送达或完全收不到。请在设备设置中允许闹钟和提醒，以便准时收到。",
+        "pill_reminder_discrete": "提醒"
     },
     "nav": {
         "history": "历史"
@@ -192,7 +191,9 @@
         "cycle_count_one": "{{count}} 个周期",
         "cycle_count_other": "{{count}} 个周期",
         "no_recent_data": "暂无近期数据",
-        "log_to_resume": "记录一次经期以恢复预测"
+        "log_to_resume": "记录一次经期以恢复预测",
+        "pregnancy": "怀孕",
+        "pregnancy_week": "第 {{week}} 周"
     },
     "discrete": {
         "title": "我的任务",
@@ -269,7 +270,9 @@
         "how_to_log_daily_body": "<strong>点击</strong>（添加）或<strong>双击</strong>（编辑）日历上的任意一天。",
         "category_flow": "周期",
         "category_logs": "日志详情",
-        "category_other": "其他"
+        "category_other": "其他",
+        "jump_to_month": "跳转到月份",
+        "jump_close": "关闭"
     },
     "cycle_insight": {
         "title": "周期解读",
@@ -411,9 +414,9 @@
         "withdrawal_bleed_question": "这是撤退性出血吗？",
         "withdrawal_bleed_desc": "如果使用激素避孕产品（药片、环、贴片）请标记",
         "withdrawal_tagged": "此经期已标记为撤退性出血，将从自然周期统计中排除。",
-        "ignore_averages_question": "从周期平均值中排除？",
+        "ignore_averages_question": "从平均值和图表中排除？",
         "ignore_averages_desc": "用于不规则周期（压力、疾病等）",
-        "ignore_tagged": "此经期将从周期长度计算和平均值中排除。",
+        "ignore_tagged": "此经期不计入你的周期平均值，也不出现在“洞察”图表中。",
         "no_period_advanced": "此日期不是经期的一部分。请开始或选择经期日以访问高级选项。",
         "vitals_tab": "身体",
         "stats": "统计",
@@ -422,7 +425,13 @@
         "excluded_label": "已排除",
         "day_x_of_y": "第 {{day}} 天 / 共 {{total}} 天",
         "spotting_hint_no_period": "记录点滴出血或更改经期",
-        "daily_log_tabs": "每日记录标签"
+        "daily_log_tabs": "每日记录标签",
+        "pregnancy": "怀孕",
+        "experimental": "实验功能，欢迎反馈",
+        "pregnancy_start_question": "怀孕是从这一天开始的吗？",
+        "pregnancy_start_desc": "下次月经开始时会自动结束",
+        "pregnancy_tagged": "这段时间将显示为怀孕，而不是记录空缺。",
+        "pregnancy_paused_note": "预测已暂停，自适应预测、易孕期和经前综合征也一并关闭。你可以在设置中重新开启。"
     },
     "settings": {
         "language": "语言",
@@ -494,6 +503,7 @@
         "repeat_pin": "再次输入 PIN",
         "enable_pin": "启用 PIN",
         "pin_security_desc": "你的健康数据已在此设备上加密。此 PIN 用于控制应用访问。",
+        "pin_forgot_hint": "忘记 PIN 了吗？如果你有备份文件，请重新安装 Mooneva 并恢复备份。没有备份时，重新安装会清除你的数据。",
         "pin_unlock_prompt": "输入你的 PIN（4 到 12 位数字）",
         "pin_placeholder": "4 到 12 位 PIN",
         "pin_exit_discrete_prompt": "输入 PIN 以退出伪装模式。",
@@ -514,6 +524,7 @@
         "enter_password": "输入密码",
         "repeat_password": "重复密码",
         "pins_dont_match": "PIN 不匹配。",
+        "passwords_dont_match": "密码不匹配。",
         "data_management_title": "数据管理",
         "create_backup": "创建备份",
         "save_to_file": "将数据保存到文件",
@@ -597,7 +608,7 @@
         "report_footer_new": "Mooneva Cycle: 隐私经期追踪器",
         "birth_control_sub_desc": "隐藏生育信息，将出血标记为撤退性出血",
         "birth_control_pill_hint": "最适合使用复方避孕药、阴道环或避孕贴片的用户。",
-        "pause_predictions_full_desc": "暂停所有预测（怀孕、周期不规律等），例如怀孕期间或您不想看到预测时。",
+        "pause_predictions_full_desc": "隐藏经期、排卵和经前期预测，直到你重新开启。",
         "adaptive_prediction_label": "自适应预测",
         "adaptive_prediction_desc_long": "根据最近 3 个周期的平均值预测周期长度",
         "cycle_length_label": "周期长度",
@@ -606,6 +617,9 @@
         "period_length_desc": "典型的出血天数",
         "luteal_phase_label": "黄体期",
         "luteal_phase_desc": "从排卵到经期的天数",
+        "kid_mode_section": "儿童模式",
+        "kid_mode_label": "儿童模式",
+        "kid_mode_desc": "隐藏目前还用不到的内容。",
         "fertility_pms_section": "生育与经前综合症",
         "pms_window_section": "经前综合症窗口",
         "cycle_config_section": "周期设置",
@@ -623,7 +637,19 @@
         "report_range_from": "起始日期",
         "report_range_to": "结束日期",
         "report_range_max": "最多 12 个月",
-        "report_share_failed": "无法分享 PDF。请尝试缩短日期范围。"
+        "report_share_failed": "无法分享 PDF。请尝试缩短日期范围。",
+        "auto_backup": "自动备份",
+        "auto_backup_subtitle": "加密保存到你选择的文件夹。每天最多运行一次。",
+        "auto_backup_enable": "自动备份",
+        "auto_backup_password_warning": "请设置密码并妥善保存。它不是你的 PIN。自动备份使用该密码加密，没有它将无法恢复你的数据。密码无法重置。",
+        "auto_backup_sync_tip": "提示：选择一个由其他应用保持同步的文件夹（Drive、Dropbox、Nextcloud、iCloud、Syncthing），这样手机丢失或损坏后备份依然还在。Mooneva Cycle 自身没有联网权限，文件在写入前就已加密，因此没有你的密码谁都打不开，保存文件的一方也不行。",
+        "auto_backup_choose_folder": "选择文件夹",
+        "auto_backup_destination": "文件夹",
+        "auto_backup_last_run": "上次备份",
+        "auto_backup_run_now": "立即备份",
+        "wipe_auto_backup_note": "已保存到“{{folder}}”的自动备份文件不会被删除。由于密码也已抹除，这些文件将无法再打开。如需清除，请自行删除。",
+        "pregnancy": "怀孕",
+        "auto_backup_saved_to": "已备份到 {{folder}}"
     },
     "trends": {
         "header": "洞察",
@@ -642,12 +668,13 @@
         "year": "1年",
         "completed_cycles_note": "此页面只显示已结束周期的数据。当前周期会在下次月经开始后加入。",
         "cycle_regularity": "周期规律性",
-        "average_label": "平均: {{count}} 天",
-        "regular": "规律",
-        "varying": "变化",
-        "irregular": "不规律",
+        "cycle_range": "{{min}} 至 {{max}} 天，相差 {{spread}} 天",
+        "includes_withdrawal": "包含撤退性出血，这不是自然周期。",
         "flow_pattern": "经血模式",
-        "last_3_periods_avg": "过去3次经期平均",
+        "based_on_cycles_one": "基于 {{count}} 个周期",
+        "based_on_cycles_other": "基于 {{count}} 个周期",
+        "based_on_periods_one": "基于 {{count}} 次经期",
+        "based_on_periods_other": "基于 {{count}} 次经期",
         "lighter": "偏少",
         "heavier": "偏多",
         "mood_by_phase": "各阶段情绪",
@@ -681,7 +708,9 @@
         "pill_timeline": "药物时间线",
         "pill_taken": "已服药",
         "pill_low": "漏服",
-        "pill_high": "已服"
+        "pill_high": "已服",
+        "pregnancy_note": "怀孕期间周期图表会暂停，产后第一次经期后恢复。",
+        "pregnancy_charts_paused": "暂时没有内容。这些图表统计周期天数，而怀孕期间没有周期。"
     },
     "timeline": {
         "header": "时间线",
@@ -692,7 +721,8 @@
         "started": "开始于",
         "gap_hint": "跟踪缺口，不用于预测",
         "short_cycle_hint": "周期过短（<18天），不用于预测",
-        "show_more_count": "显示更多历史记录（{{count}}）"
+        "show_more_count": "显示更多历史记录（{{count}}）",
+        "pregnancy_hint": "怀孕，不用于预测"
     },
     "onboarding": {
         "trust": {

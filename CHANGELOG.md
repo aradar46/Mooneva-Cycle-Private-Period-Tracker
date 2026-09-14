@@ -2,6 +2,25 @@
 
 All notable changes to Mooneva Cycle. Versions follow the Android `versionCode` / iOS build numbers used at release time.
 
+## 2.5.0 — Android versionCode 23, iOS build 26
+
+- **New: automatic encrypted backups.** Choose a folder once and the app writes an encrypted backup there by itself, at most once a day and only when something has actually changed. Old backups are pruned, and the destination, last run time and any error are shown in Settings.
+- **New: back up on demand.** A backup button sits next to the notification bell on the calendar. If automatic backup is set up it runs one immediately and names the folder it saved to; if it is not, it opens Data Management.
+- **New: log a pregnancy.** Mark the day it started and the whole span is coloured on the calendar, the dashboard shows which week you are in, and your history and clinical report call it a pregnancy instead of "tracking gap (not logged)". It ends by itself when your next period arrives, and predictions pause while it is running.
+- **New: Kid Mode.** A Settings switch that hides the Sex & Libido parts of the app for a younger user: the logging block, the calendar markers and their legend rows, the day preview chips, and the Sex and Libido columns in the exported clinical report.
+- **New: jump to any month** by tapping the month name above the calendar. Works in the Persian calendar too.
+- The back button and back swipe now return to the calendar instead of closing the app, from Trends and from the cycle insight popup.
+- Automatic backups now run once per calendar day instead of on a rolling 24-hour gap. The old behaviour drifted a couple of hours later every day until it slipped past when you actually used the app, and whole days were skipped.
+- Restoring an unencrypted `.json` backup works again. The file picker only offered `.enc`, so the plaintext backup the app itself produced could not be selected.
+- Persian text no longer renders with gaps inside words, and several Persian strings were corrected to use the half-space where a full space had been used.
+- Trend heatmaps are no longer distorted by long gaps. Everything past cycle day 31 was being piled into a single column, inventing a spike that was never there.
+- Automatic backup now has its own card at the top of Data Management, so it no longer reads as a footnote to manual export.
+- **Discrete mode now keeps reminders off the lock screen.** They were posted publicly before, so the full text was readable on a locked phone. What it still cannot do: Android draws the app name in a notification header itself, so an unlocked phone shows "Mooneva Cycle" above the neutral wording either way.
+- The notification channel description, visible in system Settings, no longer says "Period and daily log reminders".
+- Fixed the daily pill reminder showing a raw translation key as its title in discrete mode.
+- Fixed both iOS native plugins never being registered: automatic backup reported "plugin is not implemented on ios", and discrete mode silently never changed the app icon.
+- Settings ends with a link to the GitHub repository, for anyone who wants to read the source or star it.
+
 ## 2.4.0 — Android versionCode 20, iOS build 22
 
 1. Added Cycle Insights with phase-specific explanations.

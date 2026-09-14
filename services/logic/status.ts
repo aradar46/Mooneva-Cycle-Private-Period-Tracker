@@ -100,6 +100,19 @@ export const calculateCycleStatus = (
     t: TFunction,
     anchorDate?: string // New Parameter: Specific cycle start for this view date
 ): CycleStatusData => {
+    // 0. Pregnancy answers "what is my body doing" better than anything below, and the
+    // forecast is already suppressed upstream while the span is open. Sits above the
+    // paused notice because the two are independent: marking a pregnancy never touches
+    // settings, so a user can be pregnant without having paused anything.
+    if (meta.isPregnancy) {
+        return {
+            title: t('dashboard.pregnancy', 'Pregnancy'),
+            subtitle: t('dashboard.pregnancy_week', { week: meta.pregnancyWeek ?? 1 }),
+            statusVariant: 'info',
+            phaseKey: 'neutral'
+        };
+    }
+
     // 1. Terminate if predictions are paused
     if (settings.predictionsPaused) {
         return {

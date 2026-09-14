@@ -28,6 +28,8 @@ The full set the app declares or merges in:
 
 Notably absent: `INTERNET`, `ACCESS_NETWORK_STATE`, storage, location, contacts, camera, microphone, and any account permission. `SCHEDULE_EXACT_ALARM` is declared so a reminder arrives at the time you chose; without it Android may batch a pill reminder minutes or hours late. It grants no access to data and no network reach. Backup export goes through `@capacitor/filesystem` + `@capacitor/share` to the app's own cache, which needs no storage permission; import goes through the system file picker. `android:allowBackup="false"` also keeps ADB and OS cloud-backup from pulling app data off the device.
 
+**Automatic backup needs no permission either, but it does write outside the app.** When you enable it you pick a folder through the system picker, which hands the app a persisted grant to that one folder (a SAF tree URI on Android, a security-scoped bookmark on iOS) and nothing else. The app cannot browse the rest of your storage. What it writes there is an encrypted backup, using the parameters below, so the file is only as exposed as the password you chose. Anything already written stays where it is if you later disable the feature or wipe the app.
+
 Secondary adversary: **someone who picks up your unlocked phone.** PIN lock and Discrete mode address this, imperfectly (see Limitations).
 
 Explicitly **out of scope**: a rooted device, a compromised OS, a forensic image taken with the device unlocked, or a targeted attacker with physical access and time. On-device encryption at rest cannot defend against these, and Mooneva does not claim to.
@@ -47,6 +49,18 @@ All primitives come from the WebCrypto API (`crypto.subtle`) provided by the pla
 | Secret storage | Android Keystore / iOS Keychain via `capacitor-secure-storage-plugin` |
 
 The device secret is not derived from anything the user knows; it exists only in the platform keystore. Cycle records and daily logs are stored encrypted; nothing is transmitted anywhere.
+
+### The automatic-backup password
+
+Separate from the device secret above, and stored separately.
+
+| | |
+|---|---|
+| What it is | A password you choose when enabling automatic backup |
+| Storage | Android Keystore / iOS Keychain, key `mooneva_auto_backup_password` |
+| Fallback | **None.** If the keystore refuses to hold it, automatic backup will not enable at all |
+
+The device secret has a `localStorage` fallback because it is useless without the app's own storage. This password is not given one: it decrypts a file deliberately written into shared storage, so keeping a plaintext copy on the device would defeat the encryption it provides.
 
 ### Encrypted backups
 
@@ -76,10 +90,12 @@ Stated plainly, because a security policy that only lists strengths is marketing
 5. **Discrete mode is disguise, not security.** It changes the icon, name, and home-screen widget text. It does not hide the package from anyone who looks at the installed app list.
 6. **Screenshots and backgrounding.** The app does not set `FLAG_SECURE`; content may appear in the OS task switcher.
 7. **Exported PDF reports are plaintext** by design, since they are meant for a doctor. Where they land after export is outside the app's control.
+8. **The automatic-backup password is typed once and then never asked for again** on that device, because it lives in the keystore. You only need it again on a *new* device, which is exactly when the keystore holding it is gone. Write it down somewhere when you set it up; there is no recovery path, by design.
+9. **Wiping the app does not delete backups already written.** They are in a folder the app does not own. The password is erased with everything else, so those files also stop being openable. Delete them yourself if you want them gone.
 
 ## Verification
 
 - **Independent report:** [Exodus Privacy: com.mooneva.app](https://reports.exodus-privacy.eu.org/en/reports/773571/). Static analysis of the build, confirming 0 trackers and no internet permission.
 - **Zero network access:** the missing `INTERNET` permission is checkable in the manifest and in the APK itself.
 - **Zero trackers:** no analytics, crash reporting, or advertising SDK is present in [package.json](package.json).
-- **Reproducibility:** builds are published on F-Droid from this source.
+- **Built from source:** F-Droid builds this app from this repository and signs it with its own key. Verified reproducible builds, where F-Droid rebuilds and confirms the result matches a developer-signed APK byte for byte, are **not yet enabled**. Do not read the F-Droid listing as proof that a given APK matches this source.

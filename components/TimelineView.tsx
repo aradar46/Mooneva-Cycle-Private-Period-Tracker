@@ -2,16 +2,19 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatNumber } from '../services/i18n';
 import { Cycle } from '../types';
+import { cycleCoversDate, type PregnancySpan } from '../services/logic/cycle';
 import { useCalendarSystem } from '../hooks/useCalendarSystem';
 import { addDays, diffInDays, getTodayStr, parseLocalDate } from '../utils/dateUtils';
 
 interface TimelineViewProps {
   cycles: Cycle[];
   predictions: { nextPeriodStart: string | null; fertileWindow: { start: string; end: string } | null };
+  /** Optional: absent in tests that only care about cycles. */
+  pregnancySpans?: PregnancySpan[];
   // No unused props
 }
 
-const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
+const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions, pregnancySpans = [] }) => {
   const { t, i18n } = useTranslation();
   const [showAll, setShowAll] = React.useState(false);
   const calendarSystem = useCalendarSystem();
@@ -36,19 +39,35 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
 
   // Filter cycles to only show completed/started in the past
   const todayStr = getTodayStr();
-  const historyCycles = cycles
-    .filter(c => c.startDate <= todayStr)
-    .slice()
-    .reverse();
+  const historyCycles = cycles.filter(c => c.startDate <= todayStr);
 
-  const displayedHistory = showAll ? historyCycles : historyCycles.slice(0, 6);
+  /**
+   * A pregnancy that ended at the user's *first* recorded period has no cycle in front of
+   * it to carry the badge, because a cycle only exists between two periods. Those spans get
+   * their own row; the ones a cycle already covers keep the badge on that cycle instead of
+   * being listed twice.
+   */
+  const orphanSpans = pregnancySpans.filter(
+    sp => sp.start <= todayStr && !historyCycles.some(c => cycleCoversDate(c, sp.start))
+  );
+
+  type HistoryEntry =
+    | { kind: 'cycle'; startDate: string; cycle: Cycle }
+    | { kind: 'pregnancy'; startDate: string; span: PregnancySpan };
+
+  const historyEntries: HistoryEntry[] = [
+    ...historyCycles.map(c => ({ kind: 'cycle' as const, startDate: c.startDate, cycle: c })),
+    ...orphanSpans.map(sp => ({ kind: 'pregnancy' as const, startDate: sp.start, span: sp })),
+  ].sort((a, b) => b.startDate.localeCompare(a.startDate));
+
+  const displayedHistory = showAll ? historyEntries : historyEntries.slice(0, 6);
 
   return (
     <div className="flex flex-col">
       <div className="mt-0">
 
         {/* New History Visualization */}
-        {historyCycles.length === 0 ? (
+        {historyEntries.length === 0 ? (
           <div className="text-center py-10 text-slate-400 text-sm font-medium">
             {t('timeline.no_cycles')}
           </div>
@@ -64,12 +83,48 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
               </div>
 
               <div className="flex flex-col gap-8">
-                {displayedHistory.map((cycle, idx) => {
+                {displayedHistory.map((entry, idx) => {
+                  if (entry.kind === 'pregnancy') {
+                    const span = entry.span;
+                    const spanDays = diffInDays(span.end, span.start) + 1;
+                    return (
+                      <div key={`pregnancy-${span.start}-${idx}`} className="flex flex-col">
+                        <div className="flex justify-between items-end mb-[2px]">
+                          <span className="timeline-date-label text-[11px] font-bold text-slate-800 uppercase tracking-wide">
+                            {formatPeriodRange(span.start, spanDays)}
+                            <span className="ms-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[9px] font-bold normal-case text-violet-700">
+                              {t('settings.pregnancy')}
+                            </span>
+                          </span>
+                          <span
+                            className="timeline-cycle-length text-xs font-extrabold tabular-nums text-slate-500"
+                            title={t('timeline.pregnancy_hint')}
+                          >
+                            {formatNumber(spanDays)}
+                          </span>
+                        </div>
+                        {/* Same track as a cycle row so the dark-mode rules cover it, but filled
+                            flat: a pregnancy has no period segment and no fertile window, and
+                            segmenting it would invent structure that is not there. */}
+                        <div
+                          className="timeline-history-bar relative w-full h-4 bg-[#d9dde4] rounded-full overflow-hidden border border-slate-200/80"
+                          style={{ boxShadow: 'inset 2px 2px 5px rgba(163, 177, 198, 0.3), inset -2px -2px 5px rgba(255, 255, 255, 0.7)' }}
+                        >
+                          <div className="absolute inset-0 bg-violet-200/80" />
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  const cycle = entry.cycle;
                   const cycleLenForCalc = cycle.length || 28;
                   const periodLen = cycle.periodLength || 5;
                   const spanLen = cycle.spanDays || periodLen; // Full span for date display
+                  const isPregnancy = cycle.isPregnancy === true;
                   const isGap = cycle.isOutlier === true;
                   const isShort = cycleLenForCalc < 18;
+                  // Still "invalid" for maths and fertile display, which is correct: a
+                  // pregnancy is not a cycle. Only the words change.
                   const isInvalid = isGap || isShort;
 
                   // Calculate percentages for bar segments using span for width
@@ -95,18 +150,25 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
                       <div className="flex justify-between items-end mb-[2px]">
                         <span className="timeline-date-label text-[11px] font-bold text-slate-800 uppercase tracking-wide">
                           {formatPeriodRange(cycle.startDate, spanLen)}
+                          {isPregnancy && (
+                            <span className="ms-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[9px] font-bold normal-case text-violet-700">
+                              {t('settings.pregnancy')}
+                            </span>
+                          )}
                         </span>
                         {cycle.length != null && (
                           <span
                             className={`timeline-cycle-length text-xs font-extrabold tabular-nums ${isInvalid ? 'text-slate-500' : 'text-slate-800'}`}
-                            title={isGap
-                              ? t('timeline.gap_hint')
-                              : isShort
-                                ? t('timeline.short_cycle_hint')
-                                : undefined
+                            title={isPregnancy
+                              ? t('timeline.pregnancy_hint')
+                              : isGap
+                                ? t('timeline.gap_hint')
+                                : isShort
+                                  ? t('timeline.short_cycle_hint')
+                                  : undefined
                             }
                           >
-                            {isInvalid && <span className="mr-0.5" aria-hidden="true">⚠</span>}
+                            {isInvalid && !isPregnancy && <span className="mr-0.5" aria-hidden="true">⚠</span>}
                             {formatNumber(cycle.length)}
                           </span>
                         )}
@@ -145,12 +207,12 @@ const TimelineView: React.FC<TimelineViewProps> = ({ cycles, predictions }) => {
                 })}
               </div>
 
-              {!showAll && historyCycles.length > 6 && (
+              {!showAll && historyEntries.length > 6 && (
                 <button
                   onClick={() => setShowAll(true)}
                   className="w-full mt-10 py-3 rounded-2xl border border-slate-200/50 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-50 transition-all active:scale-95"
                 >
-                  {t('timeline.show_more_count', { count: historyCycles.length - 6 })}
+                  {t('timeline.show_more_count', { count: historyEntries.length - 6 })}
                 </button>
               )}
             </div>

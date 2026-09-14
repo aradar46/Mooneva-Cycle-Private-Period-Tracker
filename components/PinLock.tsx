@@ -69,6 +69,9 @@ const PinLock: React.FC<PinLockProps> = (props) => {
     return lockedUntil > Date.now() ? Math.ceil((lockedUntil - Date.now()) / 1000) : 0;
   });
   const [isVerifying, setIsVerifying] = useState(false);
+  // Sticky for the session: failedAttempts is reset to 0 the moment the lockout
+  // fires, so it cannot tell us on its own that the user has been getting it wrong.
+  const [hasFailed, setHasFailed] = useState(false);
 
   const prompt = props.purpose === 'exitDiscreteMode'
     ? t('settings.pin_exit_discrete_prompt')
@@ -102,6 +105,7 @@ const PinLock: React.FC<PinLockProps> = (props) => {
       } else {
         const nextAttempts = failedAttempts + 1;
         setError(true);
+        setHasFailed(true);
         if (nextAttempts >= MAX_FAILED_ATTEMPTS) {
           const lockedUntil = Date.now() + LOCKOUT_DURATION_SECONDS * 1000;
           setFailedAttempts(0);
@@ -180,6 +184,15 @@ const PinLock: React.FC<PinLockProps> = (props) => {
         >
           {isVerifying ? '...' : t('common.unlock', 'Unlock')}
         </button>
+        {/* The way back in exists but is invisible: the PIN is deliberately left out
+            of backups, so a fresh install plus a restore returns the data. Shown only
+            after a wrong PIN, and never for the discrete-mode prompt, where the app is
+            already unlocked and reinstalling would be the wrong advice. */}
+        {hasFailed && props.purpose !== 'exitDiscreteMode' && (
+          <p className="text-[11px] leading-relaxed text-slate-400 text-center px-2">
+            {t('settings.pin_forgot_hint')}
+          </p>
+        )}
         {props.purpose === 'exitDiscreteMode' && (
           <button
             type="button"

@@ -45,8 +45,6 @@
         "navigation": "Navigation"
     },
     "whats_new": {
-        "title": "Nouveautés",
-        "intro": "Depuis la dernière version :",
         "tip": "Mooneva paraît minimaliste, mais les <b>Paramètres</b> regorgent d'outils puissants. Une fonction vous manque ? Allez y jeter un œil : nous mettons à jour régulièrement et ajoutons les fonctionnalités demandées."
     },
     "share_message": {
@@ -54,7 +52,7 @@
     },
     "notifications": {
         "title": "Gestionnaire de notifications",
-        "discrete_mode_note": "En mode discret, les notifications utilisent des termes neutres semblables à des tâches.",
+        "discrete_mode_note": "Lorsque le mode discret est actif, les notifications utilisent une formulation neutre et n'apparaissent pas sur l'écran de verrouillage.",
         "section_action_needed": "Action requise",
         "section_cycle_updates": "Mises à jour du cycle",
         "section_period_ovulation": "Règles & Ovulation",
@@ -128,7 +126,8 @@
         "next_period_days": "Prochaines règles – {{count}} jours restants",
         "next_period_unknown": "Prédiction des prochaines règles",
         "permission_denied_message": "Les notifications sont désactivées. Activez-les dans les réglages de votre appareil pour recevoir des rappels.",
-        "exact_alarm_message": "Les rappels peuvent arriver en retard ou pas du tout. Autorise les alarmes et rappels dans les réglages de l'appareil pour une réception à l'heure."
+        "exact_alarm_message": "Les rappels peuvent arriver en retard ou pas du tout. Autorise les alarmes et rappels dans les réglages de l'appareil pour une réception à l'heure.",
+        "pill_reminder_discrete": "Rappel"
     },
     "nav": {
         "history": "Historique"
@@ -192,7 +191,9 @@
         "cycle_count_one": "Cycle {{count}}",
         "cycle_count_other": "{{count}} cycles",
         "no_recent_data": "Aucune donnée récente",
-        "log_to_resume": "Enregistre des règles pour relancer les prédictions"
+        "log_to_resume": "Enregistre des règles pour relancer les prédictions",
+        "pregnancy": "Grossesse",
+        "pregnancy_week": "Semaine {{week}}"
     },
     "discrete": {
         "title": "Mes tâches",
@@ -269,7 +270,9 @@
             "orphan_flow": "Flux (hors règles)",
             "withdrawal_bleed": "Hémorragie de privation (sous pilule)"
         },
-        "category_other": "Autre"
+        "category_other": "Autre",
+        "jump_to_month": "Aller à un mois",
+        "jump_close": "Fermer"
     },
     "cycle_insight": {
         "title": "Aperçu du cycle",
@@ -414,15 +417,21 @@
         "withdrawal_bleed_desc": "Marquer si vous utilisez une contraception hormonale (pilule, anneau, patch)",
         "withdrawal_tagged": "Ces règles sont marquées comme hémorragie de privation et seront exclues des statistiques du cycle naturel.",
         "stats": "Statistiques",
-        "ignore_averages_question": "Exclure des moyennes de cycle ?",
+        "ignore_averages_question": "Exclure des moyennes et des graphiques ?",
         "ignore_averages_desc": "Pour les cycles irréguliers (stress, maladie, etc.)",
-        "ignore_tagged": "Ces règles seront exclues des calculs de durée de cycle et des moyennes.",
+        "ignore_tagged": "Ces règles sont exclues de vos moyennes de cycle et des graphiques de la page Aperçus.",
         "tap_to_edit": "Appuyer pour modifier",
         "withdrawal_bleed_label": "Hémorragie de privation",
         "excluded_label": "Exclu",
         "day_x_of_y": "Jour {{day}} sur {{total}}",
         "no_period_advanced": "Cette date ne fait pas partie d'une période de règles. Commencez ou sélectionnez un jour de règles pour accéder aux options avancées.",
-        "daily_log_tabs": "Onglets du journal quotidien"
+        "daily_log_tabs": "Onglets du journal quotidien",
+        "pregnancy": "Grossesse",
+        "experimental": "Expérimental, retours bienvenus",
+        "pregnancy_start_question": "La grossesse a-t-elle commencé ce jour-là ?",
+        "pregnancy_start_desc": "Se termine d'elle-même au début de vos prochaines règles",
+        "pregnancy_tagged": "Cet intervalle sera affiché comme une grossesse, pas comme une absence de suivi.",
+        "pregnancy_paused_note": "Les prédictions sont en pause, ainsi que la prédiction adaptative, la fenêtre fertile et le SPM. Vous pouvez les réactiver dans les Réglages."
     },
     "settings": {
         "language": "Langue",
@@ -503,6 +512,7 @@
         "repeat_pin": "Répétez le code PIN",
         "enable_pin": "Activer le PIN",
         "pin_security_desc": "Vos données de santé sont chiffrées sur cet appareil. Ce code PIN contrôle l’accès à l’application.",
+        "pin_forgot_hint": "Code PIN oublié ? Si vous avez un fichier de sauvegarde, réinstallez Mooneva et restaurez-le. Sans sauvegarde, la réinstallation efface vos données.",
         "pin_unlock_prompt": "Saisissez votre code PIN (4 à 12 chiffres)",
         "pin_placeholder": "Code PIN de 4 à 12 chiffres",
         "pin_exit_discrete_prompt": "Saisissez votre code PIN pour quitter le mode d’application discret.",
@@ -510,6 +520,7 @@
         "enter_password": "Entrez le mot de passe",
         "repeat_password": "Répétez le mot de passe",
         "pins_dont_match": "Les PIN ne correspondent pas.",
+        "passwords_dont_match": "Les mots de passe ne correspondent pas.",
         "wipe_confirm": "Êtes-vous sûr ?",
         "feedback_title": "Aidez-nous à construire une application que vous aimez",
         "feedback_desc": "Vous avez trouvé un bug, une idée de fonctionnalité ou une traduction incorrecte ? Dites-le-nous en 30 secondes.",
@@ -596,7 +607,7 @@
         "report_footer_new": "Mooneva Cycle : suivi de règles privé",
         "birth_control_sub_desc": "Masquer la fertilité, marquer les saignements comme privation",
         "birth_control_pill_hint": "Idéal pour pilules combinées, anneaux ou patchs.",
-        "pause_predictions_full_desc": "Mettre en pause toutes les prédictions (grossesse, irrégularités, etc.), par exemple en cas de grossesse ou si vous préférez ne pas voir d'estimations.",
+        "pause_predictions_full_desc": "Masque les estimations de règles, d'ovulation et de SPM jusqu'à réactivation.",
         "adaptive_prediction_label": "Prédiction adaptative",
         "adaptive_prediction_desc_long": "Moyenne des 3 derniers cycles pour prédire la durée du cycle",
         "cycle_length_label": "Durée du cycle",
@@ -605,6 +616,9 @@
         "period_length_desc": "Jours de saignement typiques",
         "luteal_phase_label": "Phase lutéale",
         "luteal_phase_desc": "Jours de l'ovulation aux règles",
+        "kid_mode_section": "Mode enfant",
+        "kid_mode_label": "Mode enfant",
+        "kid_mode_desc": "Masque ce qui n'est pas encore utile.",
         "fertility_pms_section": "Fertilité & SPM",
         "pms_window_section": "Fenêtre de SPM",
         "cycle_config_section": "Configuration du cycle",
@@ -623,7 +637,19 @@
         "report_range_from": "Date de début",
         "report_range_to": "Date de fin",
         "report_range_max": "Max. 12 mois",
-        "report_share_failed": "Échec du partage du PDF. Essayez une période plus courte."
+        "report_share_failed": "Échec du partage du PDF. Essayez une période plus courte.",
+        "auto_backup": "Sauvegarde automatique",
+        "auto_backup_subtitle": "Chiffrée, dans un dossier de votre choix. S'exécute au maximum une fois par jour.",
+        "auto_backup_enable": "Sauvegarder automatiquement",
+        "auto_backup_password_warning": "Choisissez un mot de passe et conservez-le en lieu sûr. Ce n'est pas votre code PIN. Les sauvegardes automatiques sont chiffrées avec celui-ci et, sans lui, vos données ne peuvent pas être récupérées. Il est impossible de le réinitialiser.",
+        "auto_backup_sync_tip": "Astuce : choisissez un dossier qu'une autre application garde synchronisé (Drive, Dropbox, Nextcloud, iCloud, Syncthing) et vos sauvegardes survivront à un téléphone perdu ou cassé. Mooneva Cycle n'a pas d'accès Internet propre, et le fichier est chiffré avant d'être écrit : personne ne peut l'ouvrir sans votre mot de passe, pas même celui qui le stocke.",
+        "auto_backup_choose_folder": "Choisir un dossier",
+        "auto_backup_destination": "Dossier",
+        "auto_backup_last_run": "Dernière sauvegarde",
+        "auto_backup_run_now": "Sauvegarder maintenant",
+        "wipe_auto_backup_note": "Les sauvegardes automatiques déjà enregistrées dans « {{folder}} » ne sont pas supprimées. Elles ne pourront plus être ouvertes, car le mot de passe est également effacé. Supprimez-les vous-même si vous souhaitez vous en débarrasser.",
+        "pregnancy": "Grossesse",
+        "auto_backup_saved_to": "Sauvegardé dans {{folder}}"
     },
     "trends": {
         "header": "Aperçus",
@@ -642,12 +668,13 @@
         "year": "1 an",
         "completed_cycles_note": "Cette page n'affiche que les données des cycles terminés. Votre cycle en cours sera ajouté au début de vos prochaines règles.",
         "cycle_regularity": "Régularité du cycle",
-        "average_label": "Moyenne : {{count}} jours",
-        "regular": "Régulier",
-        "varying": "Variable",
-        "irregular": "Irrégulier",
+        "cycle_range": "De {{min}} à {{max}} jours, un écart de {{spread}}",
+        "includes_withdrawal": "Inclut les saignements de privation, qui ne sont pas des cycles naturels.",
         "flow_pattern": "Profil du flux",
-        "last_3_periods_avg": "Moyenne des 3 dernières règles",
+        "based_on_cycles_one": "Basé sur {{count}} cycle",
+        "based_on_cycles_other": "Basé sur {{count}} cycles",
+        "based_on_periods_one": "Basé sur {{count}} période de règles",
+        "based_on_periods_other": "Basé sur {{count}} périodes de règles",
         "lighter": "Plus léger",
         "heavier": "Plus abondant",
         "mood_by_phase": "Humeur par phase",
@@ -681,7 +708,9 @@
         "pill_timeline": "Chronologie des médicaments",
         "pill_taken": "Pilule prise",
         "pill_low": "Oubliée",
-        "pill_high": "Prise"
+        "pill_high": "Prise",
+        "pregnancy_note": "Les graphiques de cycle sont en pause pendant la grossesse et reviennent après vos premières règles.",
+        "pregnancy_charts_paused": "Rien à afficher pour l'instant. Ces graphiques comptent les jours du cycle, et une grossesse n'en a pas."
     },
     "timeline": {
         "header": "Chronologie",
@@ -692,7 +721,8 @@
         "started": "Commencé",
         "gap_hint": "Écart de suivi – non utilisé pour les prédictions",
         "short_cycle_hint": "Cycle trop court (<18 jours) – non utilisé pour les prédictions",
-        "show_more_count": "Afficher plus d'historique ({{count}})"
+        "show_more_count": "Afficher plus d'historique ({{count}})",
+        "pregnancy_hint": "Grossesse, non utilisée pour les prédictions"
     },
     "onboarding": {
         "trust": {

@@ -54,6 +54,22 @@ const getNotifContent = (type: keyof typeof REMINDER_IDS, isDiscrete: boolean) =
 };
 
 const CHANNEL_ID = 'mooneva_reminders';
+
+/**
+ * Discrete mode gets its own channel purely to hide reminders from the lock screen.
+ *
+ * Android freezes a channel's behaviour once it exists — only the name and description
+ * stay editable — so `visibility` cannot be flipped on the channel already installed.
+ * A second id is the supported way round that.
+ *
+ * This is the only part of discrete mode that actually defeats a glance at a locked
+ * phone. The app name in the notification header is drawn by the system from the
+ * application label and cannot be changed at runtime, so neutral wording hides *what*
+ * the reminder says, never *which app* sent it.
+ */
+const CHANNEL_ID_PRIVATE = 'mooneva_reminders_private';
+
+const channelFor = (discrete: boolean): string => (discrete ? CHANNEL_ID_PRIVATE : CHANNEL_ID);
 const DEFAULT_TIME = '09:00';
 
 export const REMINDER_DEFAULT_TIMES = {
@@ -148,7 +164,7 @@ function addContraceptionOneShot(
   notifications.push({
     id,
     ...contraceptionContent(discrete),
-    channelId: CHANNEL_ID,
+    channelId: channelFor(discrete),
     extra: { method, action },
     schedule: { at: target, repeats: false, allowWhileIdle: true },
   });
@@ -221,7 +237,7 @@ function addContraceptionReminders(
       notifications.push({
         id: CONTRACEPTION_REMINDER_IDS.pill,
         ...contraceptionContent(discrete),
-        channelId: CHANNEL_ID,
+        channelId: channelFor(discrete),
         extra: { method: profile.method, action: 'take' },
         schedule: { on: time, allowWhileIdle: true },
       });
@@ -317,14 +333,22 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
   try {
     const { LocalNotifications } = await import('@capacitor/local-notifications');
 
-    // Android: create channel (required for Android 8+)
+    const discrete = !!settings.discreteMode;
+
+    // Android: create channel (required for Android 8+). Only the one in use, so the
+    // system notification list does not grow a second entry the user never asked for.
+    //
+    // The description is what shows in system Settings > Apps > Notifications, so it must
+    // not name the subject either. It said "Period and daily log reminders" while this feature was being built;
+    // name and description are the two fields Android does let an app update in place,
+    // so that fix reaches existing installs on the next launch.
     if (Capacitor.getPlatform() === 'android') {
       await LocalNotifications.createChannel({
-        id: CHANNEL_ID,
+        id: channelFor(discrete),
         name: 'Reminders',
-        description: 'Period and daily log reminders',
+        description: 'Scheduled reminders',
         importance: 5, // MAX importance for heads-up
-        visibility: 1, // Public (show on lock screen)
+        visibility: discrete ? -1 : 1, // -1 secret: nothing on the lock screen
         vibration: true,
         lights: true
       });
@@ -343,7 +367,6 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
 
     const notifications: LocalNotificationSchema[] = [];
     const now = new Date();
-    const discrete = !!settings.discreteMode;
 
     // --- 1. Daily Repeating Reminders (Only Daily Log today) ---
     // Note: We only keep Daily Log as a repeating daily reminder.
@@ -354,7 +377,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
       notifications.push({
         id: REMINDER_IDS.reminderDailyLog,
         ...content,
-        channelId: CHANNEL_ID,
+        channelId: channelFor(discrete),
         schedule: {
           on: { hour, minute },
           allowWhileIdle: true
@@ -371,7 +394,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
       notifications.push({
         id: REMINDER_IDS.reminderPill,
         ...content,
-        channelId: CHANNEL_ID,
+        channelId: channelFor(discrete),
         schedule: {
           on: { hour, minute },
           allowWhileIdle: true
@@ -392,7 +415,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
           notifications.push({
             id: REMINDER_IDS.reminderPeriodStart,
             ...content,
-            channelId: CHANNEL_ID,
+            channelId: channelFor(discrete),
             schedule: {
               at: target,
               repeats: false,
@@ -413,7 +436,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
           notifications.push({
             id: REMINDER_IDS.reminderPeriodInput,
             ...content,
-            channelId: CHANNEL_ID,
+            channelId: channelFor(discrete),
             schedule: {
               at: target,
               repeats: false,
@@ -434,7 +457,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
           notifications.push({
             id: REMINDER_IDS.reminderPeriodEnd,
             ...content,
-            channelId: CHANNEL_ID,
+            channelId: channelFor(discrete),
             schedule: {
               at: target,
               repeats: false,
@@ -455,7 +478,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
           notifications.push({
             id: REMINDER_IDS.reminderFertility,
             ...content,
-            channelId: CHANNEL_ID,
+            channelId: channelFor(discrete),
             schedule: {
               at: target,
               repeats: false,
@@ -479,7 +502,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
           notifications.push({
             id: REMINDER_IDS.reminderOvulation,
             ...content,
-            channelId: CHANNEL_ID,
+            channelId: channelFor(discrete),
             schedule: {
               at: target,
               repeats: false,
@@ -502,7 +525,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
           notifications.push({
             id: REMINDER_IDS.reminderPMS,
             ...content,
-            channelId: CHANNEL_ID,
+            channelId: channelFor(discrete),
             schedule: {
               at: targetDate,
               repeats: false,
@@ -524,7 +547,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
             notifications.push({
               id: REMINDER_IDS.reminderPMS,
               ...content,
-              channelId: CHANNEL_ID,
+              channelId: channelFor(discrete),
               schedule: { at: catchUpTime, repeats: false, allowWhileIdle: true }
             });
           }
@@ -546,7 +569,7 @@ async function syncReminderNotificationsNow(settings: AppSettings, predictions?:
             notifications.push({
               id: REMINDER_IDS.reminderLate + i,
               ...content,
-              channelId: CHANNEL_ID,
+              channelId: channelFor(discrete),
               schedule: {
                 at: checkDate,
                 repeats: false,

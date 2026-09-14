@@ -1,43 +1,51 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DailyLog, Cycle, SymptomConfig, PeriodRecord, AppSettings, MOOD_OPTIONS } from '../types';
-import { toLocalISOString, getTimestamp, diffInDays } from '../utils/dateUtils';
-import { averageCycleLength, averagePeriodLength } from '../services/logic/cycle';
+import { toLocalISOString, getTimestamp, diffInDays, addDays } from '../utils/dateUtils';
+import { averageCycleLength, averagePeriodLength, getEligibleCycles, getPregnancySpans, isCycleOutlier } from '../services/logic/cycle';
+
+/** The heatmaps run to the longest cycle in range, never past this. 45 is where
+ *  `isCycleEligibleForAverage` stops calling a cycle normal; beyond it the days belong to a
+ *  gap, not a cycle. A fixed 31 columns used to cut a 38-day cycle's whole PMS stretch off
+ *  the chart, and left a 26-day user staring at five columns that could never hold data. */
+const MAX_CYCLE_DAY_COLUMN = 45;
 
 // Inlined useTrendStats Hook
 interface TrendStatsProps {
   logs: Record<string, DailyLog>;
   cycles: Cycle[];
+  periods: PeriodRecord[];
   range: 30 | 90 | 180 | 365;
   selectedSymptoms: string[];
   selectedMoods: string[];
   searchQuery: string;
-  settings: AppSettings;
 }
 
 const useTrendStats = ({
   logs,
   cycles,
+  periods,
   range,
   selectedSymptoms,
   selectedMoods,
   searchQuery,
-  settings
 }: TrendStatsProps) => {
 
-  // Filter logs by date range and search criteria
-  const filteredLogs = useMemo(() => {
+  const cutoffStr = useMemo(() => {
     const cutoffDate = new Date();
     cutoffDate.setHours(0, 0, 0, 0); // Start of local day
     cutoffDate.setDate(cutoffDate.getDate() - range);
-    const cutoffStr = toLocalISOString(cutoffDate);
+    return toLocalISOString(cutoffDate);
+  }, [range]);
 
+  // Search/symptom/mood filters only. The date range is applied to cycles and periods
+  // instead, so a cycle that reaches into the window is counted whole rather than
+  // sliced at the cutoff, which would empty its first columns for no real reason.
+  const filteredLogs = useMemo(() => {
     const result: Record<string, DailyLog> = {};
 
     const logEntries = Object.entries(logs) as [string, DailyLog][];
     logEntries.forEach(([date, log]) => {
-      if (date < cutoffStr) return;
-
       if (selectedSymptoms.length > 0) {
         const hasMatchingSymptom = log.symptoms.some(s => selectedSymptoms.includes(s));
         if (!hasMatchingSymptom) return;
@@ -59,16 +67,12 @@ const useTrendStats = ({
     });
 
     return result;
-  }, [logs, range, selectedSymptoms, selectedMoods, searchQuery]);
+  }, [logs, selectedSymptoms, selectedMoods, searchQuery]);
 
   // Calculate a filtered list of cycles that match the active filters
   const filteredCycles = useMemo(() => {
-    const cutoffDate = new Date();
-    cutoffDate.setHours(0, 0, 0, 0);
-    cutoffDate.setDate(cutoffDate.getDate() - range);
-    const cutoffStr = toLocalISOString(cutoffDate);
-
     const DAY_MS = 86400000;
+    const todayStr = toLocalISOString(new Date());
 
     const filteredLogTimestamps = new Set<number>();
     Object.keys(filteredLogs).forEach(dateStr => {
@@ -76,7 +80,18 @@ const useTrendStats = ({
     });
 
     return cycles.filter(c => {
-      if (c.startDate < cutoffStr) return false;
+      // A cycle counts when any part of it falls inside the window, not only when it
+      // started there: on a 30 day range a cycle that began 40 days ago and ended 12
+      // days ago is most of what actually happened in those 30 days.
+      const cycleEnd = c.length ? addDays(c.startDate, c.length - 1) : todayStr;
+      if (cycleEnd < cutoffStr) return false;
+      // A gap of 600 days has no meaningful cycle day, pregnancy or otherwise, and it would
+      // drag the axis out to its 45-day cap on the strength of one cycle.
+      if (c.isOutlier) return false;
+      // Ticking "exclude" used to drop the cycle from the averages while the charts under
+      // them kept drawing it, so the page argued with itself about a cycle the user had
+      // already ruled out. One tick, off the whole page.
+      if (c.ignoreForAverages) return false;
 
       // If no filters are active, return true
       if (selectedSymptoms.length === 0 && selectedMoods.length === 0 && searchQuery.trim() === "") {
@@ -93,7 +108,77 @@ const useTrendStats = ({
       }
       return false;
     });
-  }, [cycles, range, filteredLogs, selectedSymptoms, selectedMoods, searchQuery]);
+  }, [cycles, cutoffStr, filteredLogs, selectedSymptoms, selectedMoods, searchQuery]);
+
+  // Periods on the same rule as cycles: any overlap with the window counts, and a period
+  // the user ticked as excluded counts nowhere.
+  const filteredPeriods = useMemo(
+    () => periods.filter(p =>
+      !p.ignoreForAverages && addDays(p.startDate, Math.max(1, p.days) - 1) >= cutoffStr
+    ),
+    [periods, cutoffStr]
+  );
+
+  /** The cycle you are living in. `getPastCycles` only emits finished cycles, because a
+   *  cycle with no end has no length to average, so everything logged since your last
+   *  period started was invisible in the heatmaps until your next one began. It carries no
+   *  `length`, which keeps it out of the averages, the regularity bars and mood by phase,
+   *  all of which need a finished cycle. The heatmaps count it up to today. */
+  const openCycle = useMemo((): Cycle | null => {
+    const todayStr = toLocalISOString(new Date());
+    const last = [...periods]
+      .filter(p => p.startDate <= todayStr && !p.ignoreForAverages)
+      .sort((a, b) => b.startDate.localeCompare(a.startDate))[0];
+    if (!last) return null;
+    // A period record that is already closed by a later one is not the open cycle.
+    if (cycles.some(c => c.startDate === last.startDate)) return null;
+    // Stopped logging months ago: the same rule the rest of the app uses for a gap.
+    if (isCycleOutlier(diffInDays(todayStr, last.startDate) + 1)) return null;
+    return { startDate: last.startDate };
+  }, [periods, cycles]);
+
+  const heatmapCycles = useMemo(
+    () => openCycle ? [...filteredCycles, openCycle] : filteredCycles,
+    [filteredCycles, openCycle]
+  );
+
+  /** The last column worth drawing: the longest cycle in range, capped. Zero when there is
+   *  nothing to count, in which case the sections do not render at all. */
+  const heatmapDayCount = useMemo(() => {
+    const todayStr = toLocalISOString(new Date());
+    return heatmapCycles.reduce((longest, cycle) => {
+      const reached = cycle.length
+        ? cycle.length
+        : Math.max(1, diffInDays(todayStr, cycle.startDate) + 1);
+      return Math.max(longest, Math.min(reached, MAX_CYCLE_DAY_COLUMN));
+    }, 0);
+  }, [heatmapCycles]);
+
+  /** How many of the counted cycles actually reached each cycle day. This is the
+   *  denominator: day 5 exists in every cycle, day 30 only in the ones that ran that long,
+   *  so raw counts made the late columns look empty when they were only rarer. */
+  const cycleDayOpportunities = useMemo(() => {
+    const counts: Record<number, number> = {};
+    const todayStr = toLocalISOString(new Date());
+
+    heatmapCycles.forEach(cycle => {
+      const reached = cycle.length
+        ? cycle.length
+        : Math.max(1, diffInDays(todayStr, cycle.startDate) + 1);
+      for (let day = 1; day <= Math.min(reached, heatmapDayCount); day++) {
+        counts[day] = (counts[day] || 0) + 1;
+      }
+    });
+
+    return counts;
+  }, [heatmapCycles, heatmapDayCount]);
+
+  /** Below this many cycles a column is drawn as "not enough data" rather than coloured:
+   *  one cycle reaching day 33 would otherwise paint 100% off a single log. */
+  const minOpportunities = useMemo(
+    () => Math.min(heatmapCycles.length, Math.max(2, Math.ceil(heatmapCycles.length / 4))),
+    [heatmapCycles.length]
+  );
 
   // Average cycle and period length based on filtered data
   const rangeAverages = useMemo(() => {
@@ -117,15 +202,24 @@ const useTrendStats = ({
     };
   }, [filteredCycles, cycles]);
 
-  // Statistics for main charts
+  // Statistics for main charts. Counted over the days the filtered cycles cover, so the
+  // rows listed here are exactly the rows the heatmap below can fill.
   const statistics = useMemo(() => {
     const symptomCounts: Record<string, number> = {};
 
-    const logValues = Object.values(filteredLogs) as DailyLog[];
-    logValues.forEach(log => {
-      log.symptoms.forEach(sym => {
-        symptomCounts[sym] = (symptomCounts[sym] || 0) + 1;
-      });
+    const todayStatsStr = toLocalISOString(new Date());
+
+    heatmapCycles.forEach(cycle => {
+      const maxDay = Math.min(heatmapDayCount, cycle.length
+        ? cycle.length
+        : Math.max(1, diffInDays(todayStatsStr, cycle.startDate) + 1));
+      for (let day = 1; day <= maxDay; day++) {
+        const log = filteredLogs[addDays(cycle.startDate, day - 1)];
+        if (!log) continue;
+        log.symptoms.forEach(sym => {
+          symptomCounts[sym] = (symptomCounts[sym] || 0) + 1;
+        });
+      }
     });
 
     const sortedSymptoms = Object.entries(symptomCounts)
@@ -133,52 +227,8 @@ const useTrendStats = ({
       .slice(0, 8);
 
     return { sortedSymptoms };
-  }, [filteredLogs]);
+  }, [filteredLogs, heatmapCycles, heatmapDayCount]);
 
-
-  // Flow vs Day of Bleeding Heatmap
-  const flowHeatmap = useMemo(() => {
-    const data: Record<string, Record<number, number>> = {
-      heavy: {},
-      medium: {},
-      light: {},
-      spotting: {}
-    };
-
-    const todayStr = toLocalISOString(new Date());
-
-    filteredCycles.forEach((cycle) => {
-      const [y, m, d_val] = cycle.startDate.split('-').map(Number);
-      const cycleStart = new Date(y, m - 1, d_val);
-      // Use actual cycle length, or days-elapsed for unfinished cycle
-      const maxDay = cycle.length
-        ? cycle.length
-        : Math.max(1, diffInDays(todayStr, cycle.startDate) + 1);
-      for (let day = 1; day <= maxDay; day++) {
-        const d = new Date(cycleStart);
-        d.setDate(d.getDate() + (day - 1));
-        const dStr = toLocalISOString(d);
-
-        const log = filteredLogs[dStr];
-        if (log && log.flow) {
-          const cycleDay = Math.min(day, 31);
-          data[log.flow][cycleDay] = (data[log.flow][cycleDay] || 0) + 1;
-        }
-      }
-    });
-
-    return data;
-  }, [filteredLogs, filteredCycles]);
-
-  const maxFlowFreq = useMemo(() => {
-    let max = 1;
-    Object.values(flowHeatmap).forEach(days => {
-      Object.values(days).forEach(val => {
-        if (val > max) max = val;
-      });
-    });
-    return max;
-  }, [flowHeatmap]);
 
   // Mood vs Day of Cycle Heatmap
   const moodHeatmap = useMemo(() => {
@@ -187,12 +237,12 @@ const useTrendStats = ({
 
     const todayMoodStr = toLocalISOString(new Date());
 
-    filteredCycles.forEach((cycle) => {
+    heatmapCycles.forEach((cycle) => {
       const [y, m, d_val] = cycle.startDate.split('-').map(Number);
       const cycleStart = new Date(y, m - 1, d_val);
-      const maxDay = cycle.length
+      const maxDay = Math.min(heatmapDayCount, cycle.length
         ? cycle.length
-        : Math.max(1, diffInDays(todayMoodStr, cycle.startDate) + 1);
+        : Math.max(1, diffInDays(todayMoodStr, cycle.startDate) + 1));
       for (let day = 1; day <= maxDay; day++) {
         const d = new Date(cycleStart);
         d.setDate(d.getDate() + (day - 1));
@@ -201,10 +251,9 @@ const useTrendStats = ({
         const log = filteredLogs[dStr];
         if (log && log.mood) {
           const logMoods = log.mood;
-          const cycleDay = Math.min(day, 31);
           logMoods.forEach(mood => {
             if (data[mood]) {
-              data[mood][cycleDay] = (data[mood][cycleDay] || 0) + 1;
+              data[mood][day] = (data[mood][day] || 0) + 1;
             }
           });
         }
@@ -212,17 +261,7 @@ const useTrendStats = ({
     });
 
     return data;
-  }, [filteredLogs, filteredCycles]);
-
-  const maxMoodFreq = useMemo(() => {
-    let max = 1;
-    Object.values(moodHeatmap).forEach(days => {
-      Object.values(days).forEach(val => {
-        if (val > max) max = val;
-      });
-    });
-    return max;
-  }, [moodHeatmap]);
+  }, [filteredLogs, heatmapCycles, heatmapDayCount]);
 
   const topSymptomNames = useMemo(() => statistics.sortedSymptoms.map(([name]) => name), [statistics.sortedSymptoms]);
 
@@ -233,12 +272,12 @@ const useTrendStats = ({
 
     const todaySymptomStr = toLocalISOString(new Date());
 
-    filteredCycles.forEach((cycle) => {
+    heatmapCycles.forEach((cycle) => {
       const [y, m, d_val] = cycle.startDate.split('-').map(Number);
       const cycleStart = new Date(y, m - 1, d_val);
-      const maxDay = cycle.length
+      const maxDay = Math.min(heatmapDayCount, cycle.length
         ? cycle.length
-        : Math.max(1, diffInDays(todaySymptomStr, cycle.startDate) + 1);
+        : Math.max(1, diffInDays(todaySymptomStr, cycle.startDate) + 1));
       for (let day = 1; day <= maxDay; day++) {
         const d = new Date(cycleStart);
         d.setDate(d.getDate() + (day - 1));
@@ -246,10 +285,9 @@ const useTrendStats = ({
 
         const log = filteredLogs[dStr];
         if (log && log.symptoms) {
-          const cycleDay = Math.min(day, 31);
           log.symptoms.forEach(s => {
             if (data[s]) {
-              data[s][cycleDay] = (data[s][cycleDay] || 0) + 1;
+              data[s][day] = (data[s][day] || 0) + 1;
             }
           });
         }
@@ -257,17 +295,7 @@ const useTrendStats = ({
     });
 
     return data;
-  }, [filteredLogs, filteredCycles, topSymptomNames]);
-
-  const maxSymptomFreq = useMemo(() => {
-    let max = 1;
-    Object.values(symptomHeatmap).forEach(days => {
-      Object.values(days).forEach(val => {
-        if (val > max) max = val;
-      });
-    });
-    return max;
-  }, [symptomHeatmap]);
+  }, [filteredLogs, heatmapCycles, heatmapDayCount, topSymptomNames]);
 
 
   // Pill adherence vs Day of Cycle: count of cycles where the pill was taken on that day
@@ -276,26 +304,25 @@ const useTrendStats = ({
 
     const todayPillStr = toLocalISOString(new Date());
 
-    filteredCycles.forEach((cycle) => {
+    heatmapCycles.forEach((cycle) => {
       const [y, m, d_val] = cycle.startDate.split('-').map(Number);
       const cycleStart = new Date(y, m - 1, d_val);
-      const maxDay = cycle.length
+      const maxDay = Math.min(heatmapDayCount, cycle.length
         ? cycle.length
-        : Math.max(1, diffInDays(todayPillStr, cycle.startDate) + 1);
+        : Math.max(1, diffInDays(todayPillStr, cycle.startDate) + 1));
       for (let day = 1; day <= maxDay; day++) {
         const d = new Date(cycleStart);
         d.setDate(d.getDate() + (day - 1));
         const dStr = toLocalISOString(d);
 
         if (filteredLogs[dStr]?.pillTakenAt) {
-          const cycleDay = Math.min(day, 31);
-          data[cycleDay] = (data[cycleDay] || 0) + 1;
+          data[day] = (data[day] || 0) + 1;
         }
       }
     });
 
     return data;
-  }, [filteredLogs, filteredCycles]);
+  }, [filteredLogs, heatmapCycles, heatmapDayCount]);
 
   // Medications vs Day of Cycle: one row per medication, built only from the selected
   // range, so old one-off medications simply have no data here and never show up.
@@ -304,40 +331,39 @@ const useTrendStats = ({
 
     const todayMedsStr = toLocalISOString(new Date());
 
-    filteredCycles.forEach((cycle) => {
+    heatmapCycles.forEach((cycle) => {
       const [y, m, d_val] = cycle.startDate.split('-').map(Number);
       const cycleStart = new Date(y, m - 1, d_val);
-      const maxDay = cycle.length
+      const maxDay = Math.min(heatmapDayCount, cycle.length
         ? cycle.length
-        : Math.max(1, diffInDays(todayMedsStr, cycle.startDate) + 1);
+        : Math.max(1, diffInDays(todayMedsStr, cycle.startDate) + 1));
       for (let day = 1; day <= maxDay; day++) {
         const d = new Date(cycleStart);
         d.setDate(d.getDate() + (day - 1));
         const dStr = toLocalISOString(d);
 
         for (const name of filteredLogs[dStr]?.meds || []) {
-          const cycleDay = Math.min(day, 31);
           if (!data[name]) data[name] = {};
-          data[name][cycleDay] = (data[name][cycleDay] || 0) + 1;
+          data[name][day] = (data[name][day] || 0) + 1;
         }
       }
     });
 
     return data;
-  }, [filteredLogs, filteredCycles]);
+  }, [filteredLogs, heatmapCycles, heatmapDayCount]);
 
   return {
     filteredLogs,
     filteredCycles,
+    filteredPeriods,
     rangeAverages,
     statistics,
-    flowHeatmap,
-    maxFlowFreq,
     moodHeatmap,
-    maxMoodFreq,
     symptomHeatmap,
-    maxSymptomFreq,
     topSymptomNames,
+    cycleDayOpportunities,
+    minOpportunities,
+    heatmapDayCount,
     pillHeatmap,
     medsHeatmap
   };
@@ -374,25 +400,36 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
   const {
     rangeAverages,
     statistics,
-    flowHeatmap,
-    maxFlowFreq,
     moodHeatmap,
-    maxMoodFreq,
     symptomHeatmap,
-    maxSymptomFreq,
     topSymptomNames,
+    cycleDayOpportunities,
+    minOpportunities,
+    heatmapDayCount,
     pillHeatmap,
     medsHeatmap,
-    filteredCycles
+    filteredCycles,
+    filteredPeriods
   } = useTrendStats({
     logs,
     cycles,
+    periods,
     range,
     selectedSymptoms,
     selectedMoods,
     searchQuery,
-    settings
   });
+
+  // Cycle-day charts have nothing to say during a pregnancy: there is no cycle to
+  // count days against. The date-based charts above are unaffected and keep working.
+  const pregnancyOpen = useMemo(
+    () => getPregnancySpans(logs, periods).some(sp => sp.isOngoing),
+    [logs, periods]
+  );
+
+  // The number the cards were actually built from, not the number in range: a cycle can
+  // be in range and still be dropped for being a withdrawal bleed or manually excluded.
+  const averagedCycleCount = useMemo(() => getEligibleCycles(filteredCycles).length, [filteredCycles]);
 
   const hasActiveFilters = selectedSymptoms.length > 0 || selectedMoods.length > 0 || searchQuery.trim() !== '';
 
@@ -451,9 +488,11 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
           {settings.adaptivePrediction && !settings.isOnBirthControl && (
             <div className="px-1">
               {(() => {
-                const eligibleCount = cycles.filter(c =>
-                  c.isValid && !c.isWithdrawalBleed && !c.ignoreForAverages
-                ).length;
+                // Same rule the prediction model uses, not a local copy of it. The
+                // inline version agreed only because eligibility (18-45 days) sits
+                // inside the outlier threshold (>60); raising MAX_CYCLE_LENGTH would
+                // have silently split them.
+                const eligibleCount = getEligibleCycles(cycles).length;
 
                 if (eligibleCount < 3) {
                   const remaining = 3 - eligibleCount;
@@ -484,9 +523,17 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
           )}
 
           <p className="px-2 pb-1 text-center text-[11px] leading-relaxed text-slate-500">
-            {t('trends.completed_cycles_note')}
+            {pregnancyOpen ? t('trends.pregnancy_note') : t('trends.completed_cycles_note')}
           </p>
-          <TrendStatCards rangeAverages={rangeAverages} defaultCycleLength={settings.cycleLength} defaultPeriodLength={settings.periodLength} />
+          <TrendStatCards rangeAverages={rangeAverages} />
+
+          {(rangeAverages.isHistorical || averagedCycleCount > 0) && (
+            <p className="px-2 text-center text-[11px] leading-relaxed text-slate-500">
+              {rangeAverages.isHistorical
+                ? t('trends.no_data_range')
+                : t('trends.based_on_cycles', { count: averagedCycleCount })}
+            </p>
+          )}
         </div>
 
         <TrendsFilterDrawer
@@ -503,22 +550,24 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
         />
 
         {/* Cycle Regularity Bar Chart */}
-        <CycleHistoryChart cycles={cycles} />
+        <CycleHistoryChart cycles={filteredCycles} />
 
         {/* Flow Pattern Curve */}
-        <AverageFlowCurve logs={logs} periods={periods} />
+        <AverageFlowCurve logs={logs} periods={filteredPeriods} />
 
         {/* Mood by Phase Breakdown */}
-        <MoodByPhase logs={logs} cycles={cycles} settings={settings} />
+        <MoodByPhase logs={logs} cycles={filteredCycles} settings={settings} />
 
         {/* Mood Timeline Heatmap */}
-        {maxMoodFreq > 0 && (
+        {Object.values(moodHeatmap).some(days => Object.keys(days).length > 0) && (
           <HeatmapSection
             title={t('trends.mood_timeline')}
             gradientFrom="amber-100"
             gradientTo="amber-500"
             colorScale="orange"
-            maxValue={maxMoodFreq}
+            opportunities={cycleDayOpportunities}
+            minOpportunities={minOpportunities}
+            dayCount={heatmapDayCount}
             lowLabel={t('trends.rare')}
             highLabel={t('trends.likely')}
             rows={MOOD_OPTIONS.map((opt, idx) => ({
@@ -542,7 +591,9 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
             title={t('trends.symptom_timeline')}
             gradientFrom="indigo-100"
             gradientTo="indigo-500"
-            maxValue={maxSymptomFreq}
+            opportunities={cycleDayOpportunities}
+            minOpportunities={minOpportunities}
+            dayCount={heatmapDayCount}
             lowLabel={t('trends.rare')}
             highLabel={t('trends.likely')}
             rows={topSymptomNames.map((symName, idx) => ({
@@ -559,6 +610,17 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
           />
         )}
 
+        {/* A pregnancy has no cycle days to count, so the three sections above render
+            nothing at all. Say why, rather than ending the page in silence. */}
+        {pregnancyOpen && Object.keys(cycleDayOpportunities).length === 0 && (
+          <div
+            className="bg-[#F0F2F5] rounded-[32px] p-6"
+            style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.4), -8px -8px 16px rgba(255, 255, 255, 0.8)' }}
+          >
+            <p className="text-slate-400 text-sm text-center py-8 leading-relaxed">{t('trends.pregnancy_charts_paused')}</p>
+          </div>
+        )}
+
         {/* Pill Adherence (Cycle Days) — intensity = fraction of cycles where it was taken that day.
             Other medications share this section: one extra row each, only for medications
             actually taken inside the selected range. */}
@@ -568,7 +630,9 @@ const TrendsView: React.FC<TrendsViewProps> = ({ logs, cycles, periods, settings
             gradientFrom="teal-100"
             gradientTo="teal-500"
             colorScale="teal"
-            maxValue={Math.max(filteredCycles.length, 1)}
+            opportunities={cycleDayOpportunities}
+            minOpportunities={minOpportunities}
+            dayCount={heatmapDayCount}
             lowLabel={t('trends.pill_low')}
             highLabel={t('trends.pill_high')}
             rows={[

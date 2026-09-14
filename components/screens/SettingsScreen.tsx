@@ -9,6 +9,8 @@ import { SubViewType, ViewType } from '../../hooks/useAppNavigation';
 interface SettingsScreenProps {
     subView: SubViewType;
     setSubView: (view: SubViewType) => void;
+    /** Returns to wherever the sub-screen was opened from, not always the Settings list. */
+    closeSubView: () => void;
     setView: (view: ViewType) => void;
     isCloaked: boolean;
 }
@@ -16,6 +18,7 @@ interface SettingsScreenProps {
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     subView,
     setSubView,
+    closeSubView,
     setView,
     isCloaked
 }) => {
@@ -29,10 +32,11 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                     settings={settings}
                     onUpdate={updateSettings}
                     subView={subView}
-                    onSubViewChange={setSubView}
+                    onSubViewChange={(sub) => (sub === 'main' ? closeSubView() : setSubView(sub))}
                     periods={periods}
                     onUpdatePeriodWithdrawalBleed={updatePeriodWithdrawalBleed}
                     onViewChange={setView}
+                    runBackupNow={actions.runBackupNow}
                     onClose={() => {
                         setSubView('main');
                         setView('calendar');

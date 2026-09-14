@@ -45,8 +45,6 @@
         "navigation": "Navigation"
     },
     "whats_new": {
-        "title": "Neuigkeiten",
-        "intro": "Seit dem letzten Update:",
         "tip": "Mooneva wirkt schlicht, doch in den <b>Einstellungen</b> steckt jede Menge. Fehlt dir eine Funktion? Schau dort vorbei: Wir aktualisieren regelmäßig und setzen Wünsche um."
     },
     "share_message": {
@@ -54,7 +52,7 @@
     },
     "notifications": {
         "title": "Benachrichtigungen",
-        "discrete_mode_note": "Im Diskret-Modus sind Benachrichtigungen neutral formuliert.",
+        "discrete_mode_note": "Solange der diskrete Modus aktiv ist, verwenden Benachrichtigungen neutrale Formulierungen und erscheinen nicht auf dem Sperrbildschirm.",
         "section_period_ovulation": "Periode & Eisprung",
         "gentle_mode": "Sanfter Modus",
         "gentle_mode_desc": "Nur bei Inaktivität von 48h während der Periode.",
@@ -128,7 +126,8 @@
         "section_action_needed": "Handlungsbedarf",
         "section_cycle_updates": "Zyklus-Updates",
         "permission_denied_message": "Benachrichtigungen sind deaktiviert. Aktiviere sie in den Geräteeinstellungen, um Erinnerungen zu erhalten.",
-        "exact_alarm_message": "Erinnerungen können verspätet oder gar nicht ankommen. Erlaube Wecker & Erinnerungen in den Geräteeinstellungen für pünktliche Zustellung."
+        "exact_alarm_message": "Erinnerungen können verspätet oder gar nicht ankommen. Erlaube Wecker & Erinnerungen in den Geräteeinstellungen für pünktliche Zustellung.",
+        "pill_reminder_discrete": "Erinnerung"
     },
     "nav": {
         "history": "Historie"
@@ -192,7 +191,9 @@
         "cycle_count_one": "{{count}} Zyklus",
         "cycle_count_other": "{{count}} Zyklen",
         "no_recent_data": "Keine aktuellen Daten",
-        "log_to_resume": "Erfasse eine Periode, um Vorhersagen fortzusetzen"
+        "log_to_resume": "Erfasse eine Periode, um Vorhersagen fortzusetzen",
+        "pregnancy": "Schwangerschaft",
+        "pregnancy_week": "Woche {{week}}"
     },
     "discrete": {
         "title": "Meine Aufgaben",
@@ -269,7 +270,9 @@
         "how_to_log_daily_body": "<strong>Tippe</strong> (zum Hinzufügen) oder <strong>tippe doppelt</strong> (zum Bearbeiten) auf einen beliebigen Tag im Kalender.",
         "category_flow": "Zyklus",
         "category_logs": "Eintragsdetails",
-        "category_other": "Sonstiges"
+        "category_other": "Sonstiges",
+        "jump_to_month": "Zu Monat springen",
+        "jump_close": "Schließen"
     },
     "cycle_insight": {
         "title": "Zyklus-Einblick",
@@ -411,9 +414,9 @@
         "withdrawal_bleed_question": "War das eine Abbruchblutung?",
         "withdrawal_bleed_desc": "Markieren bei hormoneller Verhütung (Pille, Ring, Pflaster)",
         "withdrawal_tagged": "Diese Periode ist als Abbruchblutung markiert und wird von natürlichen Zyklusstatistiken ausgeschlossen.",
-        "ignore_averages_question": "Von Zyklusdurchschnitten ausschließen?",
+        "ignore_averages_question": "Von Durchschnitten und Diagrammen ausschließen?",
         "ignore_averages_desc": "Für unregelmäßige Zyklen (Stress, Krankheit, etc.)",
-        "ignore_tagged": "Diese Periode wird von Zykluslängenberechnungen und Durchschnitten ausgeschlossen.",
+        "ignore_tagged": "Diese Periode wird von deinen Zyklusdurchschnitten und den Diagrammen unter Einblicke ausgeschlossen.",
         "no_period_advanced": "Dieses Datum ist nicht Teil einer Periode. Starte oder wähle einen Periodetag für erweiterte Optionen.",
         "vitals_tab": "Körper",
         "stats": "Statistik",
@@ -422,7 +425,13 @@
         "excluded_label": "Ausgeschlossen",
         "day_x_of_y": "Tag {{day}} von {{total}}",
         "spotting_hint_no_period": "Schmierblutung erfassen oder Periode anpassen",
-        "daily_log_tabs": "Tagesprotokoll-Tabs"
+        "daily_log_tabs": "Tagesprotokoll-Tabs",
+        "pregnancy": "Schwangerschaft",
+        "experimental": "Experimentell, Feedback erwünscht",
+        "pregnancy_start_question": "Hat die Schwangerschaft an diesem Tag begonnen?",
+        "pregnancy_start_desc": "Endet von selbst, wenn deine nächste Periode beginnt",
+        "pregnancy_tagged": "Dieser Zeitraum wird als Schwangerschaft angezeigt, nicht als Aufzeichnungslücke.",
+        "pregnancy_paused_note": "Vorhersagen sind pausiert, ebenso adaptive Vorhersage, fruchtbares Fenster und PMS. Du kannst sie in den Einstellungen wieder aktivieren."
     },
     "settings": {
         "language": "Sprache",
@@ -494,6 +503,7 @@
         "repeat_pin": "PIN wiederholen",
         "enable_pin": "PIN aktivieren",
         "pin_security_desc": "Deine Gesundheitsdaten sind auf diesem Gerät verschlüsselt. Diese PIN schützt den Zugriff auf die App.",
+        "pin_forgot_hint": "PIN vergessen? Wenn du eine Sicherungsdatei hast, installiere Mooneva neu und stelle sie wieder her. Ohne Sicherung löscht eine Neuinstallation deine Daten.",
         "pin_unlock_prompt": "Gib deine PIN ein (4 bis 12 Ziffern)",
         "pin_placeholder": "4- bis 12-stellige PIN",
         "pin_exit_discrete_prompt": "Gib deine PIN ein, um den Diskret-Modus zu beenden.",
@@ -514,6 +524,7 @@
         "enter_password": "Passwort eingeben",
         "repeat_password": "Passwort wiederholen",
         "pins_dont_match": "PINs stimmen nicht überein.",
+        "passwords_dont_match": "Passwörter stimmen nicht überein.",
         "data_management_title": "Datenverwaltung",
         "create_backup": "Backup erstellen",
         "save_to_file": "Daten in Datei speichern",
@@ -597,7 +608,7 @@
         "report_footer_new": "Mooneva Cycle: Privater Perioden-Tracker",
         "birth_control_sub_desc": "Verbirgt Fruchtbarkeit, markiert Blutungen als Abbruchblutung",
         "birth_control_pill_hint": "Am besten für Nutzerinnen der Kombinationspille, des Vaginalrings oder des Verhütungspflasters.",
-        "pause_predictions_full_desc": "Pausiert alle Prognosen (Schwangerschaft, unregelmäßiger Zyklus usw.), z. B. bei einer Schwangerschaft oder wenn du keine Schätzungen sehen möchtest.",
+        "pause_predictions_full_desc": "Blendet Prognosen zu Periode, Eisprung und PMS aus, bis du sie wieder einschaltest.",
         "adaptive_prediction_label": "Adaptive Prognose",
         "adaptive_prediction_desc_long": "Berechnet den Durchschnitt der letzten 3 Zyklen zur Vorhersage der Zykluslänge",
         "cycle_length_label": "Zykluslänge",
@@ -606,6 +617,9 @@
         "period_length_desc": "Typische Blutungstage",
         "luteal_phase_label": "Lutealphase",
         "luteal_phase_desc": "Tage vom Eisprung bis zur Periode",
+        "kid_mode_section": "Kindermodus",
+        "kid_mode_label": "Kindermodus",
+        "kid_mode_desc": "Blendet aus, was jetzt noch nicht gebraucht wird.",
         "fertility_pms_section": "Fruchtbarkeit & PMS",
         "pms_window_section": "PMS-Fenster",
         "cycle_config_section": "Zykluskonfiguration",
@@ -623,7 +637,19 @@
         "report_range_from": "Von Datum",
         "report_range_to": "Bis Datum",
         "report_range_max": "Max. 12 Monate",
-        "report_share_failed": "PDF konnte nicht geteilt werden. Versuche einen kürzeren Zeitraum."
+        "report_share_failed": "PDF konnte nicht geteilt werden. Versuche einen kürzeren Zeitraum.",
+        "auto_backup": "Automatische Sicherung",
+        "auto_backup_subtitle": "Verschlüsselt, in einen Ordner deiner Wahl. Läuft höchstens einmal pro Tag.",
+        "auto_backup_enable": "Automatisch sichern",
+        "auto_backup_password_warning": "Wähle ein Passwort und bewahre es sicher auf. Es ist nicht deine PIN. Automatische Sicherungen werden damit verschlüsselt, und ohne das Passwort können deine Daten nicht wiederhergestellt werden. Es lässt sich nicht zurücksetzen.",
+        "auto_backup_sync_tip": "Tipp: Wähle einen Ordner, den eine andere App synchron hält (Drive, Dropbox, Nextcloud, iCloud, Syncthing), dann überstehen deine Sicherungen ein verlorenes oder kaputtes Telefon. Mooneva Cycle hat selbst keinen Internetzugang, und die Datei wird vor dem Schreiben verschlüsselt, sodass sie ohne dein Passwort niemand öffnen kann, auch nicht, wer sie speichert.",
+        "auto_backup_choose_folder": "Ordner wählen",
+        "auto_backup_destination": "Ordner",
+        "auto_backup_last_run": "Letzte Sicherung",
+        "auto_backup_run_now": "Jetzt sichern",
+        "wipe_auto_backup_note": "Automatische Sicherungen, die bereits in „{{folder}}“ gespeichert sind, werden nicht gelöscht. Sie lassen sich nicht mehr öffnen, da auch das Passwort gelöscht wird. Lösche sie selbst, wenn du sie loswerden möchtest.",
+        "pregnancy": "Schwangerschaft",
+        "auto_backup_saved_to": "Gesichert in {{folder}}"
     },
     "trends": {
         "header": "Einblicke",
@@ -642,12 +668,13 @@
         "year": "1 Jahr",
         "completed_cycles_note": "Diese Seite zeigt nur Daten abgeschlossener Zyklen. Dein aktueller Zyklus kommt dazu, sobald deine nächste Periode beginnt.",
         "cycle_regularity": "Zyklusregelmäßigkeit",
-        "average_label": "Durchschnitt: {{count}} Tage",
-        "regular": "Regelmäßig",
-        "varying": "Variierend",
-        "irregular": "Unregelmäßig",
+        "cycle_range": "{{min}} bis {{max}} Tage, eine Spanne von {{spread}}",
+        "includes_withdrawal": "Enthält Abbruchblutungen, die keine natürlichen Zyklen sind.",
         "flow_pattern": "Blutungsmuster",
-        "last_3_periods_avg": "Schnitt der letzten 3 Perioden",
+        "based_on_cycles_one": "Basiert auf {{count}} Zyklus",
+        "based_on_cycles_other": "Basiert auf {{count}} Zyklen",
+        "based_on_periods_one": "Basiert auf {{count}} Periode",
+        "based_on_periods_other": "Basiert auf {{count}} Perioden",
         "lighter": "Leichter",
         "heavier": "Stärker",
         "mood_by_phase": "Stimmung nach Phase",
@@ -681,7 +708,9 @@
         "pill_timeline": "Medikamenten-Verlauf",
         "pill_taken": "Pille genommen",
         "pill_low": "Verpasst",
-        "pill_high": "Genommen"
+        "pill_high": "Genommen",
+        "pregnancy_note": "Zyklusdiagramme pausieren während der Schwangerschaft und kommen nach deiner ersten Periode zurück.",
+        "pregnancy_charts_paused": "Noch nichts zu zeigen. Diese Diagramme zählen Zyklustage, und eine Schwangerschaft hat keine."
     },
     "timeline": {
         "header": "Zeitstrahl",
@@ -692,7 +721,8 @@
         "started": "Begann am",
         "gap_hint": "Lücke im Tracking – wird nicht für Prognosen genutzt",
         "short_cycle_hint": "Zyklus zu kurz (<18 Tage) – wird nicht für Prognosen verwendet",
-        "show_more_count": "Mehr Verlauf anzeigen ({{count}})"
+        "show_more_count": "Mehr Verlauf anzeigen ({{count}})",
+        "pregnancy_hint": "Schwangerschaft, nicht für Vorhersagen verwendet"
     },
     "onboarding": {
         "trust": {

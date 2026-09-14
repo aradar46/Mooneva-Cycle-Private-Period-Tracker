@@ -2,8 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMooneva } from '../contexts/MoonevaContext';
 import { MOOD_OPTIONS } from '../types';
-import { toLocalISOString, addDays, diffInDays } from '../utils/dateUtils';
+import { diffInDays } from '../utils/dateUtils';
 import { hasDailyLogContent } from '../utils/dailyLogContent';
+import { findActivePeriod } from '../services/logic/cycle';
 
 interface DayPreviewProps {
     date: string;
@@ -14,19 +15,18 @@ interface DayPreviewProps {
 export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit }) => {
     const { t, i18n } = useTranslation();
     const isRtl = i18n.dir?.() === 'rtl';
-    const { logs, periods, model } = useMooneva();
+    const { logs, periods, model, settings } = useMooneva();
     const { getDayMeta } = model;
 
     const log = logs[date];
     const meta = getDayMeta(date);
-    const activePeriod = periods.find(p => {
-        const end = addDays(p.startDate, p.days - 1);
-        return date >= p.startDate && date <= end;
-    });
+    const activePeriod = findActivePeriod(periods, date);
 
     const hasContent = hasDailyLogContent(log);
 
-    if (!hasContent && !activePeriod) {
+    // A day inside a pregnancy usually has no log and no period, so without this the
+    // preview stayed blank for the whole span and the tinted cells explained nothing.
+    if (!hasContent && !activePeriod && !meta.isPregnancy) {
         return null;
     }
 
@@ -48,6 +48,17 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                 }}
                             >
                                 {t('log.day_x_of_y', { day: diffInDays(date, activePeriod.startDate) + 1, total: activePeriod.days })}
+                            </span>
+                        )}
+                        {meta.isPregnancy && (
+                            <span
+                                className="day-preview-chip day-preview-pregnancy-chip text-[10px] font-bold text-violet-500 uppercase tracking-wider px-2 h-[20px] rounded-lg flex items-center flex-shrink-0"
+                                style={{
+                                    backgroundColor: '#F0F2F5',
+                                    boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8)'
+                                }}
+                            >
+                                {t('dashboard.pregnancy')} · {t('dashboard.pregnancy_week', { week: meta.pregnancyWeek ?? 1 })}
                             </span>
                         )}
                         {log?.flow && (
@@ -104,7 +115,7 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
             {/* Content Body */}
             <div className="space-y-2 px-1">
                 {/* Symptoms & Vitals */}
-                {(log?.symptoms?.length > 0 || log?.discharge || log?.sexDrive || log?.sexType || log?.pillTakenAt || (log?.meds?.length ?? 0) > 0 || activePeriod?.isWithdrawalBleed || activePeriod?.ignoreForAverages) && (
+                {(log?.symptoms?.length > 0 || log?.discharge || (!settings.kidMode && (log?.sexDrive || log?.sexType)) || log?.pillTakenAt || (log?.meds?.length ?? 0) > 0 || activePeriod?.isWithdrawalBleed || activePeriod?.ignoreForAverages) && (
                     <div className="flex flex-wrap items-center gap-1.5">
                         {log?.symptoms?.map((s) => (
                             <span key={s} className="day-preview-tag day-preview-tag-neutral text-[10px] font-bold text-slate-500 bg-white/50 px-2 py-0.5 rounded-full">
@@ -118,14 +129,14 @@ export const DayPreview: React.FC<DayPreviewProps> = ({ date, onClose, onEdit })
                                     : `${t(`log.discharge_${log.discharge}`, log.discharge)} ${t('log.secretions')}`}
                             </span>
                         )}
-                        {log?.sexDrive && (
+                        {!settings.kidMode && log?.sexDrive && (
                             <span className="day-preview-tag day-preview-tag-libido text-[10px] font-bold text-amber-600 bg-amber-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                                 {isRtl
                                     ? `${t('log.libido')} ${t(`log.libido_${log.sexDrive}`, log.sexDrive)}`
                                     : `${t(`log.libido_${log.sexDrive}`, log.sexDrive)} ${t('log.libido')}`}
                             </span>
                         )}
-                        {log?.sexType && (
+                        {!settings.kidMode && log?.sexType && (
                             <span className="day-preview-tag day-preview-tag-sex text-[10px] font-bold text-purple-600 bg-purple-50/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                                 {isRtl
                                     ? `${t('log.sex_activity')} ${t(`log.sex_${log.sexType}`, log.sexType)}`

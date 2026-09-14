@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSettings } from '../../types';
-import { shareOrDownloadBackup, loadData, wipeAllData, decryptBackup, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport, MAX_IMPORT_FILE_SIZE_BYTES, mergeRestoredSettings } from '../../services/logic';
+import { shareOrDownloadBackup, loadData, wipeAllData, saveData, generateBackup, restoreBackup, loadPeriods, savePeriods, parseExternalImport, MAX_IMPORT_FILE_SIZE_BYTES, mergeRestoredSettings, writeAutoBackupPassword, clearAutoBackupPassword } from '../../services/logic';
 import Logger from '../../services/logger';
 import { toLocalISOString } from '../../utils/dateUtils';
 import { PICKER_SESSION_KEY } from '../../hooks/useAutoLock';
@@ -10,11 +10,15 @@ interface DataManagementViewProps {
     settings: AppSettings;
     onUpdate: (s: AppSettings) => void;
     onBack: () => void;
+    /** Shared with the calendar header's shortcut, so there is one "back up now" in the app. */
+    runBackupNow: () => Promise<'written' | 'skipped' | 'failed'>;
 }
 
-const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpdate, onBack }) => {
+const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpdate, onBack, runBackupNow }) => {
     const { t } = useTranslation();
     const [backupPassword, setBackupPassword] = useState('');
+    const [backupPasswordConfirm, setBackupPasswordConfirm] = useState('');
+    const [backupMismatch, setBackupMismatch] = useState(false);
 
     const [isBackupEncrypted, setIsBackupEncrypted] = useState(true);
     const [importPassword, setImportPassword] = useState('');
@@ -26,6 +30,115 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
     const [showFinalWipeConfirm, setShowFinalWipeConfirm] = useState(false);
     const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
     const [archiveDate, setArchiveDate] = useState(toLocalISOString(new Date()));
+
+    // Automatic backup setup
+    const [autoBackupPassword, setAutoBackupPassword] = useState('');
+    const [autoBackupPasswordConfirm, setAutoBackupPasswordConfirm] = useState('');
+    const [autoBackupMismatch, setAutoBackupMismatch] = useState(false);
+    const [showAutoBackupSetup, setShowAutoBackupSetup] = useState(false);
+    const [autoBackupSetupError, setAutoBackupSetupError] = useState('');
+
+    // Backups otherwise only run when the app is backgrounded, so there is no way to
+    // confirm the feature works or to recover a skipped day. force=true bypasses the
+    // once-a-day and nothing-changed gates; failures land in the existing error banner.
+    // One implementation, shared with the calendar header's shortcut. See
+    // MoonevaContext.runBackupNow for why it reads the datasets from disk.
+    const handleBackupNow = async () => {
+        setIsProcessing(true);
+        setAutoBackupSetupError('');
+        try {
+            if (await runBackupNow() === 'failed') setAutoBackupSetupError(t('errors.backup_error'));
+        } catch (e) {
+            Logger.error('Manual auto-backup run failed', e);
+            setAutoBackupSetupError(t('errors.backup_error'));
+        } finally { setIsProcessing(false); }
+    };
+
+    const handleAutoBackupToggle = async () => {
+        if (settings.autoBackupEnabled) {
+            // Turning off must leave nothing behind: no stored password, no
+            // lingering folder grant.
+            await clearAutoBackupPassword().catch(err => Logger.warn('Failed to clear the backup password', err));
+            if (settings.autoBackupTarget) {
+                const { BackupFolder } = await import('../../services/autoBackup');
+                await BackupFolder.releaseFolder({ target: settings.autoBackupTarget })
+                    .catch(err => Logger.warn('Failed to release the backup folder', err));
+            }
+            onUpdate({
+                ...settings,
+                autoBackupEnabled: false,
+                autoBackupTarget: undefined,
+                autoBackupTargetLabel: undefined,
+                autoBackupLastRunAt: undefined,
+                autoBackupLastFingerprint: undefined,
+                autoBackupLastError: undefined,
+            });
+            return;
+        }
+
+        setAutoBackupSetupError('');
+        setAutoBackupPassword('');
+        setAutoBackupPasswordConfirm('');
+        setAutoBackupMismatch(false);
+        setShowAutoBackupSetup(true);
+    };
+
+    const handleAutoBackupConfirm = async () => {
+        if (autoBackupPassword.trim().length === 0) {
+            setAutoBackupSetupError(t('errors.backup_password'));
+            return;
+        }
+
+        // The password goes straight into the Keystore and is never displayed again,
+        // so a typo here would encrypt every later backup with a string the user does
+        // not know, and they would only find out on the day they need to restore.
+        if (autoBackupPassword !== autoBackupPasswordConfirm) {
+            setAutoBackupMismatch(true);
+            return;
+        }
+
+        setIsProcessing(true);
+        setAutoBackupSetupError('');
+        let passwordStored = false;
+        try {
+            // Store the password first: if the Keystore will not hold it, the
+            // feature must not switch on at all.
+            await writeAutoBackupPassword(autoBackupPassword);
+            passwordStored = true;
+
+            const { BackupFolder } = await import('../../services/autoBackup');
+            sessionStorage.setItem(PICKER_SESSION_KEY, String(Date.now()));
+            const picked = await BackupFolder.pickFolder();
+
+            if (picked.cancelled || !picked.target) {
+                await clearAutoBackupPassword().catch(() => {});
+                passwordStored = false;
+                return;
+            }
+
+            onUpdate({
+                ...settings,
+                autoBackupEnabled: true,
+                autoBackupTarget: picked.target,
+                autoBackupTargetLabel: picked.label || '',
+                autoBackupLastRunAt: undefined,
+                autoBackupLastFingerprint: undefined,
+                autoBackupLastError: undefined,
+            });
+            setShowAutoBackupSetup(false);
+            setAutoBackupPassword('');
+            setAutoBackupPasswordConfirm('');
+            passwordStored = false;
+        } catch (e) {
+            Logger.error('Failed to enable automatic backup', e);
+            setAutoBackupSetupError(e instanceof Error ? e.message : String(e));
+            // Choosing the folder failed after the password was written. Leaving it
+            // behind would strand a secret with the feature off and no way to remove it.
+            if (passwordStored) await clearAutoBackupPassword().catch(() => {});
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const appImportInputRef = useRef<HTMLInputElement>(null);
@@ -41,6 +154,13 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
             return;
         }
 
+        // Same reason as the auto-backup form: nothing can open the file afterwards
+        // without this exact string, and a typo only surfaces on the day it is needed.
+        if (isBackupEncrypted && backupPassword !== backupPasswordConfirm) {
+            setBackupMismatch(true);
+            return;
+        }
+
         setIsProcessing(true);
         try {
             const allData = await loadData();
@@ -52,6 +172,7 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
             );
             shareOrDownloadBackup(blob, `${filename.split('.')[0]}-${toLocalISOString(new Date())}.${filename.split('.')[1]}`);
             setBackupPassword('');
+            setBackupPasswordConfirm('');
         } catch (e) {
             alert(t('errors.backup_error'));
             Logger.error("Backup failed:", e);
@@ -150,6 +271,132 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
             <div className="flex-1 overflow-y-auto p-6 pb-24">
                 <div className="max-w-lg mx-auto space-y-8">
 
+                    {/* Box 0: Automatic backup. Its own card, not a section inside the
+                        manual-backup box: it is the one that keeps working without the
+                        user, and it should not read as a footnote to Export. */}
+                    <div className="bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
+                        <div className="p-6">
+                            {/* AUTOMATIC BACKUP SECTION */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    {/* Indigo, matching this section's buttons, so the automatic path
+                                        reads as one block instead of blending into the manual one below. */}
+                                    <div className="w-10 h-10 rounded-xl bg-[#F0F2F5] flex items-center justify-center text-indigo-500" style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.8)' }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7" /><polyline points="21 3 21 9 15 9" /></svg>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-700">{t('settings.auto_backup', { defaultValue: 'Automatic backup' })}</h3>
+                                        <p className="text-xs text-slate-400">{t('settings.auto_backup_subtitle', { defaultValue: 'Encrypted, to a folder you choose. Runs at most once a day.' })}</p>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white/50 rounded-xl p-3 border border-slate-100/50">
+                                    <label className="flex items-center justify-between cursor-pointer">
+                                        <span className="text-xs font-semibold text-slate-600">{t('settings.auto_backup_enable', { defaultValue: 'Back up automatically' })}</span>
+                                        <div className="relative">
+                                            <input
+                                                type="checkbox"
+                                                data-testid="auto-backup-toggle"
+                                                className="sr-only"
+                                                checked={settings.autoBackupEnabled ?? false}
+                                                onChange={handleAutoBackupToggle}
+                                            />
+                                            <div className={`w-10 h-6 rounded-full shadow-inner transition-colors duration-200 ${settings.autoBackupEnabled ? 'bg-[#7598a0]' : 'bg-slate-200'}`}></div>
+                                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${settings.autoBackupEnabled
+                                                ? 'ltr:translate-x-5 rtl:-translate-x-5'
+                                                : 'ltr:translate-x-1 rtl:-translate-x-1'
+                                                } ltr:left-0 rtl:right-0`}></div>
+                                        </div>
+                                    </label>
+
+                                    {/* The single most useful thing to know about this feature, and the
+                                        least obvious: the folder can be one another app syncs off-device.
+                                        Always shown, because it changes which folder you pick. */}
+                                    <p className="mt-2.5 text-[10px] leading-relaxed text-slate-400">
+                                        {t('settings.auto_backup_sync_tip', {
+                                            defaultValue: 'Tip: pick a folder another app keeps in sync (Drive, Dropbox, Nextcloud, iCloud, Syncthing) and your backups survive a lost or broken phone. Mooneva Cycle has no internet access of its own, and the file is encrypted before it is written, so nobody can open it without your password, not even whoever stores it.',
+                                        })}
+                                    </p>
+
+                                    {showAutoBackupSetup && !settings.autoBackupEnabled && (
+                                        <div className="mt-3 animate-fade-in space-y-2">
+                                            <div className="p-2.5 bg-amber-50 rounded-lg border border-amber-200/80 flex items-start gap-2">
+                                                <span className="text-amber-600 text-xs">⚠️</span>
+                                                <p className="text-[10px] text-amber-700 leading-tight">
+                                                    {t('settings.auto_backup_password_warning', {
+                                                        defaultValue: 'Choose a password and keep it somewhere safe. This is not your PIN. Automatic backups are encrypted with it, and without it your data cannot be recovered. There is no way to reset it.',
+                                                    })}
+                                                </p>
+                                            </div>
+                                            <input
+                                                data-testid="auto-backup-password"
+                                                placeholder={t('settings.enter_password') + '...'}
+                                                className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#7598a0] focus:ring-1 focus:ring-[#7598a0]"
+                                                type="password"
+                                                value={autoBackupPassword}
+                                                onChange={(e) => { setAutoBackupPassword(e.target.value); setAutoBackupMismatch(false); }}
+                                                autoComplete="new-password"
+                                            />
+                                            <input
+                                                data-testid="auto-backup-password-confirm"
+                                                placeholder={t('settings.repeat_password')}
+                                                className={`w-full bg-white border rounded-lg px-3 py-2.5 text-xs outline-none focus:ring-1 focus:ring-[#7598a0] ${autoBackupMismatch ? 'border-rose-400 focus:border-rose-400' : 'border-slate-200 focus:border-[#7598a0]'}`}
+                                                type="password"
+                                                value={autoBackupPasswordConfirm}
+                                                onChange={(e) => { setAutoBackupPasswordConfirm(e.target.value); setAutoBackupMismatch(false); }}
+                                                autoComplete="new-password"
+                                            />
+                                            {autoBackupMismatch && (
+                                                <p data-testid="auto-backup-password-mismatch" className="text-[10px] text-rose-600 text-center">
+                                                    {t('settings.passwords_dont_match')}
+                                                </p>
+                                            )}
+                                            <button
+                                                data-testid="auto-backup-confirm"
+                                                onClick={handleAutoBackupConfirm}
+                                                disabled={isProcessing}
+                                                className="w-full py-2.5 bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-md active:scale-95 transition-transform"
+                                            >
+                                                {t('settings.auto_backup_choose_folder', { defaultValue: 'Choose folder' })}
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {settings.autoBackupEnabled && settings.autoBackupTarget && (
+                                        <div className="mt-3 space-y-1.5 animate-fade-in">
+                                            <p data-testid="auto-backup-target" className="text-[10px] text-slate-500 px-1 break-all">
+                                                {t('settings.auto_backup_destination', { defaultValue: 'Folder' })}: {settings.autoBackupTargetLabel || settings.autoBackupTarget}
+                                            </p>
+                                            {settings.autoBackupLastRunAt && (
+                                                <p data-testid="auto-backup-last-run" className="text-[10px] text-slate-400 px-1">
+                                                    {t('settings.auto_backup_last_run', { defaultValue: 'Last backup' })}: {new Date(settings.autoBackupLastRunAt).toLocaleString()}
+                                                </p>
+                                            )}
+                                            <button
+                                                data-testid="auto-backup-run-now"
+                                                onClick={handleBackupNow}
+                                                disabled={isProcessing}
+                                                className="w-full py-2.5 bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-md active:scale-95 transition-transform disabled:opacity-50"
+                                            >
+                                                {t('settings.auto_backup_run_now', { defaultValue: 'Back up now' })}
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* A destination that has gone away must never keep looking healthy. */}
+                                    {(autoBackupSetupError || settings.autoBackupLastError) && (
+                                        <div data-testid="auto-backup-error" className="mt-3 p-2.5 bg-red-50 rounded-lg border border-red-200/80 animate-fade-in flex items-start gap-2">
+                                            <span className="text-red-600 text-xs">⚠️</span>
+                                            <p className="text-[10px] text-red-700 leading-tight">
+                                                {autoBackupSetupError || settings.autoBackupLastError}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Box 1: Export/Import Combined */}
                     <div className="bg-[#F0F2F5] rounded-[24px] overflow-hidden" style={{ boxShadow: 'rgba(163, 177, 198, 0.4) 6px 6px 12px, rgba(255, 255, 255, 0.8) -6px -6px 12px' }}>
                         <div className="p-6 space-y-6">
@@ -188,12 +435,28 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                     {isBackupEncrypted ? (
                                         <div className="mt-3 animate-fade-in">
                                             <input
+                                                data-testid="backup-password"
                                                 placeholder={t('settings.enter_password') + '...'}
                                                 className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-xs outline-none focus:border-[#7598a0] focus:ring-1 focus:ring-[#7598a0]"
                                                 type="password"
                                                 value={backupPassword}
-                                                onChange={(e) => setBackupPassword(e.target.value)}
+                                                onChange={(e) => { setBackupPassword(e.target.value); setBackupMismatch(false); }}
+                                                autoComplete="new-password"
                                             />
+                                            <input
+                                                data-testid="backup-password-confirm"
+                                                placeholder={t('settings.repeat_password')}
+                                                className={`w-full mt-2 bg-white border rounded-lg px-3 py-2.5 text-xs outline-none focus:ring-1 focus:ring-[#7598a0] ${backupMismatch ? 'border-rose-400 focus:border-rose-400' : 'border-slate-200 focus:border-[#7598a0]'}`}
+                                                type="password"
+                                                value={backupPasswordConfirm}
+                                                onChange={(e) => { setBackupPasswordConfirm(e.target.value); setBackupMismatch(false); }}
+                                                autoComplete="new-password"
+                                            />
+                                            {backupMismatch && (
+                                                <p data-testid="backup-password-mismatch" className="text-[10px] text-rose-600 text-center mt-1.5">
+                                                    {t('settings.passwords_dont_match')}
+                                                </p>
+                                            )}
                                             <p className="text-[10px] text-slate-400 mt-1.5 px-1">
                                                 {t('settings.password_warning')}
                                             </p>
@@ -264,7 +527,10 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                 </button>
 
                                 <input
-                                    accept=".enc"
+                                    // generateBackup writes .enc with a password and .json without,
+                                    // so restore has to offer both or the plaintext one is unpickable.
+                                    accept=".enc,.json,application/json"
+                                    accept=".enc,.json,application/json,application/octet-stream"
                                     className="hidden"
                                     type="file"
                                     ref={fileInputRef}
@@ -399,6 +665,17 @@ const DataManagementView: React.FC<DataManagementViewProps> = ({ settings, onUpd
                                 <div className="bg-rose-100 rounded-xl p-4 space-y-3 animate-fade-in border-2 border-rose-200">
                                     <p className="text-xs font-black text-rose-700 text-center uppercase tracking-wide">{t('settings.final_warning')}</p>
                                     <p className="text-[10px] text-rose-600 text-center leading-tight">{t('settings.delete_all_data_confirm')}</p>
+                                    {/* The encrypted auto-backups live in a folder we do not own and
+                                        may not still have access to. They become unopenable when the
+                                        password is cleared, but they do not disappear - say so. */}
+                                    {settings.autoBackupEnabled && settings.autoBackupTarget && (
+                                        <p data-testid="wipe-auto-backup-warning" className="text-[10px] text-rose-600 text-center leading-tight">
+                                            {t('settings.wipe_auto_backup_note', {
+                                                defaultValue: 'Automatic backup files already saved to "{{folder}}" are not deleted. They can no longer be opened, because the password is erased too. Delete them yourself if you want them gone.',
+                                                folder: settings.autoBackupTargetLabel || settings.autoBackupTarget,
+                                            })}
+                                        </p>
+                                    )}
                                     <div className="flex gap-2 pt-1">
                                         <button onClick={wipeAllData} className="flex-1 bg-rose-600 text-white py-3 rounded-xl text-xs font-black shadow-md active:scale-95">{t('settings.nuke_it')}</button>
                                         <button onClick={() => { setShowFinalWipeConfirm(false); setShowWipeConfirm(false); }} className="flex-1 bg-white border border-rose-200 text-slate-500 py-3 rounded-xl text-xs font-bold">{t('common.cancel')}</button>

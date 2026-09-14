@@ -8,10 +8,19 @@ interface HeaderProps {
   cycleStatus: CycleStatusData;
   taskCount?: number;
   onNotificationsClick?: () => void;
+  /** Runs a backup when automatic backup is set up, otherwise opens Data Management. */
+  onBackupClick?: () => void;
+  /** Feedback for the tap: the run takes seconds and writes to a folder the user cannot see. */
+  backupState?: 'idle' | 'running' | 'done' | 'failed';
 }
 
-const Header: React.FC<HeaderProps> = ({ isCloaked, cycleStatus, taskCount = 0, onNotificationsClick }) => {
+const Header: React.FC<HeaderProps> = ({ isCloaked, cycleStatus, taskCount = 0, onNotificationsClick, onBackupClick, backupState = 'idle' }) => {
   const { t } = useTranslation();
+
+  const backupTint =
+    backupState === 'done' ? 'text-emerald-500'
+      : backupState === 'failed' ? 'text-red-500'
+        : 'text-slate-500 hover:text-slate-700';
 
   return (
     <header
@@ -25,7 +34,34 @@ const Header: React.FC<HeaderProps> = ({ isCloaked, cycleStatus, taskCount = 0, 
             <div className="flex items-center flex-shrink-0">
               <img src="/bitmap.png" alt="Mooneva" className="h-8 w-auto object-contain drop-shadow-xl" />
             </div>
-            <div className="flex-1 min-w-0 flex justify-end">
+            <div className="flex-1 min-w-0 flex justify-end items-center gap-2">
+              {onBackupClick && (
+                <button
+                  type="button"
+                  onClick={onBackupClick}
+                  disabled={backupState === 'running'}
+                  className={`p-2 rounded-xl transition-colors ${backupTint}`}
+                  style={{
+                    backgroundColor: '#F0F2F5',
+                    boxShadow: '4px 4px 8px rgba(163, 177, 198, 0.4), -4px -4px 8px rgba(255, 255, 255, 0.8)'
+                  }}
+                  aria-label={t('settings.auto_backup', 'Automatic backup')}
+                  data-testid="header-backup"
+                >
+                  <svg
+                    className={`w-5 h-5 ${backupState === 'running' ? 'animate-spin' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 12a9 9 0 1 1-3-6.7" />
+                    <polyline points="21 3 21 9 15 9" />
+                  </svg>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={onNotificationsClick}

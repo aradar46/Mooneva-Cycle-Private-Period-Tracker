@@ -10,11 +10,11 @@ interface CycleHistoryChartProps {
 const CycleHistoryChart: React.FC<CycleHistoryChartProps> = ({ cycles }) => {
     const { t, i18n } = useTranslation();
 
-    // Get last 6 cycles, sorted oldest to newest
+    // Every cycle the caller passed, oldest to newest. The caller applies the date
+    // range; capping at 6 here made the range buttons look broken on 6 months and 1 year.
     const recentCycles = [...cycles]
         .filter(c => c.length && isCycleEligibleForAverage(c.length))
-        .sort((a, b) => a.startDate.localeCompare(b.startDate))
-        .slice(-6);
+        .sort((a, b) => a.startDate.localeCompare(b.startDate));
 
     if (recentCycles.length < 2) {
         return (
@@ -31,6 +31,9 @@ const CycleHistoryChart: React.FC<CycleHistoryChartProps> = ({ cycles }) => {
     // Calculate average
     const lengths = recentCycles.map(c => c.length || 28);
     const average = Math.round(lengths.reduce((a, b) => a + b, 0) / lengths.length);
+    const shortest = Math.min(...lengths);
+    const longest = Math.max(...lengths);
+    const hasWithdrawalBleeds = recentCycles.some(c => c.isWithdrawalBleed);
 
     // Dynamic Y-axis scale
     const minVal = Math.min(...lengths);
@@ -45,13 +48,11 @@ const CycleHistoryChart: React.FC<CycleHistoryChartProps> = ({ cycles }) => {
     const barGap = 16;
     const chartWidth = recentCycles.length * (barWidth + barGap) - barGap;
 
-    // Get bar color based on deviation from average
-    const getBarColor = (length: number) => {
-        const diff = Math.abs(length - average);
-        if (diff <= 2) return 'rgb(45, 212, 191)'; // Teal - regular
-        if (diff <= 5) return 'rgb(251, 191, 36)'; // Amber - slightly irregular
-        return 'rgb(251, 113, 133)'; // Rose - irregular
-    };
+    // One colour. The old three-colour scheme called a single bar "regular" or "irregular"
+    // by its distance from the mean, a rule with no clinical basis: regularity is a property
+    // of the set, not of one cycle. The spread printed under the title says the same thing
+    // without a verdict, and the bar heights already show the variation.
+    const BAR_COLOR = 'rgb(45, 212, 191)';
 
     // Format month label
     const getMonthLabel = (dateStr: string) => {
@@ -70,10 +71,12 @@ const CycleHistoryChart: React.FC<CycleHistoryChartProps> = ({ cycles }) => {
         >
             <div className="flex flex-col gap-1 mb-6">
                 <h3 className="text-sm font-extrabold tracking-[0.15em] text-slate-800 uppercase">{t('trends.cycle_regularity')}</h3>
-                <div className="flex items-center gap-2">
-                    <span className="w-4 h-0.5 bg-slate-400" style={{ borderTop: '1px dashed #94a3b8' }}></span>
-                    <span className="text-xs font-medium text-slate-400">{t('trends.average_label', { count: average })}</span>
-                </div>
+                <span className="text-xs font-medium text-slate-400">
+                    {t('trends.cycle_range', { min: formatNumber(shortest), max: formatNumber(longest), spread: formatNumber(longest - shortest) })}
+                </span>
+                {hasWithdrawalBleeds && (
+                    <span className="text-[11px] font-medium text-slate-400">{t('trends.includes_withdrawal')}</span>
+                )}
             </div>
 
             <div className="relative overflow-x-auto pb-2">
@@ -115,7 +118,7 @@ const CycleHistoryChart: React.FC<CycleHistoryChartProps> = ({ cycles }) => {
                                     height={barHeight}
                                     rx="6"
                                     ry="6"
-                                    fill={getBarColor(length)}
+                                    fill={BAR_COLOR}
                                     className="transition-all duration-300"
                                 />
                                 {/* Value label */}
@@ -142,21 +145,6 @@ const CycleHistoryChart: React.FC<CycleHistoryChartProps> = ({ cycles }) => {
                 </svg>
             </div>
 
-            {/* Legend */}
-            <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-slate-100">
-                <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-sm bg-teal-400"></div>
-                    <span className="text-[9px] font-medium text-slate-500 uppercase tracking-wide">{t('trends.regular')}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-sm bg-amber-400"></div>
-                    <span className="text-[9px] font-medium text-slate-500 uppercase tracking-wide">{t('trends.varying')}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-sm bg-rose-400"></div>
-                    <span className="text-[9px] font-medium text-slate-500 uppercase tracking-wide">{t('trends.irregular')}</span>
-                </div>
-            </div>
         </div>
     );
 };

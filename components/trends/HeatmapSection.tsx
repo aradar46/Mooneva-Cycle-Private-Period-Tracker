@@ -24,6 +24,10 @@ const COLOR_SCALES = {
 
 type ColorScaleName = keyof typeof COLOR_SCALES;
 
+/** Flat grey for a column too few cycles reached, so "no answer" never looks like "never
+ *  happened". Deliberately off the colour scales above. */
+const THIN_COLUMN_COLOR = '#e2e8f0';
+
 interface HeatmapSectionProps {
     title: string;
     lowLabel?: string;
@@ -37,8 +41,23 @@ interface HeatmapSectionProps {
         data: Record<number, number>;
         config?: HeatmapConfig;
     }[];
-    maxValue: number;
+    /** How many counted cycles reached each cycle day. Cells are a share of this, not a
+     *  raw count, so a 1 year range reads like a 3 month one and the late columns stop
+     *  looking empty when they were only rarer. */
+    opportunities: Record<number, number>;
+    /** Columns reached by fewer cycles than this are drawn flat, not coloured. */
+    minOpportunities: number;
+    /** How many cycle-day columns to draw: the longest cycle in range, capped by the
+     *  caller. Fixed at 31, the axis cut a 38-day cycle short and gave a 26-day one columns
+     *  that could never hold anything. */
+    dayCount: number;
 }
+
+/** Zero is the empty step; anything else lands in steps 1 to 8 by share. */
+const stepForShare = (share: number, steps: string[]): string => {
+    if (share <= 0) return steps[0];
+    return steps[Math.min(steps.length - 1, Math.max(1, Math.ceil(share * (steps.length - 1))))];
+};
 
 const HeatmapSection: React.FC<HeatmapSectionProps> = ({
     title,
@@ -48,17 +67,16 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
     gradientTo,
     colorScale = 'indigo',
     rows,
-    maxValue
+    opportunities,
+    minOpportunities,
+    dayCount
 }) => {
     const { t, i18n } = useTranslation();
     const scale = COLOR_SCALES[colorScale];
+    const days = Array.from({ length: dayCount }, (_, i) => i + 1);
+    const CELL_WIDTH = 18;
     const isRtl = i18n.dir?.() === 'rtl';
-    const stickyHeaderClass = isRtl
-        ? 'sticky right-0 pl-2 text-left'
-        : 'sticky left-0 pr-2 text-right';
-    const stickyShadowClass = isRtl
-        ? 'shadow-[-4px_0_8px_rgba(240,242,245,0.95)]'
-        : 'shadow-[4px_0_8px_rgba(240,242,245,0.95)]';
+    const labelAlignClass = isRtl ? 'pl-2 text-left' : 'pr-2 text-right';
 
     return (
         <section
@@ -87,75 +105,77 @@ const HeatmapSection: React.FC<HeatmapSectionProps> = ({
                 </div>
             </div>
 
-            <div className="overflow-x-auto no-scrollbar relative z-10 -mx-2 px-2">
-                <div className="min-w-[700px]">
-                    {/* Day Header */}
-                    <div className="flex mb-1">
-                        <div className={`heatmap-sticky-spacer w-20 shrink-0 ${stickyHeaderClass} z-30 bg-[#F0F2F5]`} />
-                        {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                            <div
-                                key={day}
-                                className="heatmap-day-label flex-1 text-center text-[9px] font-extrabold text-slate-500"
-                                style={{ minWidth: '18px' }}
-                            >
-                                {day === 31 ? '31+' : day}
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Grid Rows - Smooth heat gradient */}
+            {/* The labels are their own column, outside the scroll box. They used to be
+                sticky inside it, so the cells slid underneath them and every seam let a
+                sliver show through: the scrollport's padding, the gaps between rows, then a
+                fractional scroll offset. Nothing can slide under a column that is not in
+                the scroll box, so the whole class of bug is gone rather than patched.
+                The two columns line up because both use the same band heights. */}
+            <div className="flex">
+                <div className="w-20 shrink-0">
+                    <div className="h-4 mb-1" />
                     {rows.map((row) => (
-                        <div key={row.id} className="flex items-center h-5 mb-0.5">
-                            <div
-                                className={`heatmap-row-label w-20 shrink-0 ${stickyHeaderClass} ${stickyShadowClass} z-20 bg-[#F0F2F5] text-[9.5px] font-bold text-slate-700 truncate capitalize`}
-                            >
-                                {t(`symptom.${row.label.toLowerCase()}`, row.label)}
-                            </div>
-                            {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
-                                const count = row.data[day] || 0;
-
-                                // Use logarithmic scale for better color distribution
-                                // Even a count of 1 should show visible color
-                                const s = scale.steps;
-                                let bgColor: string;
-                                if (count === 0) {
-                                    bgColor = s[0];
-                                } else if (count === 1) {
-                                    bgColor = s[1];
-                                } else if (count === 2) {
-                                    bgColor = s[2];
-                                } else if (count === 3) {
-                                    bgColor = s[3];
-                                } else if (count === 4) {
-                                    bgColor = s[4];
-                                } else if (count === 5) {
-                                    bgColor = s[5];
-                                } else if (count <= 7) {
-                                    bgColor = s[6];
-                                } else if (count <= 10) {
-                                    bgColor = s[7];
-                                } else {
-                                    bgColor = s[8];
-                                }
-
-                                return (
-                                    <div
-                                        key={day}
-                                        className="flex-1 flex items-center justify-center px-px"
-                                        style={{ minWidth: '18px' }}
-                                    >
-                                        <div
-                                            className="w-4 h-4 rounded-sm transition-colors duration-200"
-                                            style={{ backgroundColor: bgColor }}
-                                            title={count > 0 ? `Day ${day}: ${count}x` : `Day ${day}`}
-                                        />
-                                    </div>
-                                );
-                            })}
+                        <div
+                            key={row.id}
+                            className={`heatmap-row-label h-[22px] leading-[22px] ${labelAlignClass} text-[9.5px] font-bold text-slate-700 truncate capitalize`}
+                        >
+                            {t(`symptom.${row.label.toLowerCase()}`, row.label)}
                         </div>
                     ))}
                 </div>
+
+                <div className="overflow-x-auto no-scrollbar flex-1">
+                    <div style={{ minWidth: `${dayCount * CELL_WIDTH}px` }}>
+                        {/* Day Header */}
+                        <div className="flex h-4 mb-1">
+                            {days.map(day => (
+                                <div
+                                    key={day}
+                                    className="heatmap-day-label flex-1 text-center text-[9px] leading-4 font-extrabold text-slate-500"
+                                    style={{ minWidth: `${CELL_WIDTH}px` }}
+                                >
+                                    {day}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Grid Rows - Smooth heat gradient */}
+                        {rows.map((row) => (
+                            <div key={row.id} className="flex h-[22px]">
+                                {days.map((day) => {
+                                    const count = row.data[day] || 0;
+                                    const reached = opportunities[day] || 0;
+                                    // Too few cycles ever got this far to say anything: one
+                                    // cycle reaching day 33 would otherwise paint 100% off a
+                                    // single log.
+                                    const thin = reached < minOpportunities || reached === 0;
+
+                                    const bgColor = thin
+                                        ? THIN_COLUMN_COLOR
+                                        : stepForShare(count / reached, scale.steps);
+
+                                    return (
+                                        <div
+                                            key={day}
+                                            className="flex-1 flex items-center justify-center px-px"
+                                            style={{ minWidth: `${CELL_WIDTH}px` }}
+                                        >
+                                            <div
+                                                className="w-4 h-4 rounded-sm transition-colors duration-200"
+                                                style={{ backgroundColor: bgColor }}
+                                                title={thin
+                                                    ? `Day ${day}: not enough cycles`
+                                                    : `Day ${day}: ${count} of ${reached} cycles`}
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
+
         </section>
     );
 };

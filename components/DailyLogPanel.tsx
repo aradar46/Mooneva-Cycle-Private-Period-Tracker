@@ -3,6 +3,8 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next';
 import { FlowIntensity, MoodOptionConfig, MOOD_OPTIONS, DischargeType, SexDriveType, SexType } from '../types';
 import { toLocalISOString, addDays } from '../utils/dateUtils';
+import { findActivePeriod } from '../services/logic/cycle';
+import { applySettingsInterlocks } from '../services/logic/settingsInterlocks';
 import { formatLocalTimeHHmm } from '../utils/timeFormat';
 import { useAutoSave } from '../hooks/useAutoSave';
 import { useMooneva } from '../contexts/MoonevaContext';
@@ -39,7 +41,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
     } = useMooneva();
 
     const { getDayMeta } = model;
-    const { updateLog, updatePeriodWithdrawalBleed, updatePeriodIgnoreForAverages } = actions;
+    const { updateLog, updateSettings, updatePeriodWithdrawalBleed, updatePeriodIgnoreForAverages } = actions;
 
     const log = logs[date];
 
@@ -56,14 +58,15 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
     const [sexType, setSexType] = useState<SexType>(() => logs[date]?.sexType || null);
     const [pillTakenAt, setPillTakenAt] = useState<string | undefined>(() => logs[date]?.pillTakenAt);
     const [meds, setMeds] = useState<string[]>(() => logs[date]?.meds || []);
+    const [pregnancyStart, setPregnancyStart] = useState<boolean>(() => !!logs[date]?.pregnancyStart);
     const [medInput, setMedInput] = useState('');
 
     // Keep references to current state and handlers to safely flush across date changes and unmounts
     const prevDateRef = useRef(date);
     const updateLogRef = useRef(updateLog);
     updateLogRef.current = updateLog;
-    const currentStateRef = useRef({ flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds });
-    currentStateRef.current = { flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds };
+    const currentStateRef = useRef({ flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart });
+    currentStateRef.current = { flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart };
     const isDirtyRef = useRef(false);
     const logsRef = useRef(logs);
     logsRef.current = logs;
@@ -76,7 +79,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
             return;
         }
         isDirtyRef.current = true;
-    }, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds]);
+    }, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart]);
 
     // Sync state when date changes, flushing any pending unsaved changes for the previous date
     useEffect(() => {
@@ -100,6 +103,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
             setSexType(activeLog?.sexType || null);
             setPillTakenAt(activeLog?.pillTakenAt);
             setMeds(activeLog?.meds || []);
+            setPregnancyStart(!!activeLog?.pregnancyStart);
             setMedInput('');
             isDirtyRef.current = false;
         }
@@ -119,12 +123,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
     }, []);
 
     // Check if there is an existing period overlapping this date
-    const activePeriod = useMemo(() => {
-        return periods.find(p => {
-            const end = addDays(p.startDate, p.days - 1);
-            return date >= p.startDate && date <= end;
-        });
-    }, [periods, date]);
+    const activePeriod = useMemo(() => findActivePeriod(periods, date), [periods, date]);
 
     // Derived Meta for Display
     const meta = getDayMeta(date);
@@ -141,14 +140,17 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                 sexDrive,
                 sexType,
                 pillTakenAt,
-                meds
+                meds,
+                pregnancyStart
             });
             isDirtyRef.current = false;
         }
-        // Note: Auto-period creation removed. Periods are managed via calendar toggle only.
-    }, [date, flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, updateLog]);
+        // This panel never touches PeriodRecords directly, but updateLog does: writing a
+        // flow here can create a period, extend a nearby one, or fill a gap day. See
+        // usePersistence.updateLog. The calendar toggle is the other way in, not the only one.
+    }, [date, flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, updateLog]);
 
-    useAutoSave(saveToLog, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, saveToLog]);
+    useAutoSave(saveToLog, [flow, symptoms, notes, mood, discharge, sexDrive, sexType, pillTakenAt, meds, pregnancyStart, saveToLog]);
 
     const toggleSymptom = (sym: string) => {
         if (symptoms.includes(sym)) {
@@ -237,6 +239,78 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
         setMedInput('');
     };
 
+    /**
+     * Turning this on for a pregnancy that is still running also pauses predictions, through
+     * the same interlock the Settings toggle uses. Forecasting periods on top of a pregnancy
+     * the user has told us about is worse than forecasting nothing, and doing it through the
+     * real setting rather than a hidden rule keeps Settings, the calendar and the dashboard
+     * saying the same thing. It is a one-shot: the user can switch predictions back on, and
+     * nothing turns them off again.
+     *
+     * A pregnancy with a period after it is history, so it never touches settings.
+     */
+    const handlePregnancyToggle = () => {
+        const next = !pregnancyStart;
+        setPregnancyStart(next);
+
+        const stillRunning = !periods.some(p => p.startDate > date);
+        if (next && stillRunning && !settings.predictionsPaused) {
+            updateSettings(applySettingsInterlocks(settings, { predictionsPaused: true }));
+        }
+    };
+
+    /**
+     * Available on any day, with or without a period on it, because the common case is
+     * entering a pregnancy that already happened. The span ends itself at the next
+     * period, so there is no "end pregnancy" control to get out of sync.
+     */
+    const renderPregnancyToggle = () => (
+        <div className="space-y-3">
+            <div className="flex items-center gap-2 pl-1 flex-wrap">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-violet-400">{t('log.pregnancy', 'Pregnancy')}</span>
+                <span className="text-[8px] font-bold uppercase tracking-[0.1em] text-violet-400/80 bg-violet-100/60 rounded-full px-2 py-0.5">
+                    {t('log.experimental', 'Experimental, needs feedback')}
+                </span>
+                <div className="h-[1.5px] w-6 bg-violet-200 rounded-full" />
+            </div>
+            <div
+                className="flex items-center justify-between gap-3 p-4 bg-[#F0F2F5] rounded-xl border border-slate-200/50 cursor-pointer transition-all active:scale-[0.99]"
+                style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3)' }}
+                onClick={() => handlePregnancyToggle()}
+                data-testid="pregnancy-start-toggle"
+            >
+                <div className="flex-1">
+                    <label className="text-[11px] font-bold text-slate-700 cursor-pointer select-none block">
+                        {t('log.pregnancy_start_question', 'Pregnancy started on this day?')}
+                    </label>
+                    <p className="text-[9px] text-slate-400 mt-0.5">
+                        {t('log.pregnancy_start_desc', 'Ends by itself when your next period starts')}
+                    </p>
+                </div>
+                <div
+                    className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-300 border-2
+                    ${pregnancyStart
+                            ? 'bg-violet-50 border-violet-400 text-violet-600'
+                            : 'bg-white border-transparent text-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.4)]'}`}
+                >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                </div>
+            </div>
+            {pregnancyStart && (
+                <p className="text-[10px] text-violet-500 px-1 font-medium">
+                    {t('log.pregnancy_tagged', 'This span will be shown as a pregnancy, not a tracking gap.')}
+                </p>
+            )}
+            {pregnancyStart && !periods.some(p => p.startDate > date) && settings.predictionsPaused && (
+                <p className="text-[10px] text-slate-400 px-1">
+                    {t('log.pregnancy_paused_note', 'Predictions are paused, along with adaptive prediction, the fertile window and PMS. You can switch them back on in Settings.')}
+                </p>
+            )}
+        </div>
+    );
+
     const renderAdvancedContent = () => {
         if (!activePeriod) {
             return (
@@ -279,7 +353,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                         >
                             <div className="flex-1">
                                 <label className="text-[11px] font-bold text-slate-600 select-none block">
-                                    {t('log.ignore_averages_question', 'Exclude from cycle averages?')}
+                                    {t('log.ignore_averages_question', 'Exclude from averages and charts?')}
                                 </label>
                                 <p className="text-[9px] text-slate-400 mt-0.5">
                                     {t('log.ignore_averages_desc', 'For irregular cycles (stress, illness, etc.)')}
@@ -288,6 +362,8 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                             <div className="w-6 h-6 rounded-lg bg-white border-2 border-transparent shadow-[1px_1px_2px_rgba(163,177,198,0.3)]" />
                         </div>
                     </div>
+
+                    {renderPregnancyToggle()}
                 </section>
             );
         }
@@ -342,7 +418,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                     >
                         <div className="flex-1">
                             <label className="text-[11px] font-bold text-slate-700 cursor-pointer select-none block">
-                                {t('log.ignore_averages_question', 'Exclude from cycle averages?')}
+                                {t('log.ignore_averages_question', 'Exclude from averages and charts?')}
                             </label>
                             <p className="text-[9px] text-slate-400 mt-0.5">
                                 {t('log.ignore_averages_desc', 'For irregular cycles (stress, illness, etc.)')}
@@ -361,10 +437,12 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                     </div>
                     {activePeriod.ignoreForAverages && (
                         <p className="text-[10px] text-amber-500 px-1 font-medium">
-                            ⚠️ {t('log.ignore_tagged', 'This period will be excluded from cycle length calculations and averages.')}
+                            ⚠️ {t('log.ignore_tagged', 'This period is excluded from your cycle averages and from the Insights charts.')}
                         </p>
                     )}
                 </div>
+
+                {renderPregnancyToggle()}
             </section>
         );
     };
@@ -590,6 +668,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                     </div>
                                 )}
 
+                                {!settings.kidMode && (
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2 pl-1">
                                         <span className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-500">{t('log.sex_libido', 'Sex & Libido')}</span>
@@ -630,6 +709,7 @@ const DailyLogPanel: React.FC<DailyLogPanelProps> = ({
                                         </div>
                                     </div>
                                 </div>
+                                )}
                             </section>
                         )}
 

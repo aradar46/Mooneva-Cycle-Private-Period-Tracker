@@ -27,6 +27,85 @@ export const isFullFlowDay = (log: DailyLog): boolean => {
 };
 
 // --- Period Utils ---
+
+/**
+ * The period whose span contains this date, if any. The span is `days` long from
+ * `startDate`; `activeDays` says which of those days actually bled, which is a
+ * different question and deliberately not consulted here.
+ *
+ * This scan was copy-pasted into seven call sites across components, hooks and
+ * persistence. One copy so it cannot drift.
+ */
+export const isDateInPeriod = (period: PeriodRecord, date: string): boolean =>
+    date >= period.startDate && date <= addDays(period.startDate, period.days - 1);
+
+export const findActivePeriod = (
+    periods: PeriodRecord[],
+    date: string
+): PeriodRecord | undefined => periods.find(p => isDateInPeriod(p, date));
+
+// --- Pregnancy Spans ---
+
+export interface PregnancySpan {
+    start: string;
+    /** Last day of the span, inclusive. */
+    end: string;
+    /** No period has started since `start`, so the span is still running. */
+    isOngoing: boolean;
+}
+
+/**
+ * A pregnancy is one marker on the day it started. The end is never stored: it is the
+ * day before the next period, because that period *is* the cycle coming back. Storing
+ * an end date would be a second copy of something `periods` already says, and the two
+ * copies could disagree.
+ *
+ * An open span is closed at `todayStr` so callers can range-check without special-casing.
+ */
+export const getPregnancySpans = (
+    logs: Record<string, DailyLog>,
+    periods: PeriodRecord[],
+    todayStr: string = getTodayStr()
+): PregnancySpan[] => {
+    const starts = Object.keys(logs).filter(d => logs[d]?.pregnancyStart).sort();
+    const periodStarts = periods.map(p => p.startDate).sort();
+
+    const spans: PregnancySpan[] = [];
+    for (const start of starts) {
+        // A second marker inside a span that is already running is a mis-tap, not a
+        // second pregnancy. Skip it rather than opening an overlapping span.
+        if (spans.length > 0 && start <= spans[spans.length - 1].end) continue;
+
+        const nextPeriod = periodStarts.find(s => s > start);
+        spans.push({
+            start,
+            end: nextPeriod ? addDays(nextPeriod, -1) : todayStr,
+            isOngoing: !nextPeriod,
+        });
+    }
+    return spans;
+};
+
+export const findPregnancySpan = (
+    spans: PregnancySpan[],
+    date: string
+): PregnancySpan | undefined => spans.find(s => date >= s.start && date <= s.end);
+
+/**
+ * Tags the cycle a pregnancy started inside, so history and the clinical report can say
+ * "pregnancy" rather than "tracking gap (not logged)". Nothing that computes a number
+ * reads this flag: the span is already excluded from averages for being an outlier.
+ */
+export const cycleCoversDate = (cycle: Cycle, date: string): boolean =>
+    !!cycle.length && date >= cycle.startDate && date <= addDays(cycle.startDate, cycle.length - 1);
+
+export const markPregnancyCycles = (cycles: Cycle[], spans: PregnancySpan[]): Cycle[] => {
+    if (spans.length === 0) return cycles;
+    return cycles.map(c =>
+        spans.some(s => cycleCoversDate(c, s.start)) ? { ...c, isPregnancy: true } : c
+    );
+};
+
 export const findNearbyPeriod = (
     targetDate: string,
     periods: PeriodRecord[],
@@ -77,7 +156,7 @@ const normalizePeriodLength = (length: number): number => clampAndRound(length, 
 /**
  * True if cycle length indicates a tracking gap (e.g. 153 days); exclude from averages, hide fertile in UI.
  */
-const isCycleOutlier = (length: number): boolean =>
+export const isCycleOutlier = (length: number): boolean =>
     length > OUTLIER_THRESHOLD_DAYS;
 
 /**
@@ -170,6 +249,12 @@ export const getPastCycles = (
  * Filters past cycles to find "eligible" ones for adaptive prediction.
  * Criteria: length between 18 and 45 days (also excludes gap cycles > 60, via isOutlier).
  * Also excludes cycles marked as withdrawal bleeds (birth control).
+ *
+ * A cycle a pregnancy started inside is excluded whatever its length. Cycle length is
+ * measured period start to period start, so an early loss - marked on day 10, bleeding back
+ * on day 35 - produced a 35-day cycle that looked ordinary and was counted as one. The
+ * luteal phase of such a cycle is not a luteal phase, and the clinical report labelled the
+ * same cycle "Pregnancy" on the page where the average that counted it was printed.
  */
 export const getEligibleCycles = (cycles: Cycle[]): Cycle[] => {
     return cycles.filter(c => {
@@ -177,6 +262,7 @@ export const getEligibleCycles = (cycles: Cycle[]): Cycle[] => {
         if (c.isOutlier) return false;
         if (c.isWithdrawalBleed) return false; // Exclude birth control cycles
         if (c.ignoreForAverages) return false; // Exclude manually ignored cycles
+        if (c.isPregnancy) return false;
         return isCycleEligibleForAverage(c.length);
     });
 };
@@ -346,11 +432,6 @@ export const getCyclePredictions = (
     );
     // Use effectiveLength
     const nextPeriodEnd = addDays(nextPeriodStart, effectivePeriodLength - 1);
-
-    // Update periods[0] projected length for replica consistency if needed, 
-    // although replica isn't used for the main calc anymore.
-    // However, if we want the calendar cells to match, we might need to update replica.ts too 
-    // or just trust that `cycleLengthUsed` returned here overrides UI display.
 
     const ovulationDateStr = addDays(nextPeriodStart, -effectiveLutealPhaseLength);
 

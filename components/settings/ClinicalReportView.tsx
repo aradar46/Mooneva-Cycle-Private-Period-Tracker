@@ -84,6 +84,13 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
     const [toDate, setToDate] = React.useState(() => getTodayStr());
     const [fromDate, setFromDate] = React.useState(() => addDays(getTodayStr(), -MAX_RANGE_DAYS));
 
+    // Kid mode hides Sex & Libido everywhere, and this is the one screen meant to be handed
+    // to someone else. Gate the render rather than seeding the toggles, so the setting still
+    // holds if it is switched on while the report is open.
+    const kidMode = !!settings.kidMode;
+    const showSex = includeSex && !kidMode;
+    const showLibido = includeLibido && !kidMode;
+
     // Whichever end the user moved stays put; the other end follows only when the span
     // would otherwise exceed the cap.
     const handleFromChange = (value: string) => {
@@ -152,17 +159,16 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
 
             // Lazy load html2pdf.js only when needed
             //
-            // `npm audit` flags jspdf (critical) and dompurify (moderate) through this
-            // import, and bumping them does NOT fix it: html2pdf's dist is a webpack
-            // bundle that externalizes only html2canvas, so both libraries are inlined
-            // and the installed versions are never loaded. Accepted rather than patched,
+            // `npm audit --omit=dev` flags fflate (moderate, via jspdf) through this
+            // import, and bumping it does NOT fix it: html2pdf's dist is a webpack
+            // bundle that externalizes only html2canvas, so jspdf and dompurify are
+            // inlined and the installed versions are never loaded. Accepted rather than patched,
             // because every flagged path is unreachable here - the advisories run through
             // AcroForm, addJS, BMP/GIF decoders and XMP metadata, and this call only
             // rasterises our own DOM to a JPEG and writes one page, from on-device data
             // with no untrusted input. To actually clear the audit, drop html2pdf and
             // call html2canvas + jsPDF directly; the report is single-page by design
             // (see the scale logic above), so none of html2pdf's pagination is needed.
-            // @ts-ignore
             const html2pdf = (await import('html2pdf.js')).default;
 
             const pdfDataUri = await html2pdf().set(opt).from(element).outputPdf('datauristring');
@@ -248,17 +254,20 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
         });
     }, [model.cycles, logs, periods, fromDate, toDate]);
 
-    // Calculate Averages (exclude ongoing from stats to avoid skewing)
+    /** Averaged over the cycles this report actually lists, not over all time. Picking
+     *  January to March used to print averages covering several years. The ongoing cycle is
+     *  never in `model.cycles`, so it cannot skew these. */
     const averages = useMemo(() => {
-        const avgCycle = averageCycleLength(model.cycles);
-        const avgPeriod = averagePeriodLength(model.cycles);
+        const inRange = model.cycles.filter(c => c.startDate >= fromDate && c.startDate <= toDate);
+        const avgCycle = averageCycleLength(inRange);
+        const avgPeriod = averagePeriodLength(inRange);
         if (avgCycle === null || avgPeriod === null) return { avgCycle: '-', avgPeriod: '-' };
 
         return {
             avgCycle,
             avgPeriod
         };
-    }, [model.cycles]);
+    }, [model.cycles, fromDate, toDate]);
 
     const formatDate = (dateStr: string) => {
         const [y, m, d] = dateStr.split('-').map(Number);
@@ -282,32 +291,26 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
         return display.join(', ');
     };
 
-    // Helper for Cycle Type Label
+    /** What this cycle is, never whether it is good. The app used to print "regular" or
+     *  "irregular" here against a 21 to 35 day band while the averages above were measured
+     *  over 18 to 45, so one sheet carried two definitions of normal and a 19-day cycle was
+     *  called irregular in the list and counted in the average. The lengths are printed
+     *  beside each row; a clinician reads those against whichever range they use.
+     *  What stays is what the user told us or what the app knows, not a verdict. */
     const getCycleLabel = (cycle: Cycle) => {
         if (cycle.isWithdrawalBleed) return t('settings.pill_controlled');
 
-        // An in-progress cycle has no length yet - its day count is just how far it has
-        // got, so measuring it against the regular range would label every current cycle
-        // irregular until it passes day 21.
+        // No length yet, so its day count is only how far it has got.
         if (cycle.isOngoing) return t('settings.cycle_ongoing', 'In progress');
 
-        // A gap this long means the user stopped logging, not that they bled 75 days
-        // apart. Saying so beats presenting it as an irregular cycle.
+        // A pregnancy is also a long gap, but the user told us why. Saying "not logged"
+        // on a sheet handed to a clinician would be actively wrong.
+        if (cycle.isPregnancy) return t('settings.pregnancy', 'Pregnancy');
+
+        // A gap this long means the user stopped logging, not that they bled 75 days apart.
         if (cycle.isOutlier) return t('settings.tracking_gap', 'Tracking gap (not logged)');
 
-        // Clinical regularity is 21-35 days (narrower than the 18-45 the app accepts for
-        // its own averages), because this sheet is read by a clinician.
-        // We explicitly check length if it exists
-        if (cycle.length && (cycle.length < 21 || cycle.length > 35)) {
-            return t('settings.natural_irregular');
-        }
-
-        // Fallback to explicit properties if length check didn't trigger (e.g. undefined length)
-        if (cycle.isOutlier || cycle.isValid === false) {
-            return t('settings.natural_irregular');
-        }
-
-        return t('settings.natural');
+        return '-';
     };
 
     const isRtl = i18n.dir() === 'rtl';
@@ -373,6 +376,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                         <span className="text-[10px] font-medium text-slate-300 group-hover:text-white transition-colors select-none">{t('settings.include_notes')}</span>
                     </label>
 
+                    {!kidMode && (<>
                     <label className="flex items-center gap-2 cursor-pointer group">
                         <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-all ${includeSex ? 'bg-emerald-500 border-emerald-500' : 'border-slate-500 bg-transparent'}`}>
                             {includeSex && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
@@ -388,6 +392,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                         <input type="checkbox" checked={includeLibido} onChange={(e) => setIncludeLibido(e.target.checked)} className="hidden" />
                         <span className="text-[10px] font-medium text-slate-300 group-hover:text-white transition-colors select-none">{t('settings.include_libido')}</span>
                     </label>
+                    </>)}
 
                     <label className="flex items-center gap-2 cursor-pointer group">
                         <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-all ${includeSecretion ? 'bg-emerald-500 border-emerald-500' : 'border-slate-500 bg-transparent'}`}>
@@ -489,7 +494,7 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                                 <div className={`text-[10px] text-slate-600 ${isRtl ? 'text-left' : 'text-right'}`}>
                                     {cycle.isOngoing
                                         ? <span className="font-semibold">{t('settings.cycle_day_n', { count: cycle.length ?? 0 })}</span>
-                                        : <><span className="font-semibold">{cycle.length} {t('common.days_short')}</span> {cycle.isOutlier ? t('settings.tracking_gap', 'Tracking gap (not logged)') : t('dashboard.cycle_active')}</>}
+                                        : <><span className="font-semibold">{cycle.length} {t('common.days_short')}</span> {cycle.isPregnancy ? t('settings.pregnancy', 'Pregnancy') : cycle.isOutlier ? t('settings.tracking_gap', 'Tracking gap (not logged)') : t('dashboard.cycle_active')}</>}
                                     , <span className="font-semibold">{cycle.periodLength} {t('common.days_short')}</span> {t('settings.flow')}
                                 </div>
                             </div>
@@ -501,8 +506,8 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                                         <th className={`py-2 px-2 w-[5%] ${isRtl ? 'border-l' : 'border-r'} border-slate-200`}>#</th>
                                         <th className={`py-2 px-2 w-[14%] ${isRtl ? 'border-l' : 'border-r'} border-slate-200`}>{t('common.date')}</th>
                                         <th className={`py-2 px-2 w-[8%] ${isRtl ? 'border-l' : 'border-r'} border-slate-200`}>{t('settings.flow')}</th>
-                                        {(includeSex || includeLibido || includeSecretion) && (
-                                            <th className={`py-2 px-2 w-[20%] ${isRtl ? 'border-l' : 'border-r'} border-slate-200`}>{t('settings.sex_libido_secretion')}</th>
+                                        {(showSex || showLibido || includeSecretion) && (
+                                            <th className={`py-2 px-2 w-[20%] ${isRtl ? 'border-l' : 'border-r'} border-slate-200`}>{(showSex || showLibido) ? t('settings.sex_libido_secretion') : t('settings.secretion')}</th>
                                         )}
                                         {includeSymptoms && <th className={`py-2 px-2 w-[28%] ${isRtl ? 'border-l' : 'border-r'} border-slate-200`}>{t('settings.symptoms_mood')}</th>}
                                         {(includeNotes || includeMeds) && <th className="py-2 px-2 w-[25%]">{t('settings.notes')}</th>}
@@ -520,11 +525,11 @@ export const ClinicalReportView: React.FC<ClinicalReportViewProps> = ({ onClose 
                                             </td>
 
                                             {/* Combined Sex / Libido / Secretion */}
-                                            {(includeSex || includeLibido || includeSecretion) && (
+                                            {(showSex || showLibido || includeSecretion) && (
                                                 <td className={`py-2 px-2 ${isRtl ? 'border-l' : 'border-r'} border-slate-100 text-[8px]`}>
                                                     <div className="flex flex-col gap-0.5">
-                                                        {(includeSex && day.sexType) && <div className="font-bold text-slate-800">{t(`log.sex_${day.sexType}`)}</div>}
-                                                        {(includeLibido && day.sexDrive) && <div className="text-slate-600">{t('settings.libido')}: {t(`log.libido_${day.sexDrive}`)}</div>}
+                                                        {(showSex && day.sexType) && <div className="font-bold text-slate-800">{t(`log.sex_${day.sexType}`)}</div>}
+                                                        {(showLibido && day.sexDrive) && <div className="text-slate-600">{t('settings.libido')}: {t(`log.libido_${day.sexDrive}`)}</div>}
                                                         {(includeSecretion && day.discharge) && <div className="text-slate-500 opacity-80">{t(`log.discharge_${day.discharge}`)}</div>}
                                                     </div>
                                                 </td>

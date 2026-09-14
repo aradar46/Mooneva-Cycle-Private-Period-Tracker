@@ -1,7 +1,7 @@
 {
   "name": "mooneva-private-period-tracker",
   "private": true,
-  "version": "2.4.0",
+  "version": "2.5.0",
   "type": "module",
   "author": "Mooneva (https://mooneva.se/)",
   "license": "GPL-3.0-or-later",

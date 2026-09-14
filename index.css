@@ -229,6 +229,11 @@ body[data-theme="dark-neumorphism"] [class~="bg-blue-50/70"] {
   background-color: rgba(127, 182, 255, 0.14) !important;
 }
 
+body[data-theme="dark-neumorphism"] [class~="bg-violet-50"],
+body[data-theme="dark-neumorphism"] [class~="bg-violet-100"] {
+  background-color: rgba(167, 139, 250, 0.16) !important;
+}
+
 body[data-theme="dark-neumorphism"] [class~="bg-emerald-50"],
 body[data-theme="dark-neumorphism"] [class~="bg-emerald-100"],
 body[data-theme="dark-neumorphism"] [class~="bg-emerald-50/70"],
@@ -353,7 +358,6 @@ body[data-theme="dark-neumorphism"] .cycle-insight-hero {
 }
 
 body[data-theme="dark-neumorphism"] .cycle-insight-hero .bg-white\/75,
-body[data-theme="dark-neumorphism"] .cycle-insight-close,
 body[data-theme="dark-neumorphism"] .cycle-insight-sections span {
   background-color: #2a343b !important;
   color: #b8c6c9 !important;
@@ -523,19 +527,6 @@ body[data-theme="dark-neumorphism"] .timeline-cycle-length {
     height: 10px;
     left: max(0px, calc(25% - 9.5px));
   }
-}
-
-body[data-theme="dark-neumorphism"] .heatmap-row-label,
-body[data-theme="dark-neumorphism"] .heatmap-sticky-spacer {
-  background-color: var(--surface) !important;
-}
-
-body[data-theme="dark-neumorphism"] .heatmap-row-label {
-  box-shadow: 5px 0 10px rgba(11, 15, 19, 0.88) !important;
-}
-
-[dir="rtl"] body[data-theme="dark-neumorphism"] .heatmap-row-label {
-  box-shadow: -5px 0 10px rgba(11, 15, 19, 0.88) !important;
 }
 
 body[data-theme="dark-neumorphism"] .timeline-history-divider {
@@ -882,8 +873,13 @@ body[data-theme="dark-neumorphism"] .text-cyan-800 {
 }
 
 body[data-theme="dark-neumorphism"] .text-indigo-600,
+body[data-theme="dark-neumorphism"] .text-indigo-500,
 body[data-theme="dark-neumorphism"] .text-indigo-400,
-body[data-theme="dark-neumorphism"] .text-purple-600 {
+body[data-theme="dark-neumorphism"] .text-purple-600,
+body[data-theme="dark-neumorphism"] .text-violet-700,
+body[data-theme="dark-neumorphism"] .text-violet-600,
+body[data-theme="dark-neumorphism"] .text-violet-500,
+body[data-theme="dark-neumorphism"] .text-violet-400 {
   color: #c4b5fd !important;
 }
 
@@ -932,6 +928,16 @@ body[data-theme="dark-neumorphism"] #report-content [class*="border-slate-"] {
 [dir="rtl"],
 [dir="rtl"] * {
   font-family: 'Sahel', sans-serif !important;
+
+  /* Arabic and Persian letters join into words. letter-spacing severs those joins, so
+     a word renders as detached glyphs with gaps inside it. Tailwind's tracking-* runs
+     through ~150 places in this UI, so clear it wholesale for RTL rather than per
+     element. Uppercasing does nothing for Persian and can defeat the shaper on a
+     fallback font. The clinical report has the same pair of rules scoped to itself,
+     because html2canvas bakes the broken shaping into the exported image. */
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-transform: none !important;
 }
 
 /* Chinese (System Fonts) */

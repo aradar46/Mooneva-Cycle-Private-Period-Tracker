@@ -9,10 +9,11 @@ import { SettingCard, SettingRow, Toggle } from './settings/SettingsUI';
 import DataManagementView from './settings/DataManagementView';
 import NumberSettingRow from './settings/NumberSettingRow';
 import { ClinicalReportView } from './settings/ClinicalReportView';
-import { addDays, getTodayStr } from '../utils/dateUtils';
+import { getTodayStr } from '../utils/dateUtils';
 import { PIN_MAX_LENGTH, isValidPin, normalizePinInput, hasPin, hashPin } from '../utils/pin';
 import { FIRST_DAY_OPTIONS, resolveFirstDayOfWeek } from '../utils/weekStart';
 import { applySettingsInterlocks } from '../services/logic/settingsInterlocks';
+import { findActivePeriod } from '../services/logic/cycle';
 
 import { SubViewType, ViewType } from '../hooks/useAppNavigation';
 
@@ -25,6 +26,7 @@ interface SettingsProps {
   periods: PeriodRecord[];
   onUpdatePeriodWithdrawalBleed: (id: string, isWithdrawalBleed: boolean) => Promise<void>;
   onViewChange: (v: ViewType) => void;
+  runBackupNow: () => Promise<'written' | 'skipped' | 'failed'>;
 }
 
 const Icons = {
@@ -51,7 +53,7 @@ const Icons = {
   Gift: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
 };
 
-const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subView, onSubViewChange, periods, onUpdatePeriodWithdrawalBleed, onViewChange }) => {
+const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subView, onSubViewChange, periods, onUpdatePeriodWithdrawalBleed, onViewChange, runBackupNow }) => {
   const { t, i18n } = useTranslation();
   const [pinInput, setPinInput] = useState('');
   const [pinConfirm, setPinConfirm] = useState('');
@@ -81,13 +83,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
     setTimeout(() => setCopiedCoupon(false), 2000);
   };
 
-  const activePeriod = useMemo(() => {
-    const todayStr = getTodayStr();
-    return periods.find(p => {
-      const end = addDays(p.startDate, p.days - 1);
-      return todayStr >= p.startDate && todayStr <= end;
-    });
-  }, [periods]);
+  const activePeriod = useMemo(() => findActivePeriod(periods, getTodayStr()), [periods]);
 
   if (subView === 'predictions') {
     return (
@@ -316,6 +312,12 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
               </SettingRow>
             </SettingCard>
 
+            <SettingCard title={t('settings.kid_mode_section')}>
+              <SettingRow label={t('settings.kid_mode_label')} desc={t('settings.kid_mode_desc')} icon={<Icons.Eye />} last>
+                <Toggle active={!!settings.kidMode} onClick={() => onUpdate({ ...settings, kidMode: !settings.kidMode })} />
+              </SettingRow>
+            </SettingCard>
+
           </div>
         </div>
 
@@ -412,7 +414,7 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
   }
 
   if (subView === 'data_management') {
-    return <DataManagementView settings={settings} onUpdate={onUpdate} onBack={() => onSubViewChange('main')} />;
+    return <DataManagementView settings={settings} onUpdate={onUpdate} onBack={() => onSubViewChange('main')} runBackupNow={runBackupNow} />;
   }
 
   return (
@@ -829,7 +831,44 @@ const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose, subVie
             </div>
           </section>
 
-          {/* 7. Footer */}
+          {/* 7. Star the repo */}
+          <section>
+            <div
+              className="bg-[#F0F2F5] rounded-2xl p-5 text-center"
+              style={{ boxShadow: '6px 6px 12px rgba(163, 177, 198, 0.4), -6px -6px 12px rgba(255, 255, 255, 0.8)' }}
+            >
+              <div
+                className="w-10 h-10 rounded-full bg-[#F0F2F5] flex items-center justify-center text-amber-400 mx-auto mb-3"
+                style={{ boxShadow: 'inset 2px 2px 4px rgba(163, 177, 198, 0.3), inset -2px -2px 4px rgba(255, 255, 255, 0.8)' }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                  <path fillRule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clipRule="evenodd" />
+                </svg>
+              </div>
+
+              <h3 className="text-sm font-bold text-slate-700 mb-1">{t('settings.star_repo_title', 'Star Mooneva on GitHub')}</h3>
+              <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                {t('settings.star_repo_desc', 'Mooneva is open source. A star costs you nothing and helps other people find a tracker that keeps their data on their own phone.')}
+              </p>
+
+              <button
+                type="button"
+                onClick={() => {
+                  // '_system' hands the URL to the OS browser, the same route the store link
+                  // uses. The app itself holds no INTERNET permission and makes no request.
+                  window.open('https://github.com/aradar46/Mooneva-Cycle-Private-Period-Tracker', '_system');
+                }}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#24292f] text-white font-bold text-xs active:scale-[0.98] transition-transform"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4" aria-hidden="true">
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                </svg>
+                {t('settings.star_repo_button', 'Open GitHub')}
+              </button>
+            </div>
+          </section>
+
+          {/* 8. Footer */}
           <div className="text-center pt-8 pb-12 space-y-4">
             <p className="text-[10px] text-slate-400 font-medium">v{version}</p>
           </div>

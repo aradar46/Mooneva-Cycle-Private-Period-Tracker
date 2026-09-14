@@ -1,0 +1,7 @@
+Automatic encrypted backups to a folder you choose, plus a "Back up now" button on the calendar. Backup passwords are typed twice now, so a typo cannot lock you out of your own file.
+
+New Kid Mode hides the Sex and Libido sections everywhere, including the exported clinical report.
+
+You can now log a pregnancy: the calendar marks the whole span, and your history and report name it instead of a tracking gap.
+
+Trend heatmaps now show the share of cycles a symptom appeared in, not raw counts.

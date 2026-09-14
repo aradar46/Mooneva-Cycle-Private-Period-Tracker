@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { DailyLog, AppSettings, DayMeta } from '../types';
-import { toLocalISOString } from '../utils/dateUtils';
+import { toLocalISOString, parseLocalDate } from '../utils/dateUtils';
 import { formatNumber } from '../services/i18n';
 import { CycleStatusData } from '../services/logic/status';
 import { DayCell } from './calendar/DayCell';
@@ -10,6 +10,7 @@ import { CycleInsightModal } from './calendar/CycleInsightModal';
 import { CycleInsightMoon } from './calendar/CycleInsightMoon';
 import { useSwipe } from '../hooks/useSwipe';
 import { useCalendarSystem } from '../hooks/useCalendarSystem';
+import { pushBackInterceptor } from '../hooks/useAppNavigation';
 
 const INSTALL_DATE_KEY = 'mooneva_install_date';
 const HINT_DISMISSED_KEY = 'mooneva_hint_dismissed';
@@ -49,7 +50,6 @@ interface CalendarProps {
   getDayMeta: (dateStr: string) => DayMeta;
   settings: AppSettings;
   isCloaked: boolean;
-  onBulkUpdate?: (updates: Record<string, DailyLog>) => void;
   onMonthChange: (newDate: Date) => void;
   onToggleBleedingDay?: (date: string) => void;
   onNextMonth?: () => void;
@@ -70,7 +70,6 @@ const Calendar: React.FC<CalendarProps> = ({
   getDayMeta,
   settings,
   isCloaked,
-  onBulkUpdate,
   onMonthChange,
   onToggleBleedingDay,
   isEditMode: controlledEditMode,
@@ -127,6 +126,47 @@ const Calendar: React.FC<CalendarProps> = ({
   }, [currentDate, calendarSystem]);
 
   const days = useMemo(() => calendarSystem.getMonthGrid(year, month), [calendarSystem, month, year]);
+
+  // --- Month / year jump ---
+  const [showMonthPicker, setShowMonthPicker] = useState(false);
+  const [pickerYear, setPickerYear] = useState(year);
+
+  // Reopen on the month actually being viewed, not wherever the user browsed to last time.
+  useEffect(() => {
+    if (showMonthPicker) setPickerYear(year);
+  }, [showMonthPicker, year]);
+
+  useEffect(() => {
+    if (!showMonthPicker) return;
+    const release = pushBackInterceptor(() => setShowMonthPicker(false));
+    return release;
+  }, [showMonthPicker]);
+
+  /**
+   * Years offered, in the active calendar system. Bounded by the oldest thing the user
+   * has actually logged so someone with three years of history is not scrolling past
+   * twenty empty ones, with a floor of five years back so a fresh install can still
+   * reach a past pregnancy.
+   */
+  const pickerYears = useMemo(() => {
+    const todayYear = calendarSystem.today().year;
+    const keys = Object.keys(logs);
+    // ISO date keys sort lexicographically, so the minimum string is the earliest day.
+    const earliestIso = keys.length ? keys.reduce((a, b) => (a < b ? a : b)) : null;
+    const earliestYear = earliestIso
+      ? calendarSystem.toCalendarDate(parseLocalDate(earliestIso)).year
+      : todayYear;
+
+    const from = Math.min(earliestYear, todayYear - 5);
+    const years: number[] = [];
+    for (let y = from; y <= todayYear + 1; y++) years.push(y);
+    return years;
+  }, [logs, calendarSystem]);
+
+  const jumpToMonth = (targetMonth: number) => {
+    onMonthChange(calendarSystem.fromCalendarDate(pickerYear, targetMonth, 1));
+    setShowMonthPicker(false);
+  };
 
   const changeMonth = useCallback((amount: number) => {
     const newParts = calendarSystem.addMonths({ year, month, day: 1 }, amount);
@@ -261,10 +301,17 @@ const Calendar: React.FC<CalendarProps> = ({
               {t('calendar.guide.label')}
             </button>
           </div>
-          <h2 className="text-xs font-black uppercase tracking-[0.18em] text-slate-800 text-center">
+          <button
+            type="button"
+            onClick={() => setShowMonthPicker(open => !open)}
+            aria-expanded={showMonthPicker}
+            aria-label={t('calendar.jump_to_month', 'Jump to month')}
+            data-testid="calendar-month-title"
+            className="calendar-month-title text-xs font-black uppercase tracking-[0.18em] text-slate-800 text-center transition-opacity active:opacity-60"
+          >
             {/* Use the hook to format month/year */}
             {calendarSystem.formatMonthYear(year, month)}
-          </h2>
+          </button>
           <button
             onClick={() => onMonthChange(new Date())}
             className={`text-[8px] uppercase tracking-[0.12em] transition-all justify-self-end font-bold mr-1 ${isTodayMonth
@@ -275,6 +322,66 @@ const Calendar: React.FC<CalendarProps> = ({
             {t('common.today') || 'Today'}
           </button>
         </div>
+
+        {showMonthPicker && (
+          <>
+            {/* Catches the tap that dismisses, and keeps it off the day grid underneath. */}
+            <button
+              type="button"
+              aria-label={t('calendar.jump_close', 'Close')}
+              onClick={() => setShowMonthPicker(false)}
+              className="absolute inset-0 z-30 cursor-default"
+            />
+            <div
+              data-testid="calendar-month-picker"
+              className="absolute inset-x-3 top-12 z-40 rounded-3xl bg-[#F0F2F5] p-3 animate-fade-in"
+              style={{ boxShadow: '8px 8px 16px rgba(163, 177, 198, 0.45), -8px -8px 16px rgba(255, 255, 255, 0.9)' }}
+              // The card owns the month-swipe gesture; without this, dragging across the
+              // picker flips the month behind it.
+              onTouchStart={e => e.stopPropagation()}
+              onTouchMove={e => e.stopPropagation()}
+              onTouchEnd={e => e.stopPropagation()}
+            >
+              <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-2">
+                {pickerYears.map(y => (
+                  <button
+                    key={y}
+                    type="button"
+                    onClick={() => setPickerYear(y)}
+                    className={`shrink-0 rounded-lg px-2.5 py-1 text-[11px] font-bold tabular-nums transition-all ${
+                      y === pickerYear
+                        ? 'bg-[#7598a0] text-white shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    {formatNumber(y)}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-4 gap-1.5 pt-1">
+                {Array.from({ length: 12 }, (_, m) => {
+                  const isCurrent = m === month && pickerYear === year;
+                  return (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => jumpToMonth(m)}
+                      className={`rounded-xl py-2 text-[10px] font-bold uppercase tracking-wide transition-all active:scale-95 ${
+                        isCurrent
+                          ? 'bg-[#7598a0] text-white shadow-sm'
+                          : 'bg-[#F0F2F5] text-slate-600'
+                      }`}
+                      style={isCurrent ? undefined : { boxShadow: '2px 2px 4px rgba(163, 177, 198, 0.35), -2px -2px 4px rgba(255, 255, 255, 0.85)' }}
+                    >
+                      {calendarSystem.formatMonth(pickerYear, m)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {calendarSystem.weekDayKeys.map((d) => (
@@ -535,19 +642,23 @@ const Calendar: React.FC<CalendarProps> = ({
                     <span className="text-[11px] text-slate-600 font-bold leading-tight">{t('calendar.legend.pill_logged')}</span>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-neutral-marker calendar-guide-sex-protected-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
-                      <SexMarkerIcon type="protected" className="w-[16px] h-[16px] text-purple-500" />
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.protected_sex')}</span>
-                  </div>
+                  {!settings.kidMode && (
+                    <>
+                      <div className="flex items-center gap-3">
+                        <div className="calendar-guide-neutral-marker calendar-guide-sex-protected-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                          <SexMarkerIcon type="protected" className="w-[16px] h-[16px] text-purple-500" />
+                        </div>
+                        <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.protected_sex')}</span>
+                      </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="calendar-guide-neutral-marker calendar-guide-sex-unprotected-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
-                      <SexMarkerIcon type="unprotected" className="w-[16px] h-[16px] text-purple-500" />
-                    </div>
-                    <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.unprotected_sex')}</span>
-                  </div>
+                      <div className="flex items-center gap-3">
+                        <div className="calendar-guide-neutral-marker calendar-guide-sex-unprotected-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
+                          <SexMarkerIcon type="unprotected" className="w-[16px] h-[16px] text-purple-500" />
+                        </div>
+                        <span className="text-[11px] text-slate-600 font-bold">{t('calendar.legend.unprotected_sex')}</span>
+                      </div>
+                    </>
+                  )}
 
                   <div className="flex items-center gap-3">
                     <div className="calendar-guide-neutral-marker w-9 h-9 shrink-0 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center overflow-hidden">
@@ -576,6 +687,20 @@ const Calendar: React.FC<CalendarProps> = ({
 
                   {/* CATEGORY 3: OTHER */}
                   <div className="calendar-guide-section-other text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-200 pb-1.5 mt-2 mb-1">{t('calendar.category_other')}</div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="calendar-guide-pregnancy-marker relative w-9 h-9 shrink-0 rounded-full bg-violet-50 border border-violet-200/60 flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-violet-700">14</span>
+                      <div className="absolute top-0 right-0 translate-x-[15%] -translate-y-[15%] bg-white rounded-full p-0.5 shadow-sm border border-violet-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-violet-500">
+                          <path d="M12 22a1 1 0 0 1-1-1v-7a1 1 0 1 1 2 0v7a1 1 0 0 1-1 1Z" />
+                          <path d="M11 14c0-3.314-2.686-6-6-6 0 3.314 2.686 6 6 6Z" />
+                          <path d="M13 12.5C13 9.462 15.462 7 18.5 7c0 3.038-2.462 5.5-5.5 5.5Z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <span className="text-[11px] text-slate-600 font-bold">{t('dashboard.pregnancy')}</span>
+                  </div>
 
                   <div className="flex items-center gap-3">
                     <div className="calendar-guide-period-soft-marker w-9 h-9 shrink-0 rounded-full bg-rose-50/50 border border-rose-100/30 flex items-center justify-center">

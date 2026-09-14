@@ -45,8 +45,6 @@
         "navigation": "Navigáció"
     },
     "whats_new": {
-        "title": "Újdonságok",
-        "intro": "A legutóbbi verzió óta:",
         "tip": "A Mooneva elsőre letisztult, de a <b>Beállítások</b> tele van hasznos funkciókkal. Hiányzik valami? Nézz körül ott: rendszeresen frissítünk, és beépítjük a kért funkciókat."
     },
     "share_message": {
@@ -54,7 +52,7 @@
     },
     "notifications": {
         "title": "Értesítéskezelő",
-        "discrete_mode_note": "Amíg a diszkrét mód aktív, az értesítések semleges, feladat jellegű szöveget használnak.",
+        "discrete_mode_note": "Amíg a diszkrét mód aktív, az értesítések semleges megfogalmazást használnak, és nem jelennek meg a zárolási képernyőn.",
         "section_action_needed": "Teendő",
         "section_cycle_updates": "Ciklus frissítések",
         "section_period_ovulation": "Menstruáció és ovuláció",
@@ -128,7 +126,8 @@
         "next_period_days": "Következő menstruáció – {{count}} nap múlva",
         "next_period_unknown": "Következő menstruáció előrejelzése",
         "permission_denied_message": "Az értesítések ki vannak kapcsolva. Kapcsold be őket az eszköz beállításaiban az emlékeztetők fogadásához.",
-        "exact_alarm_message": "Az emlékeztetők késve vagy egyáltalán nem érkezhetnek meg. Engedélyezd az ébresztőket és emlékeztetőket az eszköz beállításaiban a pontos kézbesítéshez."
+        "exact_alarm_message": "Az emlékeztetők késve vagy egyáltalán nem érkezhetnek meg. Engedélyezd az ébresztőket és emlékeztetőket az eszköz beállításaiban a pontos kézbesítéshez.",
+        "pill_reminder_discrete": "Emlékeztető"
     },
     "nav": {
         "history": "Előzmények"
@@ -192,7 +191,9 @@
         "cycle_count_one": "{{count}} ciklus",
         "cycle_count_other": "{{count}} ciklus",
         "no_recent_data": "Nincs friss adat",
-        "log_to_resume": "Rögzíts egy menstruációt az előrejelzések folytatásához"
+        "log_to_resume": "Rögzíts egy menstruációt az előrejelzések folytatásához",
+        "pregnancy": "Terhesség",
+        "pregnancy_week": "{{week}}. hét"
     },
     "discrete": {
         "title": "Feladataim",
@@ -269,7 +270,9 @@
             "orphan_flow": "Vérzés (nincs menstruáció)",
             "withdrawal_bleed": "Megvonásos vérzés (tabletta okozta vérzés)"
         },
-        "category_other": "Egyéb"
+        "category_other": "Egyéb",
+        "jump_to_month": "Ugrás hónapra",
+        "jump_close": "Bezárás"
     },
     "cycle_insight": {
         "title": "Ciklusinformáció",
@@ -414,15 +417,21 @@
         "withdrawal_bleed_desc": "Jelöld meg, ha hormonális fogamzásgátlót szedsz (tabletta, gyűrű, tapasz)",
         "withdrawal_tagged": "Ez a menstruáció megvonásos vérzésként van megjelölve, és ki lesz zárva a természetes ciklus statisztikáiból.",
         "stats": "Statisztika",
-        "ignore_averages_question": "Kizárás a ciklusátlagokból?",
+        "ignore_averages_question": "Kizárás az átlagokból és a grafikonokból?",
         "ignore_averages_desc": "Szabálytalan ciklusokhoz (stressz, betegség stb.)",
-        "ignore_tagged": "Ez a menstruáció ki lesz zárva a ciklushossz-számításokból és az átlagokból.",
+        "ignore_tagged": "Ez a menstruáció kimarad a ciklusátlagokból és az Elemzések grafikonjaiból.",
         "tap_to_edit": "Koppints a szerkesztéshez",
         "withdrawal_bleed_label": "Megvonásos vérzés",
         "excluded_label": "Kizárva",
         "day_x_of_y": "{{day}}. / {{total}}. nap",
         "no_period_advanced": "Ez a dátum nem tartozik menstruációhoz. Kezdj el egy menstruációt vagy jelölj ki egy menstruációs napot a speciális beállítások eléréséhez.",
-        "daily_log_tabs": "Napi napló fülek"
+        "daily_log_tabs": "Napi napló fülek",
+        "pregnancy": "Terhesség",
+        "experimental": "Kísérleti, visszajelzés kell",
+        "pregnancy_start_question": "Ezen a napon kezdődött a terhesség?",
+        "pregnancy_start_desc": "Magától véget ér, amikor elkezdődik a következő menstruáció",
+        "pregnancy_tagged": "Ez az időszak terhességként jelenik meg, nem naplózási hiányként.",
+        "pregnancy_paused_note": "Az előrejelzések szünetelnek, az adaptív előrejelzéssel, a termékeny ablakkal és a PMS-sel együtt. A Beállításokban bármikor visszakapcsolhatod."
     },
     "settings": {
         "language": "Nyelv",
@@ -503,6 +512,7 @@
         "repeat_pin": "Ismételd meg a PIN-kódot",
         "enable_pin": "PIN-kód bekapcsolása",
         "pin_security_desc": "Az egészségügyi adataid titkosítva vannak ezen a készüléken. Ez a PIN-kód szabályozza az alkalmazáshoz való hozzáférést.",
+        "pin_forgot_hint": "Elfelejtetted a PIN-kódot? Ha van biztonsági mentésed, telepítsd újra a Moonevát, és állítsd vissza. Mentés nélkül az újratelepítés törli az adataidat.",
         "pin_unlock_prompt": "Add meg a PIN-kódodat (4-12 számjegy)",
         "pin_placeholder": "4-12 jegyű PIN-kód",
         "pin_exit_discrete_prompt": "Add meg a PIN-kódodat a diszkrét mód elhagyásához",
@@ -510,6 +520,7 @@
         "enter_password": "Add meg a jelszót",
         "repeat_password": "Ismételd meg a jelszót",
         "pins_dont_match": "A PIN-kódok nem egyeznek.",
+        "passwords_dont_match": "A jelszavak nem egyeznek.",
         "wipe_confirm": "Biztos vagy benne?",
         "feedback_title": "Segíts, hogy olyat építsünk, amit szeretni fogsz",
         "feedback_desc": "Hibát találtál, van egy ötleted egy funkcióhoz, vagy pontatlan fordítást láttál? Mondd el 30 másodpercben.",
@@ -596,7 +607,7 @@
         "report_footer_new": "Mooneva Cycle: privát ciklusnapló",
         "birth_control_sub_desc": "Termékenység elrejtése, vérzések megjelölése megvonásosként",
         "birth_control_pill_hint": "Legjobb kombinált tablettát, gyűrűt vagy tapaszt használóknak.",
-        "pause_predictions_full_desc": "Minden előrejelzés szüneteltetése (terhesség, szabálytalan ciklus stb.), például terhesség esetén, vagy ha nem szeretnéd látni a becsléseket.",
+        "pause_predictions_full_desc": "Elrejti a menstruációra, peteérésre és PMS-re vonatkozó becsléseket, amíg vissza nem kapcsolod.",
         "adaptive_prediction_label": "Adaptív előrejelzés",
         "adaptive_prediction_desc_long": "Az utolsó 3 ciklus átlagát számolja a ciklushossz előrejelzéséhez",
         "cycle_length_label": "Ciklushossz",
@@ -605,6 +616,9 @@
         "period_length_desc": "Jellemző vérzési napok",
         "luteal_phase_label": "Luteális fázis",
         "luteal_phase_desc": "Napok az ovulációtól a menstruációig",
+        "kid_mode_section": "Gyerekmód",
+        "kid_mode_label": "Gyerekmód",
+        "kid_mode_desc": "Elrejti azt, amire most még nincs szükség.",
         "fertility_pms_section": "Termékenység és PMS",
         "pms_window_section": "PMS időszak",
         "cycle_config_section": "Ciklusbeállítások",
@@ -623,7 +637,19 @@
         "report_range_from": "Kezdő dátum",
         "report_range_to": "Záró dátum",
         "report_range_max": "Legfeljebb 12 hónap",
-        "report_share_failed": "A PDF megosztása sikertelen. Próbálj rövidebb dátumtartományt."
+        "report_share_failed": "A PDF megosztása sikertelen. Próbálj rövidebb dátumtartományt.",
+        "auto_backup": "Automatikus biztonsági mentés",
+        "auto_backup_subtitle": "Titkosítva, az általad választott mappába. Naponta legfeljebb egyszer fut le.",
+        "auto_backup_enable": "Automatikus mentés",
+        "auto_backup_password_warning": "Válassz jelszót, és őrizd biztonságos helyen. Ez nem a PIN-kódod. Az automatikus mentések ezzel vannak titkosítva, és nélküle az adataid nem állíthatók helyre. A jelszó nem állítható vissza.",
+        "auto_backup_sync_tip": "Tipp: válassz olyan mappát, amelyet egy másik alkalmazás szinkronban tart (Drive, Dropbox, Nextcloud, iCloud, Syncthing), így a mentéseid túlélik az elveszett vagy tönkrement telefont. A Mooneva Cycle-nek nincs saját internet-hozzáférése, a fájl pedig már írás előtt titkosítva van, így a jelszavad nélkül senki sem tudja megnyitni, még az sem, aki tárolja.",
+        "auto_backup_choose_folder": "Mappa kiválasztása",
+        "auto_backup_destination": "Mappa",
+        "auto_backup_last_run": "Utolsó mentés",
+        "auto_backup_run_now": "Biztonsági mentés most",
+        "wipe_auto_backup_note": "A(z) „{{folder}}” mappába már mentett automatikus biztonsági mentések nem törlődnek. Ezek többé nem nyithatók meg, mert a jelszó is törlődik. Töröld őket magad, ha meg akarsz szabadulni tőlük.",
+        "pregnancy": "Terhesség",
+        "auto_backup_saved_to": "Mentve ide: {{folder}}"
     },
     "trends": {
         "header": "Elemzések",
@@ -642,12 +668,13 @@
         "year": "1 év",
         "completed_cycles_note": "Ez az oldal csak a lezárt ciklusok adatait mutatja. A jelenlegi ciklusod a következő menstruáció kezdetekor kerül bele.",
         "cycle_regularity": "Ciklus szabályossága",
-        "average_label": "Átlag: {{count}} nap",
-        "regular": "Rendszeres",
-        "varying": "Változó",
-        "irregular": "Szabálytalan",
+        "cycle_range": "{{min}}–{{max}} nap, {{spread}} nap eltérés",
+        "includes_withdrawal": "Megvonásos vérzéseket is tartalmaz, amelyek nem természetes ciklusok.",
         "flow_pattern": "Vérzésminta",
-        "last_3_periods_avg": "Az utolsó 3 menstruáció átlaga",
+        "based_on_cycles_one": "{{count}} ciklus alapján",
+        "based_on_cycles_other": "{{count}} ciklus alapján",
+        "based_on_periods_one": "{{count}} menstruáció alapján",
+        "based_on_periods_other": "{{count}} menstruáció alapján",
         "lighter": "Enyhébb",
         "heavier": "Erősebb",
         "mood_by_phase": "Hangulat fázisonként",
@@ -681,7 +708,9 @@
         "pill_timeline": "Gyógyszeridővonal",
         "pill_taken": "Tabletta bevéve",
         "pill_low": "Kihagyva",
-        "pill_high": "Bevéve"
+        "pill_high": "Bevéve",
+        "pregnancy_note": "A ciklusgrafikonok szünetelnek a terhesség alatt, és az első menstruáció után térnek vissza.",
+        "pregnancy_charts_paused": "Még nincs mit mutatni. Ezek a grafikonok ciklusnapokat számolnak, a terhesség alatt pedig nincs ciklus."
     },
     "timeline": {
         "header": "Idővonal",
@@ -692,7 +721,8 @@
         "started": "Kezdődött",
         "gap_hint": "Naplózási kihagyás – nem használt előrejelzéshez",
         "short_cycle_hint": "Ciklus túl rövid (<18 nap) – nem használt előrejelzéshez",
-        "show_more_count": "Több előzmény mutatása ({{count}})"
+        "show_more_count": "Több előzmény mutatása ({{count}})",
+        "pregnancy_hint": "Terhesség, nem használjuk előrejelzéshez"
     },
     "onboarding": {
         "trust": {

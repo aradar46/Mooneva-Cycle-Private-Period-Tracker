@@ -95,6 +95,10 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, settings }) => 
 
         // Go through each cycle and count moods by phase
         cycles.forEach(cycle => {
+            // Same reason as the trends heatmaps: phaseForCycleDay would file almost the
+            // whole of a 600-day span under "luteal".
+            if (cycle.isOutlier) return;
+
             const [y, m, d] = cycle.startDate.split('-').map(Number);
             const cycleStart = new Date(y, m - 1, d);
             const cycleLength = cycle.length || 28;
@@ -192,6 +196,9 @@ const MoodByPhase: React.FC<MoodByPhaseProps> = ({ logs, cycles, settings }) => 
                 </h2>
                 <span className="text-xs font-medium text-slate-400">
                     {t('trends.mood_emotional_patterns')}
+                </span>
+                <span className="text-[11px] font-medium text-slate-400">
+                    {t('trends.based_on_cycles', { count: cycles.length })}
                 </span>
             </div>
 

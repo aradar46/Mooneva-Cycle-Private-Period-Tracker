@@ -34,6 +34,23 @@ const DEVICE_SECRET_KEY = 'mooneva_device_secret';
 
 const BACKUP_SECURITY_SETTING_KEYS = ['pin', 'pinHash', 'pinSalt', 'lockTimeout'] as const;
 
+/**
+ * Auto-backup settings describe *this* device's destination folder and its
+ * bookkeeping. A SAF tree URI or iOS bookmark is meaningless on another device,
+ * so they are excluded from backups and preserved across a restore.
+ */
+const AUTO_BACKUP_SETTING_KEYS = [
+    'autoBackupEnabled',
+    'autoBackupTarget',
+    'autoBackupTargetLabel',
+    'autoBackupLastRunAt',
+    'autoBackupLastFingerprint',
+    'autoBackupLastError',
+] as const;
+
+/** Settings that belong to the device rather than to the data. */
+const DEVICE_LOCAL_SETTING_KEYS = [...BACKUP_SECURITY_SETTING_KEYS, ...AUTO_BACKUP_SETTING_KEYS] as const;
+
 const isPlainRecord = (value: unknown): value is Record<string, unknown> => {
     if (typeof value !== 'object' || value === null || Array.isArray(value)) {
         return false;
@@ -329,6 +346,10 @@ export const wipeAllData = async () => {
     } catch (e) {
         // SecureStorage may not be available on web
     }
+    // Settings are gone after this, so the Settings toggle that would otherwise
+    // clear the auto-backup password becomes unreachable. This is the last chance
+    // to stop the key to the backup files outliving the data it protects.
+    await clearAutoBackupPassword();
     cachedMasterKeyPromise = null;
     window.location.reload();
 };
@@ -389,6 +410,45 @@ export const savePeriods = async (periods: PeriodRecord[]) => {
 const isKeyNotFoundError = (e: unknown): boolean => {
     const message = typeof e === 'string' ? e : e instanceof Error ? e.message : '';
     return message.toLowerCase().includes('does not exist');
+};
+
+/** Keystore/Keychain entry holding the automatic-backup password. */
+export const AUTO_BACKUP_PASSWORD_KEY = 'mooneva_auto_backup_password';
+
+/**
+ * The automatic-backup password, unlike the device secret, has no localStorage
+ * fallback. The device secret can fall back because it is useless without the
+ * app's own storage; this password decrypts a file the user deliberately writes
+ * to shared storage, so writing it in plaintext would defeat the encryption.
+ * If the Keystore cannot hold it, auto-backup must not be enabled at all.
+ */
+export const writeAutoBackupPassword = async (password: string): Promise<void> => {
+    try {
+        await SecureStoragePlugin.set({ key: AUTO_BACKUP_PASSWORD_KEY, value: password });
+    } catch (e) {
+        Logger.warn('Secure storage unavailable; refusing to persist the auto-backup password', e);
+        throw new Error('Unable to store the backup password: secure storage is unavailable on this device');
+    }
+};
+
+export const readAutoBackupPassword = async (): Promise<string | null> => {
+    try {
+        const result = await SecureStoragePlugin.get({ key: AUTO_BACKUP_PASSWORD_KEY });
+        return result.value;
+    } catch (e) {
+        if (isKeyNotFoundError(e)) return null;
+        Logger.warn('Ambiguous secure-storage read failure for the auto-backup password', e);
+        throw new Error('Unable to read the backup password: secure storage error');
+    }
+};
+
+export const clearAutoBackupPassword = async (): Promise<void> => {
+    try {
+        await SecureStoragePlugin.remove({ key: AUTO_BACKUP_PASSWORD_KEY });
+    } catch (e) {
+        if (isKeyNotFoundError(e)) return;
+        Logger.warn('Failed to clear the auto-backup password', e);
+    }
 };
 
 /**
@@ -487,7 +547,7 @@ export const __resetDeviceMasterKeyCacheForTests = (): void => {
  */
 export const sanitizeSettingsForBackup = (settings: AppSettings): AppSettings => {
     const safeSettings = { ...settings };
-    for (const key of BACKUP_SECURITY_SETTING_KEYS) {
+    for (const key of DEVICE_LOCAL_SETTING_KEYS) {
         delete safeSettings[key];
     }
     return safeSettings;
@@ -504,10 +564,11 @@ export const mergeRestoredSettings = (
 ): AppSettings => {
     const safeSettings = sanitizeSettingsForBackup(restoredSettings);
 
-    if (Object.hasOwn(currentSettings, 'pin')) safeSettings.pin = currentSettings.pin;
-    if (Object.hasOwn(currentSettings, 'pinHash')) safeSettings.pinHash = currentSettings.pinHash;
-    if (Object.hasOwn(currentSettings, 'pinSalt')) safeSettings.pinSalt = currentSettings.pinSalt;
-    if (Object.hasOwn(currentSettings, 'lockTimeout')) safeSettings.lockTimeout = currentSettings.lockTimeout;
+    for (const key of DEVICE_LOCAL_SETTING_KEYS) {
+        if (Object.hasOwn(currentSettings, key)) {
+            Object.assign(safeSettings, { [key]: currentSettings[key] });
+        }
+    }
 
     return safeSettings;
 };

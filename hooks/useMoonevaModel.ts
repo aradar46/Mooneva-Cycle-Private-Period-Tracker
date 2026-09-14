@@ -1,6 +1,14 @@
 import { useMemo, useCallback, useEffect, useState } from 'react';
 import { DailyLog, AppSettings, Cycle, PredictionResults, DayMeta, PeriodRecord } from '../types';
-import { getPastCycles, getCyclePredictions } from '../services/logic';
+import {
+    getPastCycles,
+    getCyclePredictions,
+    findActivePeriod,
+    getPregnancySpans,
+    findPregnancySpan,
+    markPregnancyCycles,
+} from '../services/logic';
+import type { PregnancySpan } from '../services/logic/cycle';
 import { toLocalISOString, addDays, diffInDays } from '../utils/dateUtils';
 import { calculateCycleStatus, computeDayOfCycle } from '../services/logic/status';
 import type { CycleStatusData } from '../services/logic/status';
@@ -57,16 +65,14 @@ export interface MoonevaModel {
     // Data
     cycles: Cycle[];
     predictions: PredictionResults;
+    /** Pregnancy spans, newest last. History renders the ones no cycle covers. */
+    pregnancySpans: PregnancySpan[];
 
     // Helpers
     getDayMeta: (dateStr: string) => DayMeta;
     /** Full localized status for one day. Only the dashboard header needs this;
      *  calendar cells read meta.dayOfCycle instead. */
     getDayStatus: (dateStr: string) => CycleStatusData;
-
-    // Exposed model properties
-    lastPeriodStart: string | null;
-    predictionAnchorStart: string | null;
 }
 
 /**
@@ -97,9 +103,15 @@ export const useMoonevaModel = (
     }, [todayStr]);
 
     // 1. History (Past)
+    const pregnancySpans = useMemo(
+        () => getPregnancySpans(logs, periods, todayStr),
+        [logs, periods, todayStr]
+    );
+
     const cycles = useMemo(() => {
-        return getPastCycles(periods, settings.historyArchivedDate, settings.lutealPhaseLength);
-    }, [periods, settings.historyArchivedDate, settings.lutealPhaseLength]);
+        const past = getPastCycles(periods, settings.historyArchivedDate, settings.lutealPhaseLength);
+        return markPregnancyCycles(past, pregnancySpans);
+    }, [periods, settings.historyArchivedDate, settings.lutealPhaseLength, pregnancySpans]);
 
     // 2. Predictions (Future)
     const {
@@ -142,10 +154,7 @@ export const useMoonevaModel = (
         const isCycleStart = periods.some(p => p.startDate === dateStr);
 
         // Explicit Period Check
-        const activePeriod = periods.find(p => {
-            const end = addDays(p.startDate, p.days - 1);
-            return dateStr >= p.startDate && dateStr <= end;
-        });
+        const activePeriod = findActivePeriod(periods, dateStr);
 
         const isInsidePeriod = !!activePeriod;
         let isBleeding = false;
@@ -190,6 +199,12 @@ export const useMoonevaModel = (
             symptoms: log?.symptoms,
             mood: log?.mood ?? []
         };
+
+        const pregnancy = findPregnancySpan(pregnancySpans, dateStr);
+        if (pregnancy) {
+            meta.isPregnancy = true;
+            meta.pregnancyWeek = Math.floor(diffInDays(dateStr, pregnancy.start) / 7) + 1;
+        }
 
         // Calculate Day of Period if active
         if (meta.isPeriod) {
@@ -265,7 +280,7 @@ export const useMoonevaModel = (
         }
 
         return meta;
-    }, [logs, periods, settings, cycles, predictions, t, todayStr]);
+    }, [logs, periods, settings, cycles, predictions, t, todayStr, pregnancySpans]);
 
     const getDayStatus = useCallback((dateStr: string): CycleStatusData => {
         const anchorDate = findAnchorStart(periods, dateStr);
@@ -275,9 +290,8 @@ export const useMoonevaModel = (
     return useMemo(() => ({
         cycles,
         predictions,
+        pregnancySpans,
         getDayMeta,
         getDayStatus,
-        lastPeriodStart: predictions.lastPeriodStart,
-        predictionAnchorStart: predictions.lastPeriodStart
-    }), [cycles, predictions, getDayMeta, getDayStatus]);
+    }), [cycles, predictions, pregnancySpans, getDayMeta, getDayStatus]);
 };

@@ -45,8 +45,6 @@
         "navigation": "Navigering"
     },
     "whats_new": {
-        "title": "Nyheter",
-        "intro": "Sedan den senaste versionen:",
         "tip": "Mooneva ser minimalistisk ut, men <b>Inställningar</b> är fullt av kraftfulla verktyg. Saknar du något? Kika in där: vi uppdaterar ofta och lägger till det som önskas."
     },
     "share_message": {
@@ -54,7 +52,7 @@
     },
     "notifications": {
         "title": "Notiser",
-        "discrete_mode_note": "I diskret läge använder notiser ett neutralt språk.",
+        "discrete_mode_note": "När diskret läge är aktivt använder aviseringar neutrala formuleringar och visas inte på låsskärmen.",
         "section_period_ovulation": "Mens & Ägglossning",
         "gentle_mode": "Mjukt läge",
         "gentle_mode_desc": "Varnar endast vid inaktivitet 48h under mens.",
@@ -128,7 +126,8 @@
         "section_action_needed": "Åtgärd krävs",
         "section_cycle_updates": "Cykeluppdateringar",
         "permission_denied_message": "Aviseringar är avstängda. Aktivera dem i enhetens inställningar för att få påminnelser.",
-        "exact_alarm_message": "Påminnelser kan komma sent eller inte alls. Tillåt alarm och påminnelser i enhetens inställningar för leverans i tid."
+        "exact_alarm_message": "Påminnelser kan komma sent eller inte alls. Tillåt alarm och påminnelser i enhetens inställningar för leverans i tid.",
+        "pill_reminder_discrete": "Påminnelse"
     },
     "nav": {
         "history": "Historik"
@@ -192,7 +191,9 @@
         "cycle_count_one": "{{count}} cykel",
         "cycle_count_other": "{{count}} cykler",
         "no_recent_data": "Inga aktuella data",
-        "log_to_resume": "Logga en mens för att återuppta prognoserna"
+        "log_to_resume": "Logga en mens för att återuppta prognoserna",
+        "pregnancy": "Graviditet",
+        "pregnancy_week": "Vecka {{week}}"
     },
     "discrete": {
         "title": "Mina uppgifter",
@@ -269,7 +270,9 @@
         "how_to_log_daily_body": "<strong>Tryck</strong> (för att lägga till) eller <strong>dubbeltryck</strong> (för att redigera) på valfri dag i kalendern.",
         "category_flow": "Cykel",
         "category_logs": "Loggdetaljer",
-        "category_other": "Övrigt"
+        "category_other": "Övrigt",
+        "jump_to_month": "Hoppa till månad",
+        "jump_close": "Stäng"
     },
     "cycle_insight": {
         "title": "Cykelinsikt",
@@ -411,9 +414,9 @@
         "withdrawal_bleed_question": "Var detta en bortfallsblödning?",
         "withdrawal_bleed_desc": "Märk om du använder hormonellt preventivmedel (p-piller, p-ring, p-plåster)",
         "withdrawal_tagged": "Denna mens är märkt som bortfallsblödning och exkluderas från naturlig cykelstatistik.",
-        "ignore_averages_question": "Exkludera från cykelsnitt?",
+        "ignore_averages_question": "Exkludera från snitt och diagram?",
         "ignore_averages_desc": "För oregelbundna cykler (stress, sjukdom, etc.)",
-        "ignore_tagged": "Denna mens exkluderas från cykellängdsberäkningar och snitt.",
+        "ignore_tagged": "Denna mens utesluts från dina cykelsnitt och från diagrammen under Insikter.",
         "no_period_advanced": "Detta datum är inte del av en mens. Starta eller välj en mensdag för avancerade alternativ.",
         "vitals_tab": "Kropp",
         "stats": "Statistik",
@@ -422,7 +425,13 @@
         "excluded_label": "Exkluderad",
         "day_x_of_y": "Dag {{day}} av {{total}}",
         "spotting_hint_no_period": "Logga stänkblödning eller ändra mens",
-        "daily_log_tabs": "Flikar för dagslogg"
+        "daily_log_tabs": "Flikar för dagslogg",
+        "pregnancy": "Graviditet",
+        "experimental": "Experimentell, behöver feedback",
+        "pregnancy_start_question": "Började graviditeten den här dagen?",
+        "pregnancy_start_desc": "Avslutas av sig själv när nästa mens börjar",
+        "pregnancy_tagged": "Den här perioden visas som graviditet, inte som en lucka i loggen.",
+        "pregnancy_paused_note": "Prognoser är pausade, liksom adaptiv prognos, fertilt fönster och PMS. Du kan slå på dem igen i Inställningar."
     },
     "settings": {
         "language": "Språk",
@@ -494,6 +503,7 @@
         "repeat_pin": "Upprepa PIN-koden",
         "enable_pin": "Aktivera PIN-kod",
         "pin_security_desc": "Dina hälsodata är krypterade på den här enheten. PIN-koden styr åtkomsten till appen.",
+        "pin_forgot_hint": "Glömt PIN-koden? Om du har en säkerhetskopia, installera om Mooneva och återställ den. Utan en säkerhetskopia raderar en ominstallation dina data.",
         "pin_unlock_prompt": "Ange din PIN-kod (4 till 12 siffror)",
         "pin_placeholder": "PIN-kod med 4 till 12 siffror",
         "pin_exit_discrete_prompt": "Ange din PIN-kod för att avsluta diskret läge.",
@@ -514,6 +524,7 @@
         "enter_password": "Ange lösenord",
         "repeat_password": "Upprepa lösenord",
         "pins_dont_match": "PIN-koderna matchar inte.",
+        "passwords_dont_match": "Lösenorden matchar inte.",
         "data_management_title": "Datahantering",
         "create_backup": "Skapa backup",
         "save_to_file": "Spara data till fil",
@@ -597,7 +608,7 @@
         "report_footer_new": "Mooneva Cycle: privat mensspårare",
         "birth_control_sub_desc": "Döljer fertilitet, märker blödningar som bortfallsblödning",
         "birth_control_pill_hint": "Bäst för dig som använder kombinerade p-piller, p-ring eller p-plåster.",
-        "pause_predictions_full_desc": "Pausar alla prognoser (graviditet, oregelbunden cykel osv.), t.ex. vid graviditet eller om du inte vill se uppskattningar.",
+        "pause_predictions_full_desc": "Döljer uppskattningar för mens, ägglossning och PMS tills du slår på det igen.",
         "adaptive_prediction_label": "Adaptiv Prognos",
         "adaptive_prediction_desc_long": "Beräknar snittet av de senaste 3 cyklerna för att förutsäga cykellängd",
         "cycle_length_label": "Cykellängd",
@@ -606,6 +617,9 @@
         "period_length_desc": "Typiska blödningsdagar",
         "luteal_phase_label": "Lutealfas",
         "luteal_phase_desc": "Dagar från ägglossning till mens",
+        "kid_mode_section": "Barnläge",
+        "kid_mode_label": "Barnläge",
+        "kid_mode_desc": "Döljer sådant som inte behövs än.",
         "fertility_pms_section": "Fertilitet & PMS",
         "pms_window_section": "PMS-fönster",
         "cycle_config_section": "Cykelinställningar",
@@ -623,7 +637,19 @@
         "report_range_from": "Från datum",
         "report_range_to": "Till datum",
         "report_range_max": "Max 12 månader",
-        "report_share_failed": "Kunde inte dela PDF. Prova ett kortare datumintervall."
+        "report_share_failed": "Kunde inte dela PDF. Prova ett kortare datumintervall.",
+        "auto_backup": "Automatisk säkerhetskopiering",
+        "auto_backup_subtitle": "Krypterad, till en mapp du väljer. Körs högst en gång per dag.",
+        "auto_backup_enable": "Säkerhetskopiera automatiskt",
+        "auto_backup_password_warning": "Välj ett lösenord och förvara det säkert. Det är inte din PIN-kod. Automatiska säkerhetskopior krypteras med det, och utan det kan dina data inte återställas. Det går inte att återställa lösenordet.",
+        "auto_backup_sync_tip": "Tips: välj en mapp som en annan app håller synkad (Drive, Dropbox, Nextcloud, iCloud, Syncthing), så överlever dina säkerhetskopior en borttappad eller trasig telefon. Mooneva Cycle har ingen egen internetåtkomst, och filen krypteras innan den skrivs, så ingen kan öppna den utan ditt lösenord, inte ens den som lagrar den.",
+        "auto_backup_choose_folder": "Välj mapp",
+        "auto_backup_destination": "Mapp",
+        "auto_backup_last_run": "Senaste säkerhetskopia",
+        "auto_backup_run_now": "Säkerhetskopiera nu",
+        "wipe_auto_backup_note": "Automatiska säkerhetskopior som redan sparats i ”{{folder}}” raderas inte. De går inte längre att öppna, eftersom lösenordet också raderas. Ta bort dem själv om du vill bli av med dem.",
+        "pregnancy": "Graviditet",
+        "auto_backup_saved_to": "Säkerhetskopierad till {{folder}}"
     },
     "trends": {
         "header": "Insikter",
@@ -642,12 +668,13 @@
         "year": "1 år",
         "completed_cycles_note": "Den här sidan visar bara data från avslutade cykler. Din pågående cykel läggs till när nästa mens börjar.",
         "cycle_regularity": "Cykelregelbundenhet",
-        "average_label": "Medel: {{count}} dagar",
-        "regular": "Regelbunden",
-        "varying": "Varierande",
-        "irregular": "Oregelbunden",
+        "cycle_range": "{{min}} till {{max}} dagar, en spridning på {{spread}}",
+        "includes_withdrawal": "Inkluderar bortfallsblödningar, som inte är naturliga cykler.",
         "flow_pattern": "Blödningsmönster",
-        "last_3_periods_avg": "Medel 3 senaste",
+        "based_on_cycles_one": "Baserat på {{count}} cykel",
+        "based_on_cycles_other": "Baserat på {{count}} cykler",
+        "based_on_periods_one": "Baserat på {{count}} menstruation",
+        "based_on_periods_other": "Baserat på {{count}} menstruationer",
         "lighter": "Lättare",
         "heavier": "Kraftigare",
         "mood_by_phase": "Humör per fas",
@@ -681,7 +708,9 @@
         "pill_timeline": "Medicintidslinje",
         "pill_taken": "Piller taget",
         "pill_low": "Missat",
-        "pill_high": "Taget"
+        "pill_high": "Taget",
+        "pregnancy_note": "Cykeldiagrammen pausas under graviditeten och kommer tillbaka efter din första mens.",
+        "pregnancy_charts_paused": "Inget att visa än. Diagrammen räknar cykeldagar, och en graviditet har inga."
     },
     "timeline": {
         "header": "Tidslinje",
@@ -692,7 +721,8 @@
         "started": "Startade",
         "gap_hint": "Lucka i loggning – används ej för prognoser",
         "short_cycle_hint": "Cykel för kort (<18 dagar) – används ej för prognoser",
-        "show_more_count": "Visa mer historik ({{count}})"
+        "show_more_count": "Visa mer historik ({{count}})",
+        "pregnancy_hint": "Graviditet, används inte för prognoser"
     },
     "onboarding": {
         "trust": {

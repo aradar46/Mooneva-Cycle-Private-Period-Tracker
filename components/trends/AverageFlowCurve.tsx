@@ -19,20 +19,35 @@ const flowToValue = (flow: string | null | undefined): number => {
     }
 };
 
+/** How wide this period should make the chart. A record can span days that never bled
+ *  (a 14 day span with 3 bleeding days), and one sloppily logged 20 day span used to
+ *  stretch the whole chart to 20 columns. Stop at the last day that actually bled, and
+ *  never past the 10 day clamp the averages already use. */
+const bleedingSpan = (p: PeriodRecord): number => {
+    const last = p.activeDays?.length ? Math.max(...p.activeDays) + 1 : p.days;
+    return Math.min(Math.max(1, last), 10);
+};
+
 const AverageFlowCurve: React.FC<AverageFlowCurveProps> = ({ logs, periods }) => {
     const { t } = useTranslation();
-    // Get last 3 completed periods
+    // Every period in the selected range, newest first. The range comes from the caller;
+    // this used to take the last 3 periods whatever range was showing.
     const recentPeriods = useMemo(() => {
-        return [...periods]
-            .sort((a, b) => b.startDate.localeCompare(a.startDate))
-            .slice(0, 3);
+        return [...periods].sort((a, b) => b.startDate.localeCompare(a.startDate));
     }, [periods]);
+
+    // Kept, not filtered out: dropping them would leave a pill user with an empty chart.
+    // Said out loud instead, because a withdrawal bleed is not a period.
+    const hasWithdrawalBleeds = useMemo(
+        () => recentPeriods.some(p => p.isWithdrawalBleed),
+        [recentPeriods]
+    );
 
     // Calculate average intensity per day across periods
     const curveData = useMemo(() => {
         if (recentPeriods.length === 0) return [];
 
-        const maxDays = Math.max(...recentPeriods.map(p => p.days), 7);
+        const maxDays = Math.max(...recentPeriods.map(bleedingSpan), 7);
         const dayAverages: { day: number; avg: number; count: number }[] = [];
 
         for (let dayIdx = 0; dayIdx < maxDays; dayIdx++) {
@@ -124,7 +139,10 @@ const AverageFlowCurve: React.FC<AverageFlowCurveProps> = ({ logs, periods }) =>
         >
             <div className="flex flex-col gap-1 mb-4">
                 <h3 className="text-sm font-extrabold tracking-[0.15em] text-slate-800 uppercase">{t('trends.flow_pattern')}</h3>
-                <span className="text-xs font-medium text-slate-400">{t('trends.last_3_periods_avg')}</span>
+                <span className="text-xs font-medium text-slate-400">{t('trends.based_on_periods', { count: recentPeriods.length })}</span>
+                {hasWithdrawalBleeds && (
+                    <span className="text-[11px] font-medium text-slate-400">{t('trends.includes_withdrawal')}</span>
+                )}
             </div>
 
             <div className="relative">

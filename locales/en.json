@@ -45,8 +45,6 @@
         "navigation": "Navigation"
     },
     "whats_new": {
-        "title": "What's new",
-        "intro": "Since the last release:",
         "tip": "Mooneva is minimalist on the surface, but packed with powerful tools in <b>Settings</b>. Missing a feature? Look around: we update regularly and add requested ones."
     },
     "share_message": {
@@ -54,7 +52,7 @@
     },
     "notifications": {
         "title": "Notification Manager",
-        "discrete_mode_note": "While discrete mode is active, notifications use neutral, task-like wording.",
+        "discrete_mode_note": "While discrete mode is active, notifications use neutral wording and stay off the lock screen.",
         "section_action_needed": "Action Needed",
         "section_cycle_updates": "Cycle Updates",
         "section_period_ovulation": "Period & Ovulation",
@@ -128,7 +126,8 @@
         "next_period_days": "Next Period – {{count}} days left",
         "next_period_unknown": "Next period prediction",
         "permission_denied_message": "Notifications are disabled. Please enable them in your device settings to receive reminders.",
-        "exact_alarm_message": "Reminders may arrive late or not at all. Allow alarms & reminders in device settings for on-time delivery."
+        "exact_alarm_message": "Reminders may arrive late or not at all. Allow alarms & reminders in device settings for on-time delivery.",
+        "pill_reminder_discrete": "Reminder"
     },
     "nav": {
         "history": "History"
@@ -192,7 +191,9 @@
         "cycle_count_one": "{{count}} cycle",
         "cycle_count_other": "{{count}} cycles",
         "no_recent_data": "No recent data",
-        "log_to_resume": "Log a period to resume predictions"
+        "log_to_resume": "Log a period to resume predictions",
+        "pregnancy": "Pregnancy",
+        "pregnancy_week": "Week {{week}}"
     },
     "discrete": {
         "title": "My Tasks",
@@ -269,7 +270,9 @@
             "orphan_flow": "Flow (No Period)",
             "withdrawal_bleed": "Withdrawal Bleed (Pill Bleed)"
         },
-        "category_other": "Other"
+        "category_other": "Other",
+        "jump_to_month": "Jump to month",
+        "jump_close": "Close"
     },
     "cycle_insight": {
         "title": "Cycle insight",
@@ -414,15 +417,21 @@
         "withdrawal_bleed_desc": "Tag if on hormonal birth control (pill, ring, patch)",
         "withdrawal_tagged": "This period is tagged as a withdrawal bleed and will be excluded from natural cycle statistics.",
         "stats": "Statistics",
-        "ignore_averages_question": "Exclude from cycle averages?",
+        "ignore_averages_question": "Exclude from averages and charts?",
         "ignore_averages_desc": "For irregular cycles (stress, illness, etc.)",
-        "ignore_tagged": "This period will be excluded from cycle length calculations and averages.",
+        "ignore_tagged": "This period is excluded from your cycle averages and from the Insights charts.",
         "tap_to_edit": "Tap to Edit",
         "withdrawal_bleed_label": "Withdrawal Bleeding",
         "excluded_label": "Excluded",
         "day_x_of_y": "Day {{day}} of {{total}}",
         "no_period_advanced": "This date is not part of a period. Start or select a period day to access advanced options.",
-        "daily_log_tabs": "Daily log tabs"
+        "daily_log_tabs": "Daily log tabs",
+        "pregnancy": "Pregnancy",
+        "experimental": "Experimental, needs feedback",
+        "pregnancy_start_question": "Pregnancy started on this day?",
+        "pregnancy_start_desc": "Ends by itself when your next period starts",
+        "pregnancy_tagged": "This span will be shown as a pregnancy, not a tracking gap.",
+        "pregnancy_paused_note": "Predictions are paused, along with adaptive prediction, the fertile window and PMS. You can switch them back on in Settings."
     },
     "settings": {
         "community_care": "Community & Care",
@@ -506,6 +515,7 @@
         "repeat_pin": "Repeat PIN",
         "enable_pin": "Enable PIN",
         "pin_security_desc": "Your health data is encrypted on this device. This PIN controls access to the app.",
+        "pin_forgot_hint": "Forgot your PIN? If you have a backup file, reinstall Mooneva and restore it. Without a backup, reinstalling erases your data.",
         "pin_unlock_prompt": "Enter your PIN (4-12 digits)",
         "pin_placeholder": "4-12 digit PIN",
         "pin_exit_discrete_prompt": "Enter your PIN to exit discrete mode",
@@ -514,6 +524,7 @@
         "enter_password": "Enter password",
         "repeat_password": "Repeat password",
         "pins_dont_match": "PINs do not match.",
+        "passwords_dont_match": "Passwords do not match.",
         "wipe_confirm": "Are you sure?",
         "feedback_title": "Help us build something you love",
         "feedback_desc": "Found a bug, have a feature idea, or spotted a translation that's off? Tell us in 30 seconds.",
@@ -601,7 +612,7 @@
         "report_footer_new": "Mooneva Cycle: private period tracker",
         "birth_control_sub_desc": "Hide fertility, tag bleeds as withdrawal",
         "birth_control_pill_hint": "Best for combined pill, ring, or patch users.",
-        "pause_predictions_full_desc": "Pause all predictions (pregnancy, irregular, etc.), e.g. in case of pregnancy or when you prefer not to see estimates.",
+        "pause_predictions_full_desc": "Hides period, ovulation and PMS estimates until you switch it back on.",
         "adaptive_prediction_label": "Adaptive Prediction",
         "adaptive_prediction_desc_long": "Averages last 3 cycles to predict cycle length",
         "cycle_length_label": "Cycle Length",
@@ -610,6 +621,9 @@
         "period_length_desc": "Typical bleeding days",
         "luteal_phase_label": "Luteal Phase",
         "luteal_phase_desc": "Days from ovulation to period",
+        "kid_mode_section": "Kid Mode",
+        "kid_mode_label": "Kid Mode",
+        "kid_mode_desc": "Hides things that are not needed for now.",
         "fertility_pms_section": "Fertility & PMS",
         "pms_window_section": "PMS Window",
         "cycle_config_section": "Cycle Configuration",
@@ -623,7 +637,19 @@
         "report_range_from": "From date",
         "report_range_to": "To date",
         "report_range_max": "Max 12 months",
-        "report_share_failed": "Failed to share PDF. Try a shorter date range."
+        "report_share_failed": "Failed to share PDF. Try a shorter date range.",
+        "auto_backup": "Automatic backup",
+        "auto_backup_subtitle": "Encrypted, to a folder you choose. Runs at most once a day.",
+        "auto_backup_enable": "Back up automatically",
+        "auto_backup_password_warning": "Choose a password and keep it somewhere safe. This is not your PIN. Automatic backups are encrypted with it, and without it your data cannot be recovered. There is no way to reset it.",
+        "auto_backup_sync_tip": "Tip: pick a folder another app keeps in sync (Drive, Dropbox, Nextcloud, iCloud, Syncthing) and your backups survive a lost or broken phone. Mooneva Cycle has no internet access of its own, and the file is encrypted before it is written, so nobody can open it without your password, not even whoever stores it.",
+        "auto_backup_choose_folder": "Choose folder",
+        "auto_backup_destination": "Folder",
+        "auto_backup_last_run": "Last backup",
+        "auto_backup_run_now": "Back up now",
+        "wipe_auto_backup_note": "Automatic backup files already saved to \"{{folder}}\" are not deleted. They can no longer be opened, because the password is erased too. Delete them yourself if you want them gone.",
+        "pregnancy": "Pregnancy",
+        "auto_backup_saved_to": "Backed up to {{folder}}"
     },
     "trends": {
         "header": "Insights",
@@ -642,12 +668,13 @@
         "year": "1 Year",
         "completed_cycles_note": "This page only shows completed cycles data. Your current cycle is added once your next period starts.",
         "cycle_regularity": "Cycle Regularity",
-        "average_label": "Average: {{count}} days",
-        "regular": "Regular",
-        "varying": "Varying",
-        "irregular": "Irregular",
+        "cycle_range": "{{min}} to {{max}} days, a spread of {{spread}}",
+        "includes_withdrawal": "Includes withdrawal bleeds, which are not natural cycles.",
         "flow_pattern": "Flow Pattern",
-        "last_3_periods_avg": "Average of last 3 periods",
+        "based_on_cycles_one": "Based on {{count}} cycle",
+        "based_on_cycles_other": "Based on {{count}} cycles",
+        "based_on_periods_one": "Based on {{count}} period",
+        "based_on_periods_other": "Based on {{count}} periods",
         "lighter": "Lighter",
         "heavier": "Heavier",
         "mood_by_phase": "Mood by Phase",
@@ -681,7 +708,9 @@
         "pill_timeline": "Meds Timeline",
         "pill_taken": "Pill taken",
         "pill_low": "Missed",
-        "pill_high": "Taken"
+        "pill_high": "Taken",
+        "pregnancy_note": "Cycle charts pause during pregnancy and come back after your first period.",
+        "pregnancy_charts_paused": "Nothing to show yet. These charts count days of your cycle, and a pregnancy has none."
     },
     "timeline": {
         "header": "Timeline",
@@ -692,7 +721,8 @@
         "started": "Started",
         "gap_hint": "Tracking gap – not used for predictions",
         "short_cycle_hint": "Cycle too short (<18 days) – not used for predictions",
-        "show_more_count": "Show More History ({{count}})"
+        "show_more_count": "Show More History ({{count}})",
+        "pregnancy_hint": "Pregnancy, not used for predictions"
     },
     "onboarding": {
         "trust": {

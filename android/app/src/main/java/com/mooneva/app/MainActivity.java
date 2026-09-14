@@ -9,6 +9,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(AppIconPlugin.class);
         registerPlugin(ExactAlarmPlugin.class);
         registerPlugin(WidgetSyncPlugin.class);
+        registerPlugin(BackupFolderPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

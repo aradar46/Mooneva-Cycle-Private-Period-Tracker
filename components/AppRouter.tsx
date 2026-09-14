@@ -16,7 +16,7 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { NotificationManagerScreen } from './screens/NotificationManagerScreen';
 
 type PendingPinAction = 'exitDiscreteMode' | null;
-const WHATS_NEW_VERSION = '2.4.0';
+const WHATS_NEW_VERSION = '2.5.0';
 const WHATS_NEW_STORAGE_KEY = `mooneva_whats_new_seen_${WHATS_NEW_VERSION}`;
 
 export const AppRouter = () => {
@@ -30,7 +30,7 @@ export const AppRouter = () => {
     const { completeOnboarding } = actions;
 
     // --- Navigation & Theme Hooks ---
-    const { view, setView, subView, setSubView, previousView } = useAppNavigation();
+    const { view, setView, subView, setSubView, openSubViewFrom, closeSubView, previousView } = useAppNavigation();
     useAppTheme({ view, discreteMode: !!settings.discreteMode, darkNeumorphism: !!settings.darkNeumorphism });
     useAppReview();
 
@@ -108,7 +108,7 @@ export const AppRouter = () => {
 
     const content = (() => {
         if (view === 'settings') {
-            return <SettingsScreen subView={subView} setSubView={setSubView} setView={setView} isCloaked={settings.discreteMode} />;
+            return <SettingsScreen subView={subView} setSubView={setSubView} closeSubView={closeSubView} setView={setView} isCloaked={settings.discreteMode} />;
         }
 
         if (view === 'notifications') {
@@ -123,6 +123,7 @@ export const AppRouter = () => {
             <CalendarScreen
                 setSubView={setSubView}
                 setView={setView}
+                openSubViewFrom={openSubViewFrom}
                 isCloaked={settings.discreteMode}
                 onRequestExitDiscreteMode={requestExitDiscreteMode}
             />

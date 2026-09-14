@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DailyLog, AppSettings, INITIAL_SYMPTOMS, PeriodRecord } from '../types';
-import { loadData, saveData, loadSettings, saveSettings, loadPeriods, savePeriods, findNearbyPeriod, MIN_GAP_DAYS, cleanupStaleBackupFiles, DEFAULT_SETTINGS } from '../services/logic';
+import { loadData, saveData, loadSettings, saveSettings, loadPeriods, savePeriods, findNearbyPeriod, findActivePeriod, isDateInPeriod, MIN_GAP_DAYS, cleanupStaleBackupFiles, DEFAULT_SETTINGS } from '../services/logic';
 import { addDays, diffInDays } from '../utils/dateUtils';
 import { hasDailyLogContent } from '../utils/dailyLogContent';
 import { hashPin } from '../utils/pin';
@@ -18,14 +18,10 @@ interface UsePersistenceResult {
     loading: boolean;
     loadError: boolean;
     updateLog: (date: string, data: DailyLog) => Promise<void>;
-    bulkUpdateLogs: (updates: Record<string, DailyLog>) => Promise<void>;
-    deleteLog: (date: string) => Promise<void>;
     updateSettings: (newSettings: AppSettings) => void;
 
     // Onboarding logic moved to Context
     startPeriod: (startDate: string, days?: number, isWithdrawalBleed?: boolean) => Promise<void>;
-    editPeriod: (id: string, days: number) => Promise<void>;
-    deletePeriod: (id: string) => Promise<void>;
     toggleBleedingDay: (date: string, effectivePeriodLength?: number) => Promise<void>;
     updatePeriodWithdrawalBleed: (id: string, isWithdrawalBleed: boolean) => Promise<void>;
     updatePeriodIgnoreForAverages: (id: string, ignoreForAverages: boolean) => Promise<void>;
@@ -257,10 +253,7 @@ export const usePersistence = (): UsePersistenceResult => {
                 let changed = false;
 
                 // Check if date is inside an existing period span (gap day case)
-                const pIdx = updated.findIndex(p => {
-                    const end = addDays(p.startDate, p.days - 1);
-                    return date >= p.startDate && date <= end;
-                });
+                const pIdx = updated.findIndex(p => isDateInPeriod(p, date));
 
                 if (pIdx !== -1) {
                     const p = updated[pIdx];
@@ -340,23 +333,6 @@ export const usePersistence = (): UsePersistenceResult => {
         }
     }, [logs, settings.periodLength, settings.isOnBirthControl]);
 
-    const bulkUpdateLogs = useCallback(async (updates: Record<string, DailyLog>) => {
-        setLogs(prev => {
-            const newLogs = { ...prev, ...updates };
-
-            return newLogs;
-        });
-    }, []);
-
-    const deleteLog = useCallback(async (date: string) => {
-        setLogs(prev => {
-            const newLogs = { ...prev };
-            delete newLogs[date];
-
-            return newLogs;
-        });
-    }, []);
-
     const updateSettingsWrapper = useCallback((newSettings: AppSettings) => {
         setSettings(newSettings);
         persistSettings(newSettings).catch(err => Logger.error('Failed to persist settings:', err));
@@ -383,14 +359,6 @@ export const usePersistence = (): UsePersistenceResult => {
         });
     }, [settings.periodLength, settings.isOnBirthControl]);
 
-    const editPeriod = useCallback(async (id: string, days: number) => {
-        setPeriods(prev => {
-            const updated = prev.map(p => p.id === id ? { ...p, days } : p);
-            const resolved = sortPeriods(updated);
-            return resolved;
-        });
-    }, []);
-
     const updatePeriodWithdrawalBleed = useCallback(async (id: string, isWithdrawalBleed: boolean) => {
         setPeriods(prev => {
             const updated = prev.map(p => p.id === id ? { ...p, isWithdrawalBleed } : p);
@@ -407,17 +375,10 @@ export const usePersistence = (): UsePersistenceResult => {
         });
     }, []);
 
-    const deletePeriod = useCallback(async (id: string) => {
-        const target = periodsRef.current.find(item => item.id === id);
-        if (target) clearFlowOnDates(periodFlowDates(target));
-        setPeriods(prev => prev.filter(item => item.id !== id));
-    }, [clearFlowOnDates]);
-
     const toggleBleedingDay = useCallback(async (date: string, effectivePeriodLength?: number) => {
         // Same lookup the updater does below, run against the current periods so the
         // log clearing can happen outside it. Both read the same array, so they agree.
-        const containing = periodsRef.current.find(p =>
-            date >= p.startDate && date <= addDays(p.startDate, p.days - 1));
+        const containing = findActivePeriod(periodsRef.current, date);
         if (containing) {
             const dayIdx = diffInDays(date, containing.startDate);
             const activeDays = containing.activeDays
@@ -431,10 +392,7 @@ export const usePersistence = (): UsePersistenceResult => {
         setPeriods(prev => {
             let updated = [...prev];
 
-            const pIdx = updated.findIndex(p => {
-                const end = addDays(p.startDate, p.days - 1);
-                return date >= p.startDate && date <= end;
-            });
+            const pIdx = updated.findIndex(p => isDateInPeriod(p, date));
 
             if (pIdx !== -1) {
                 const p = updated[pIdx];
@@ -569,13 +527,9 @@ export const usePersistence = (): UsePersistenceResult => {
         loading,
         loadError,
         updateLog,
-        bulkUpdateLogs,
-        deleteLog,
         updateSettings: updateSettingsWrapper,
         periods,
         startPeriod,
-        editPeriod,
-        deletePeriod,
         toggleBleedingDay,
         updatePeriodWithdrawalBleed,
         updatePeriodIgnoreForAverages,

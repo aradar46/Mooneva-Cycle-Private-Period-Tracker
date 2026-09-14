@@ -25,11 +25,11 @@ export const WhatsNewModal: React.FC<WhatsNewModalProps> = ({ onClose }) => {
         {/* Release notes are intentionally English-only and hard-coded -- see RELEASE.md.
             Replace this list every release; do not add these strings to the locale files. */}
         <ul className="mt-3 list-disc space-y-1.5 pl-5 text-xs sm:text-sm leading-relaxed text-slate-600">
-          <li><strong>Cycle phase insights:</strong> tap the rotating moon.</li>
-          <li><strong>Hide the fertility level</strong> while still showing the fertility window—explore Settings.</li>
-          <li><strong>Need more symptoms?</strong> We added some.</li>
-          <li><strong>Mooneva is more secure.</strong></li>
-          <li><strong>Translation fixes and more.</strong></li>
+          <li><strong>Automatic encrypted backups.</strong> Pick a folder once in Settings and the app backs itself up, or tap the new button on the calendar to back up now.</li>
+          <li><strong>Log a pregnancy.</strong> Open the day it started, tap Advanced. The calendar marks the whole span and it ends by itself when your period returns.</li>
+          <li><strong>Kid Mode.</strong> Hides the Sex &amp; Libido sections everywhere, including the exported report. In Settings.</li>
+          <li><strong>Jump to any month</strong> by tapping the month name.</li>
+          <li><strong>Persian text and trend charts fixed.</strong></li>
         </ul>
 
         <p dir="auto" className="mt-5 rounded-2xl bg-[#F0F4F6] px-4 py-3.5 text-center text-xs sm:text-sm leading-relaxed text-slate-600">
